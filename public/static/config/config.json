@@ -1,0 +1,5 @@
+{
+  "url": "http://192.168.1.194:8013",
+  "yunUrl": "http://192.168.1.194:8007",
+  "updateFile": "http://192.168.1.194:8044/api/MallFileManage/UpLoadFilesSec"
+}

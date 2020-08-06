@@ -1,0 +1,280 @@
+<template>
+  <div class="screensaver-content">
+    <!--  面包屑  -->
+    <el-breadcrumb separator="/">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
+    </el-breadcrumb>
+
+    <el-card class="box-card">
+      <p class="from-p">
+        屏保时间
+        <span>
+          <el-input-number v-model="list.time" :min="1" label="描述文字"></el-input-number>
+          秒
+        </span>
+      </p>
+      <el-divider></el-divider>
+      <p>图标设置</p>
+      <div class="style-div">
+        <div class="style-item" @click="clickStyle(index)" v-for="(item,index) of styleData"
+             :class="{'style-active' : active == index}">
+          <p class="style-title">{{item.title}}</p>
+          <div class="item-div">
+            <img v-show="item.img" :src="item.img" alt="">
+          </div>
+          <i class="el-icon-circle-check"></i>
+        </div>
+        <div class="style-item" @click="clickStyle(6)" :class="{'style-active' : active == 6}">
+          <p class="style-title">提示图标样式自定义</p>
+          <div class="item-div">
+            <div @click.stop="">
+              <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              <el-upload
+                      v-else
+                      class="avatar-uploader"
+                      :action="config.updateFile"
+                      :show-file-list="false"
+                      :on-success="handleAvatarSuccess"
+                      :before-upload="beforeAvatarUpload">
+                <i class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+            </div>
+          </div>
+          <i class="el-icon-circle-check"></i>
+        </div>
+      </div>
+      <p>图标效果</p>
+      <p class="radio-p">
+        <el-radio v-for="item of effectType" v-model="list.effectType" :label="item.value">{{item.label}}</el-radio>
+      </p>
+      <div class="radio-p">
+        <p v-show="list.effectType == 0">
+          <el-radio v-for="item of screenEffect[0]" v-model="list.screenEffect" :label="item.value">{{item.label}}
+          </el-radio>
+        </p>
+        <p v-show="list.effectType == 1">
+          <el-radio v-for="item of screenEffect[1]" v-model="list.screenEffect" :label="item.value">{{item.label}}
+          </el-radio>
+        </p>
+      </div>
+      <p class="button-p">
+        <el-button type="primary" @click="clickSubmit">确定</el-button>
+      </p>
+    </el-card>
+  </div>
+</template>
+
+<script>
+	import {mapGetters} from 'vuex'
+	import {
+		GetScreensaver,
+		SetScreensaver,
+	} from 'http/api/system'
+	import {ERR_OK} from 'http/config'
+
+	export default {
+		name: "screensaver",
+		data() {
+			return {
+				num: 30,
+				styleData: [
+					{
+						title: '无提示图标',
+						img: ''
+					},
+					{
+						title: '提示图标样式一',
+						img: require('../../common/images/touch1.gif')
+					},
+					{
+						title: '提示图标样式二',
+						img: require('../../common/images/touch2.gif')
+					},
+					{
+						title: '提示图标样式三',
+						img: require('../../common/images/touch3.gif')
+					},
+					{
+						title: '提示图标样式四',
+						img: require('../../common/images/touch4.gif')
+					},
+				],
+				active: -1,
+				imageUrl: '',
+				list: {},
+				effectType: [{label: '固定位置', value: 0}, {label: '自由运动', value: 1}],
+				screenEffect: [
+					[{label: '右下角显示', value: 0}, {label: '居中显示', value: 1}],
+					[{label: '左右移动', value: 0}, {label: '随机移动', value: 1}]
+				],
+			}
+		},
+		created() {
+			this.GetScreensaver()
+		},
+		methods: {
+			/**
+			 * 网络请求
+			 * @param val
+			 */
+			GetScreensaver() {
+				const param = {
+					MallCode: this.user.mallCode,
+				}
+				GetScreensaver(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.list = res.data
+						this.active = this.list.screenType
+						this.imageUrl = this.list.screenFilePath
+					}
+				})
+			},
+			SetScreensaver(param) {
+				SetScreensaver(param).then(res => {
+					this.$message.success(res.msg);
+					if (res.code === ERR_OK) {
+						this.GetScreensaver()
+					}
+				})
+			},
+			/**
+			 * End
+			 */
+			clickStyle(index) {
+				this.active = index
+			},
+			clickSubmit() {
+				const param = {
+					"Time": this.list.time,
+					"ScreenType": this.active,
+					"ScreenFile": this.list.screenFile,
+					"ScreenEffect": this.list.screenEffect,
+					"EffectType": this.list.effectType
+				}
+				this.SetScreensaver(param);
+			},
+			handleAvatarSuccess(res, file) {
+				if (res.code === '200') {
+					this.imageUrl = URL.createObjectURL(file.raw);
+					this.list.screenFile = res.data.fileGuid;
+					// this.list.screenFile = res.data.code;
+				} else {
+					this.$message.error('上传失败!');
+				}
+			},
+			beforeAvatarUpload(file) {
+				const isLt2M = file.size / 1024 / 1024 < 10;
+        const type = ['image/jpg','image/png','image/jpeg']
+
+        if (type.indexOf(file.type) === -1) {
+          this.$message.error('上传图片只能是 jpg、png格式!');
+          return false
+        }
+				if (!isLt2M) {
+					this.$message.error('上传图片大小不能超过 10MB!');
+					return false
+				}
+			},
+		},
+		computed: {
+			...mapGetters(['config', 'user',"config"])
+		}
+	}
+</script>
+
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 60px;
+    height: 60px;
+    display: block;
+  }
+</style>
+<style scoped lang="scss">
+  .box-card {
+    margin-top: 40px;
+  }
+
+  .from-p {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .style-div {
+    display: flex;
+    justify-content: space-between;
+
+    .style-item {
+      width: 216px;
+      text-align: center;
+
+      .style-title {
+        line-height: 50px;
+      }
+
+      .item-div {
+        border: 1px solid #ddd;
+        height: 384px;
+        width: 216px;
+        position: relative;
+
+        img {
+          display: block;
+          width: 60px;
+          height: 60px;
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+        }
+      }
+
+      .el-icon-circle-check {
+        line-height: 50px;
+        font-size: 25px;
+        color: #ddd;
+      }
+    }
+
+    .style-active {
+      .item-div {
+        border: 1px solid #409EFF;
+      }
+
+      .el-icon-circle-check {
+        color: #409EFF;
+      }
+    }
+  }
+
+  .radio-p {
+    margin: 10px 0;
+  }
+
+  .button-p {
+    text-align: center;
+  }
+</style>

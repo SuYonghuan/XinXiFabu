@@ -1,0 +1,562 @@
+<template>
+  <div class="deptManager-content">
+
+    <!--  面包屑  -->
+    <el-breadcrumb separator="/">
+      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>信息管理</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
+    </el-breadcrumb>
+
+    <!--  搜索  -->
+    <el-form :inline="true" :model="search" class="demo-form-inline">
+      <el-form-item label="店铺名称">
+        <el-input v-model="search.Name" placeholder="店铺名称"></el-input>
+      </el-form-item>
+      <el-form-item label="楼栋">
+        <el-select v-model="search.BuildingCode" placeholder="请选择" @change="changeBuilding1()">
+          <el-option v-for="item in buildingList" :label="item.name" :value="item.code"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="楼层">
+        <el-select v-model="search.FloorCode" placeholder="请选择">
+          <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="业态">
+        <el-select v-model="search.ShopFormatCode" placeholder="请选择">
+          <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="onSearch">查询</el-button>
+        <el-button @click="replaySearch">清空</el-button>
+      </el-form-item>
+      <el-form-item class="right-button">
+        <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
+        <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出
+        </el-button>
+      </el-form-item>
+    </el-form>
+
+    <!--  表格  -->
+    <el-table :data="tableData" style="width: 100%;">
+      <el-table-column prop="name" label="店铺名称"></el-table-column>
+      <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
+      <el-table-column prop="floorName" label="所属楼层"></el-table-column>
+      <el-table-column prop="houseNum" label="门牌号"></el-table-column>
+      <el-table-column prop="phone" label="联系方式"></el-table-column>
+      <el-table-column label="启用状态">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.isShow" v-if="pageMenu.changeShopStatus"
+                     @change="changeShow(scope.row)"></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editShop">编辑</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delShop">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!--  分页  -->
+    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                @handleCurrentChange="handleCurrentChange"></pagination>
+
+    <!--  新增  -->
+    <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :close-on-click-modal="false"
+               :before-close="handleClose" append-to-body>
+      <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
+        <el-form-item label="商铺名称" prop="name">
+          <el-input type="text" v-model="editForm.name" class="" style="width: 40%" placeholder="请输入中文商铺名称"></el-input>
+          <el-input type="text" v-model="editForm.nameEn" style="width: 40%;margin-left: 10px;"
+                    placeholder="请输入英文商铺名称"></el-input>
+        </el-form-item>
+        <el-form-item label="所属业态" prop="shopFormat">
+          <el-select v-model="editForm.shopFormat" placeholder="请选择业态" @change="changeFormat()">
+            <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
+          </el-select>
+          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态">
+            <el-option v-for="item in formatInfo.child" :label="item.name" :value="item.code"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属楼栋楼层" prop="floorCode">
+          <el-select v-model="editForm.buildingCode" placeholder="请选择楼栋" @change="changeBuilding()">
+            <el-option v-for="item in buildingList" :label="item.name" :value="item.code"></el-option>
+          </el-select>
+          <el-select v-model="editForm.floorCode" style="margin-left: 10px;" placeholder="请选择楼层">
+            <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="门牌号" prop="houseNum">
+          <el-input type="text" v-model="editForm.houseNum" class="" placeholder="请输入门牌号"></el-input>
+        </el-form-item>
+        <el-form-item label="联系方式" prop="phone">
+          <el-input type="text" v-model="editForm.phone" class="" placeholder="请输入联系方式"></el-input>
+        </el-form-item>
+        <el-form-item label="营业时间" prop="businessHours">
+          <el-input type="text" v-model="editForm.businessHours" class="" placeholder="请输入营业时间"></el-input>
+        </el-form-item>
+        <el-form-item label="商铺LOGO" prop="logo">
+          <el-upload
+                  class="avatar-uploader"
+                  :action="config.updateFile"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="简介" prop="intro">
+          <el-input type="textarea" style="width: 40%;" rows="5" v-model="editForm.intro"
+                    placeholder="请输入中文简介"></el-input>
+          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5"
+                    v-model="editForm.introEn" placeholder="请输入英文简介"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose('editForm')">取 消</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+	import pagination from 'components/pagination/pagination'
+	import transferView from 'components/transfer-view/transfer-view'
+	import {
+		GetRolePermissions,
+		PageShopList,
+		GetBuildingList,
+		GetShopFormatList,
+		GetShopFormatInfo,
+		GetFloorList,
+		ShopAdd,
+		GetShopInfo,
+		ShopEdit,
+		ShopDel,
+		ChangeShopStatus,
+		QueryShopList,
+	} from 'http/api/mall'
+	import {ERR_OK} from 'http/config'
+	import {mapGetters} from 'vuex'
+
+	export default {
+		name: "deptManager",
+		data() {
+			return {
+				search: {
+					"Name": '',
+					"FloorCode": '',
+					"BuildingCode": '',
+					"ShopFormatCode": '',
+				},
+				tableData: [],
+				total: 0,
+				currentPage: 0,
+				pageSize: 10,
+				dialogVisible: false,
+				dialogVisibleDevice: false,
+				dialogTitle: '新增',
+				editForm: {},
+				tableChecked: [],
+				deviceForm: {},
+				rules: {
+					name: [{required: true, message: '请输入商铺名称', trigger: 'blur'}],
+					shopFormat: [{required: true, message: '请选择所属业态', trigger: 'blur'}],
+					floorCode: [{required: true, message: '请选择所属楼层', trigger: 'blur'}],
+					houseNum: [{required: true, message: '请输入商铺编号', trigger: 'blur'}],
+					logo: [{required: true, message: '请上传logo信息', trigger: 'blur'}],
+				},
+				building: [
+					{label: '1栋', value: '1'},
+					{label: '2栋', value: '2'}
+				],
+				imageUrl: '',
+				pageMenu: {},
+				buildingList: [],
+				formatList: [],
+				formatInfo: {},
+				floorList: [],
+				excelData: [],
+			}
+		},
+		created() {
+			this.GetRolePermissions()
+			this.GetBuildingList()
+			this.GetShopFormatList()
+		},
+		methods: {
+			/**
+			 * 网络请求
+			 * @param val
+			 */
+			GetRolePermissions() {
+				const param = {
+					MenuCode: this.presentMenu.code,
+				}
+				GetRolePermissions(param).then(res => {
+					if (res.code === ERR_OK) {
+						for (let a = 0; a < res.data.length; a++) {
+							this.pageMenu[res.data[a].actionId] = true;
+						}
+						this.getList()
+						// console.log(this.pageMenu)
+					}
+				})
+			},
+			getList(pageSize, page) {
+				const param = {
+					"Name": this.search.Name,
+					"FloorCode": this.search.FloorCode,
+					"BuildingCode": this.search.BuildingCode,
+					"ShopFormatCode": this.search.ShopFormatCode,
+					"MallCode": this.user.mallCode,
+					"UserName": this.user.accountName,
+					"Paging": 1,
+					"PageIndex": page,
+					"PageSize": pageSize
+				}
+				PageShopList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.tableData = res.data.list
+						this.total = res.data.allCount
+						// console.log(this.tableData)
+					}
+				})
+			},
+			GetBuildingList() {
+				const param = {"MallCode": this.user.mallCode}
+				GetBuildingList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.buildingList = res.data
+					}
+				})
+			},
+			GetShopFormatList() {
+				const param = {"MallCode": this.user.mallCode}
+				GetShopFormatList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.formatList = res.data
+					}
+				})
+			},
+			GetShopFormatInfo(code) {
+				const param = {
+					"Code": code
+				}
+				GetShopFormatInfo(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.formatInfo = res.data
+					}
+				})
+			},
+			GetFloorList(code) {
+				const param = {
+					"Code": code
+				}
+				GetFloorList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.floorList = res.data
+					}
+				})
+			},
+			ShopAdd(param) {
+				ShopAdd(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.handleClose()
+						this.$message.success(res.msg);
+						this.getList()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
+			ShopEdit(param) {
+				ShopEdit(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.handleClose()
+						this.$message.success(res.msg);
+						this.getList()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
+			ChangeShopStatus(param) {
+				ChangeShopStatus(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.$message.success(res.msg);
+						this.getList()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
+			GetShopInfo(code) {
+				const param = {"code": code}
+				GetShopInfo(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.editForm = res.data
+						this.imageUrl = res.data.logoPath
+						this.GetShopFormatInfo(res.data.shopFormat)
+						this.GetFloorList(res.data.buildingCode)
+					}
+				})
+			},
+			ShopDel(param) {
+				ShopDel(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.$message.success(res.msg);
+						this.getList()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
+			QueryShopList() {
+				const param = {
+					"Name": this.search.Name,
+					"FloorCode": this.search.FloorCode,
+					"BuildingCode": this.search.BuildingCode,
+					"ShopFormatCode": this.search.ShopFormatCode,
+					"MallCode": this.user.mallCode,
+					"UserName": this.user.accountName,
+					"Paging": 1,
+					"PageIndex": 1,
+					"PageSize": 10
+				}
+				QueryShopList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.excelData = res.data
+						this.export2Excel()
+					}
+				})
+			},
+			/**
+			 * End
+			 * @param val
+			 */
+
+			//当前页码
+			handleCurrentChange(val) {
+				this.currentPage = val;
+				this.getList(this.pageSize, val)
+			},
+			//搜索
+			onSearch() {
+				this.currentPage = 1
+				this.getList(this.pageSize, this.currentPage, this.search)
+			},
+			//重置搜索
+			replaySearch() {
+				this.search = {}
+				this.currentPage = 1
+				this.getList(this.pageSize, this.currentPage)
+			},
+			//打开弹窗
+			handleEdit(item) {
+				this.dialogVisible = true
+				if (JSON.stringify(item) != '{}') {
+					this.GetShopInfo(item.code)
+					this.dialogTitle = '编辑'
+				}
+			},
+			//分配设备
+			handleEditDevice() {
+				this.dialogVisibleDevice = true
+			},
+			//关闭弹窗
+			handleClose() {
+				this.dialogVisible = false
+				this.dialogVisibleDevice = false
+				this.$refs["editForm"].resetFields()
+				this.editForm = {}
+				this.formatInfo = {}
+				this.floorList = []
+			},
+			//提交
+			submitUpForm(item) {
+				this.$refs[item].validate(valid => {
+					if (valid) {
+						const param = {
+							"Code": "",
+							"ShopFormat": this.editForm.shopFormat,
+							"SecFormat": this.editForm.secFormat,
+							"BuildingCode": this.editForm.buildingCode,
+							"FloorCode": this.editForm.floorCode,
+							"Name": this.editForm.name,
+							"NameEn": this.editForm.nameEn,
+							"HouseNum": this.editForm.houseNum,
+							"Phone": this.editForm.phone,
+							"OpenTime": "",
+							"BusinessHours": this.editForm.businessHours,
+							"Logo": this.editForm.logo,
+							"Haswifi": 0,
+							"SupportQueuing": 0,
+							"Intro": this.editForm.intro,
+							"FileID": "",
+							"AreaCode": "",
+							"IntroEN": this.editForm.introEn,
+							"MallCode": this.user.mallCode,
+							"UserName": this.user.accountName,
+							"BrandCode": ""
+						}
+
+						if (this.editForm.code) {
+							param.Code = this.editForm.code
+							this.ShopEdit(param)
+							return
+						}
+						this.ShopAdd(param)
+					}
+				})
+			},
+			//删除
+			handleDelete(item) {
+				this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+					confirmButtonText: "确定",
+					cancelButtonText: "取消",
+					type: "warning"
+				}).then(() => {
+					const param = {"Code": item.code}
+					this.ShopDel(param)
+				}).catch(() => {
+					this.$message({
+						type: 'info',
+						message: '已取消删除'
+					});
+				});
+			},
+			//上传图片
+			handleAvatarSuccess(res, file) {
+				if (res.code === '200') {
+					this.imageUrl = URL.createObjectURL(file.raw);
+					this.editForm.logo = res.data.fileGuid;
+				} else {
+					this.$message.error('上传失败!');
+				}
+			},
+			beforeAvatarUpload(file) {
+				const isLt2M = file.size / 1024 / 1024 < 10;
+				const type = ['image/jpg', 'image/png', 'image/jpeg']
+
+				if (type.indexOf(file.type) === -1) {
+					this.$message.error('上传图片只能是 jpg、png格式!');
+					return false
+				}
+				if (!isLt2M) {
+					this.$message.error('上传图片大小不能超过 10MB!');
+					return false
+				}
+			},
+			//选中业态
+			changeFormat() {
+				this.formatInfo = {}
+				this.GetShopFormatInfo(this.editForm.shopFormat)
+			},
+			//选中楼栋
+			changeBuilding() {
+				this.floorList = []
+				this.GetFloorList(this.editForm.buildingCode)
+			},
+			//选中楼栋
+			changeBuilding1() {
+				this.floorList = []
+				this.GetFloorList(this.search.BuildingCode)
+			},
+			//修改启用状态
+			changeShow(item) {
+				const param = {
+					"Code": item.code,
+					"IsShow": item.isShow,
+					"UserName": this.user.accountName
+				}
+				this.ChangeShopStatus(param)
+			},
+			//导出excel
+			handleExcel() {
+				this.QueryShopList();
+			},
+			export2Excel() {
+				require.ensure([], () => {
+					const {export_json_to_excel} = require('../../vendor/Export2Excel');
+					//头
+					const tHeader = ['店铺名称', '所属业态', '所属楼层', '门牌号', '联系方式'];
+					//对应的标签
+					const filterVal = ['name', 'shopFormat', 'floorName', 'houseNum', 'phone'];
+					//标签对应的内容  是一个数组结构
+					const list = this.excelData;
+					//一个方法 我也不知道干嘛的
+					const data = this.formatJson(filterVal, list);
+					export_json_to_excel(tHeader, data, '店铺数据');
+				})
+			},
+			formatJson(filterVal, jsonData) {
+				return jsonData.map(v => filterVal.map(j => v[j]))
+			},
+		},
+		computed: {
+			...mapGetters(['presentMenu', 'user', 'config'])
+		},
+		components: {
+			pagination,
+			transferView,
+		},
+
+	}
+</script>
+
+<style>
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
+
+  .el-dialog {
+    margin-top: 5vh !important;
+  }
+</style>
+<style scoped lang="scss">
+  .demo-form-inline {
+    margin-top: 40px;
+
+    .right-button {
+      float: right;
+    }
+  }
+
+  .page-div {
+    margin-top: 20px;
+  }
+
+  .time-tag {
+    margin: 2px;
+    cursor: pointer;
+  }
+</style>
