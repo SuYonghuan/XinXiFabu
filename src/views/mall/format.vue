@@ -75,7 +75,7 @@
             <el-form-item label="业态图标" prop="iconFile">
               <el-upload
                       class="avatar-uploader"
-                      :action="config.updateFile"
+                      :action="config.yunUpdateFile"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload">

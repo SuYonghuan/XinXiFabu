@@ -96,7 +96,7 @@ export const GetModuleList = (param) =>
 
 //获取时间轴
 export const getTimeAxis = (param) =>
-	post(`${store.state.config.url}/api/TimeAxis/GetInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/GetInfo"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/TimeAxis/GetInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/GetInfo"))}&time=${timeStamp()}`,param)
 
 //获取素材到期提醒
 export const GetProgramMonitor = (param) =>
@@ -108,11 +108,11 @@ export const SettingProgramMonitor = (param) =>
 
 //设置时间段
 export const SetTimeAxis = (param) =>
-	post(`${store.state.config.url}/api/TimeAxis/SetTimeAxis?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/SetTimeAxis"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/TimeAxis/SetTimeAxis?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/SetTimeAxis"))}&time=${timeStamp()}`,param)
 
 //设置时间段开放商家
 export const setTimeRelate = (param) =>
-	post(`${store.state.config.url}/api/TimeAxis/setTimeRelate?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/setTimeRelate"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/TimeAxis/setTimeRelate?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/setTimeRelate"))}&time=${timeStamp()}`,param)
 
 //设置系统功能开关
 export const ModulesSet = (param) =>

@@ -117,7 +117,7 @@
 				rememberpwd: false,
 				dialogVisible: false,
 				ruleForm: {
-					username: 'admin123',
+					username: 'admin',
 					password: '123456'
 				},
 				//rules前端验证

@@ -24,7 +24,7 @@ export const GetAppDev = (param) =>
 
 //获取时间轴列表
 export const GetTimeInfo = (param) =>
-	post(`${store.state.config.url}/api/TimeAxis/GetInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/GetInfo"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/TimeAxis/GetInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/TimeAxis/GetInfo"))}&time=${timeStamp()}`,param)
 
 //获取时间轴应用详情
 export const GetAppListByDev = (param) =>

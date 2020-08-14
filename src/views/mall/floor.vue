@@ -60,7 +60,7 @@
         <el-form-item label="地图" prop="image">
           <el-upload
                   class="avatar-uploader"
-                  :action="config.updateFile"
+                  :action="config.yunUpdateFile"
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload">

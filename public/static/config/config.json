@@ -1,5 +1,7 @@
 {
   "url": "http://192.168.1.246:8003",
-  "yunUrl": "http://192.168.1.194:8007",
-  "updateFile": "http://192.168.1.194:8044/api/MallFileManage/UpLoadFilesSec"
+  "yunUrl": "http://121.37.146.236:8012",
+  "mallYunUrl": "http://test.1000my.com:8013",
+  "updateFile": "http://192.168.1.246:8003/api/FileManage/UpLoadFilesSec",
+  "yunUpdateFile": "http://test.1000my.com:8011/api/MallFileManage/UpLoadFilesSec"
 }

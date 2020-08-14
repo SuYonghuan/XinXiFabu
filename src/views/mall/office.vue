@@ -297,6 +297,7 @@
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+						this.editForm.mallCode = this.user.mallCode
 						if (this.editForm.code) {
 							this.OfficeEdit(this.editForm)
 							return
@@ -312,7 +313,7 @@
 					cancelButtonText: "取消",
 					type: "warning"
 				}).then(() => {
-					this.OfficeDel({"Code": item.code})
+					this.OfficeDel({"Code": item.code, "MallCode": this.user.mallCode})
 				}).catch(() => {
 					this.$message({
 						type: 'info',
@@ -323,6 +324,7 @@
 			//选中楼栋
 			changeBuilding() {
 				this.floorList = []
+				this.editForm.floorCode = ''
 				this.GetFloorList(this.editForm.buildingCode)
 			},
 			//选中楼栋
@@ -335,7 +337,8 @@
 				const param = {
 					"Code": item.code,
 					"IsShow": item.isShow,
-					"UserName": this.user.accountName
+					"UserName": this.user.accountName,
+					"MallCode": this.user.mallCode
 				}
 				this.ChangeOfficeStatus(param)
 			},

@@ -101,7 +101,7 @@
         <el-form-item label="商铺LOGO" prop="logo">
           <el-upload
                   class="avatar-uploader"
-                  :action="config.updateFile"
+                  :action="config.yunUpdateFile"
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload">
@@ -458,11 +458,13 @@
 			//选中业态
 			changeFormat() {
 				this.formatInfo = {}
+				this.editForm.secFormat = ''
 				this.GetShopFormatInfo(this.editForm.shopFormat)
 			},
 			//选中楼栋
 			changeBuilding() {
 				this.floorList = []
+				this.editForm.floorCode = ''
 				this.GetFloorList(this.editForm.buildingCode)
 			},
 			//选中楼栋
