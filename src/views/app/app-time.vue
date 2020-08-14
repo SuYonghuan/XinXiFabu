@@ -170,7 +170,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -205,7 +205,7 @@
 			},
 			changeCheckbox(index) {
 				for (let i = 0; i < this.editForm.length; i++) {
-			    this.editForm[i].TimeSlot = []
+					this.editForm[i].TimeSlot = []
 					if (i != index) {
 						this.editForm[i].Default = 0
 					}

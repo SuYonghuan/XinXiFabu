@@ -11,7 +11,7 @@
       <p class="from-p">
         屏保时间
         <span>
-          <el-input-number v-model="list.time" :min="1" label="描述文字"></el-input-number>
+          <el-input-number v-model="list.time" :min="1" :max="3600" label="描述文字"></el-input-number>
           秒
         </span>
       </p>
@@ -30,15 +30,14 @@
           <p class="style-title">提示图标样式自定义</p>
           <div class="item-div">
             <div @click.stop="">
-              <img v-if="imageUrl" :src="imageUrl" class="avatar">
               <el-upload
-                      v-else
                       class="avatar-uploader"
                       :action="config.updateFile"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload">
                 <i class="el-icon-plus avatar-uploader-icon"></i>
+                <img v-if="imageUrl" :src="imageUrl" class="avatar">
               </el-upload>
             </div>
           </div>
@@ -60,7 +59,7 @@
         </p>
       </div>
       <p class="button-p">
-        <el-button type="primary" @click="clickSubmit">确定</el-button>
+        <el-button type="primary" @click="clickSubmit" v-if="pageMenu.setScreen">确定</el-button>
       </p>
     </el-card>
   </div>
@@ -71,6 +70,7 @@
 	import {
 		GetScreensaver,
 		SetScreensaver,
+		GetRolePermissions,
 	} from 'http/api/system'
 	import {ERR_OK} from 'http/config'
 
@@ -104,6 +104,7 @@
 				active: -1,
 				imageUrl: '',
 				list: {},
+				pageMenu: {},
 				effectType: [{label: '固定位置', value: 0}, {label: '自由运动', value: 1}],
 				screenEffect: [
 					[{label: '右下角显示', value: 0}, {label: '居中显示', value: 1}],
@@ -113,12 +114,26 @@
 		},
 		created() {
 			this.GetScreensaver()
+			this.GetRolePermissions()
 		},
 		methods: {
 			/**
 			 * 网络请求
 			 * @param val
 			 */
+			GetRolePermissions() {
+				const param = {
+					MenuCode: this.presentMenu.code,
+				}
+				GetRolePermissions(param).then(res => {
+					if (res.code === ERR_OK) {
+						for (let a = 0; a < res.data.length; a++) {
+							this.pageMenu[res.data[a].actionId] = true;
+						}
+						console.log(this.pageMenu)
+					}
+				})
+			},
 			GetScreensaver() {
 				const param = {
 					MallCode: this.user.mallCode,
@@ -166,12 +181,12 @@
 			},
 			beforeAvatarUpload(file) {
 				const isLt2M = file.size / 1024 / 1024 < 10;
-        const type = ['image/jpg','image/png','image/jpeg']
+				const type = ['image/jpg', 'image/png', 'image/jpeg']
 
-        if (type.indexOf(file.type) === -1) {
-          this.$message.error('上传图片只能是 jpg、png格式!');
-          return false
-        }
+				if (type.indexOf(file.type) === -1) {
+					this.$message.error('上传图片只能是 jpg、png格式!');
+					return false
+				}
 				if (!isLt2M) {
 					this.$message.error('上传图片大小不能超过 10MB!');
 					return false
@@ -179,7 +194,7 @@
 			},
 		},
 		computed: {
-			...mapGetters(['config', 'user',"config"])
+			...mapGetters(['config', 'user', "config", 'presentMenu'])
 		}
 	}
 </script>
@@ -241,6 +256,27 @@
         height: 384px;
         width: 216px;
         position: relative;
+        .avatar-uploader{
+          display: block;
+          width: 60px;
+          height: 60px;
+          position: absolute;
+          bottom: 0px;
+          right: 0px;
+          img{
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            z-index: 2;
+          }
+          .el-upload{
+            height: 60px;
+          }
+          .avatar-uploader-icon{
+            width: 60px;
+            height: 60px;
+          }
+        }
 
         img {
           display: block;

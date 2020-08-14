@@ -110,7 +110,7 @@
       </el-table-column>
       <el-table-column label="操作" width="250">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleDetail(scope.row)">管理</el-button>
+          <el-button type="primary" size="small" @click="handleDetail(scope.row)" v-if="pageMenu.devoper">管理</el-button>
           <el-button type="warning" size="small" @click="screenshot(scope.row)" v-if="pageMenu.devicescreenshot">截图
           </el-button>
           <el-dropdown style="margin-left: 15px">
@@ -124,9 +124,9 @@
               </el-dropdown-item>
               <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除关机时间</p>
               </el-dropdown-item>
-              <el-dropdown-item>
-                <el-link :underline="false" href="https://element.eleme.io" target="_blank">远程协助</el-link>
-              </el-dropdown-item>
+<!--              <el-dropdown-item>-->
+<!--                <el-link :underline="false" href="https://element.eleme.io" target="_blank">远程协助</el-link>-->
+<!--              </el-dropdown-item>-->
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -335,7 +335,7 @@
 				DeviceCommandReStart(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -345,7 +345,7 @@
 				DeviceCommandShutDown(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -355,7 +355,7 @@
 				DeviceCleanShutDownTime(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -365,7 +365,7 @@
 				SetSynStatus(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					item.isSyn = !item.isSyn
@@ -376,7 +376,7 @@
 				ScreenOper(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					item.operable = !item.operable
@@ -387,7 +387,7 @@
 				DelDevices(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -398,7 +398,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -409,7 +409,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);

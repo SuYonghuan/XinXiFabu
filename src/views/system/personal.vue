@@ -91,7 +91,7 @@
 		SelfEdit,
 	} from 'http/api/login'
 	import {ERR_OK} from 'http/config'
-	import {mapGetters} from 'vuex'
+	import {mapGetters, mapMutations} from 'vuex'
 
 	export default {
 		name: "personal",
@@ -196,6 +196,11 @@
 						this.handleClose()
 						this.$message.success(res.msg);
 						this.GetUserInfo()
+						let user = this.user
+						user.nickName = param.nickName
+						user.phone = param.phone
+						user.email = param.email
+						this.setUser(user)
 						return
 					}
 					this.$message.error(res.msg);
@@ -250,6 +255,9 @@
 					}
 				})
 			},
+			...mapMutations({
+				setUser: "SET_USER"
+			})
 		},
 		computed: {
 			...mapGetters(['presentMenu', 'user', 'config'])

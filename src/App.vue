@@ -36,7 +36,7 @@
 				if (getCookie('userInfo')) {
 					let userInfo = JSON.parse(getCookie('userInfo'))
 					if (userInfo.userCode) {
-						this.GetUserInfo(userInfo.userCode)
+			      !getCookie('autoauth') && this.GetUserInfo(userInfo)
 						getCookie('presentMenu') && this.setPresentMenu(JSON.parse(getCookie('presentMenu')))
 						this._getMenu(userInfo.nickName)
 						return
@@ -44,19 +44,20 @@
 				}
 				this.$router.push('/login');
 			},
-			GetUserInfo(code) {
-				const param = {"Code": code}
+			GetUserInfo(user) {
+				const param = {"Code": user.userCode}
 				GetUserInfo(param).then(res => {
 					if (res.code === ERR_OK) {
 						let userInfo = res.data;
-						userInfo.userCode = code
+						userInfo.userCode = user.userCode
+						userInfo.mallCode = user.mallCode
 						this.setUser(userInfo);
 					}
 				})
 			},
 			_getMenu(nickName) {
 				const param = {
-					"accountName": nickName
+					// "accountName": nickName
 				}
 				getMenu(param).then(res => {
 					if (res.code == ERR_OK) {

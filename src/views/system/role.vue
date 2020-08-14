@@ -38,10 +38,10 @@
                append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="角色名称" prop="name">
-          <el-input type="text" v-model="editForm.name" placeholder="请输入角色名称"></el-input>
+          <el-input type="text" v-model="editForm.name" :maxlength="10" placeholder="请输入角色名称"></el-input>
         </el-form-item>
         <el-form-item label="描述" prop="intro">
-          <el-input type="textarea" rows="5" v-model="editForm.description" placeholder="请输入角色描述"></el-input>
+          <el-input type="textarea" rows="5" v-model="editForm.description" :maxlength="50" placeholder="请输入角色描述"></el-input>
         </el-form-item>
         <el-form-item label="权限" prop="authority">
           <el-tree

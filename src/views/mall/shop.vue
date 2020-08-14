@@ -161,7 +161,7 @@
 				dialogVisible: false,
 				dialogVisibleDevice: false,
 				dialogTitle: '新增',
-				editForm: {},
+				editForm: {logo: ''},
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
@@ -203,7 +203,7 @@
 						for (let a = 0; a < res.data.length; a++) {
 							this.pageMenu[res.data[a].actionId] = true;
 						}
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						// console.log(this.pageMenu)
 					}
 				})
@@ -269,7 +269,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -280,7 +280,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -290,7 +290,7 @@
 				ChangeShopStatus(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -311,7 +311,7 @@
 				ShopDel(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -374,12 +374,14 @@
 				this.dialogVisible = false
 				this.dialogVisibleDevice = false
 				this.$refs["editForm"].resetFields()
-				this.editForm = {}
+				this.editForm = {logo: ''}
 				this.formatInfo = {}
 				this.floorList = []
+				this.imageUrl = ''
 			},
 			//提交
 			submitUpForm(item) {
+				console.log(this.editForm)
 				this.$refs[item].validate(valid => {
 					if (valid) {
 						const param = {

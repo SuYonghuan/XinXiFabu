@@ -56,10 +56,10 @@
                append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="部门名称" prop="name">
-          <el-input type="text" v-model="editForm.name" placeholder="请输入部门名称"></el-input>
+          <el-input type="text" v-model="editForm.name" :maxlength="50" placeholder="请输入部门名称"></el-input>
         </el-form-item>
         <el-form-item label="备注" prop="intro">
-          <el-input type="textarea" rows="5" v-model="editForm.intro" placeholder="请输入备注"></el-input>
+          <el-input type="textarea" rows="5" :maxlength="50" v-model="editForm.intro" placeholder="请输入备注"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -210,6 +210,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose(1)
 						this.$message.success(res.msg);
+			      this.getList(this.currentPage, this.pageSize)
 						return
 					} else {
 						this.$message.error(res.msg);

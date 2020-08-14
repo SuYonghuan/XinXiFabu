@@ -117,8 +117,8 @@
 				rememberpwd: false,
 				dialogVisible: false,
 				ruleForm: {
-					// username: 'admin123',
-					// password: '123456'
+					username: 'admin123',
+					password: '123456'
 				},
 				//rules前端验证
 				rules: {
@@ -202,7 +202,7 @@
 			},
 			_getMenu(nickName) {
 				const param = {
-					"accountName": nickName
+					// "accountName": nickName
 				}
 				getMenu(param).then(res => {
 					if (res.code == ERR_OK) {

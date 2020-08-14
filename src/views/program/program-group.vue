@@ -323,7 +323,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -334,7 +334,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -344,7 +344,7 @@
 				DelProgramGroup(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -371,7 +371,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -396,7 +396,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -425,7 +425,7 @@
 			},
 			//搜索
 			onSearch() {
-		    this.currentPage = 1
+				this.currentPage = 1
 				this.getList(this.pageSize, this.currentPage, this.search)
 			},
 			//重置搜索
@@ -463,12 +463,14 @@
 			},
 			//发布设备
 			handleDevice(item) {
+				console.log(item)
 				this.dialogVisibleDevice = true
 				this.GetDeviceByGroupCode(this.searchDeviceList[0].code, false)
 				this.deviceForm = {
 					groupName: this.dateFormat('y-m-d h:i:s') + ' 新建设备',
 					screenInfo: item.screenInfo,
 					screenInfoCode: item.screenInfoCode,
+					ProgramGroupCode: item.code,
 				}
 				this.transferStatus = true
 			},
@@ -579,8 +581,9 @@
 					"ScreenInfoCode": this.deviceForm.screenInfoCode,
 					"Devices": ids,
 					"IsSync": this.deviceForm.isSyn,
-					"ProgramGroupCode": this.deviceForm.code
+					"ProgramGroupCode": this.deviceForm.ProgramGroupCode
 				}
+
 				this.PublishProgramToDevice(param)
 			},
 			//发布设备组

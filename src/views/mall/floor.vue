@@ -257,7 +257,7 @@
 
 						if (this.editForm.floorCode) {
 							param.code = this.editForm.floorCode
-							param.FileGUID = this.editForm.mapFile
+							param.FileGUID = this.editForm.map
 							this.FloorEdit(param)
 							return
 						}

@@ -40,7 +40,8 @@
       <el-table-column prop="phone" label="联系方式"></el-table-column>
       <el-table-column label="启用状态">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.isShow" @change="changeShow(scope.row)"></el-switch>
+          <el-switch v-model="scope.row.isShow" @change="changeShow(scope.row)"
+                     :disabled="!pageMenu.changeOfficeStatus"></el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作">
@@ -162,7 +163,7 @@
 						for (let a = 0; a < res.data.length; a++) {
 							this.pageMenu[res.data[a].actionId] = true;
 						}
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						// console.log(this.pageMenu)
 					}
 				})
@@ -210,7 +211,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -221,7 +222,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -240,7 +241,7 @@
 				OfficeDel(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -250,7 +251,7 @@
 				ChangeOfficeStatus(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);

@@ -8,7 +8,7 @@
           active-text-color="#fff"
   >
     <div class="nav_right">
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" v-show="!autoAuth">
         <el-badge :value="noticeData.count" :hidden="noticeData.count < 1" class="item">
           <i class="el-icon-message-solid" style="font-size: 30px;" @click="clickNoticeIcon"></i>
         </el-badge>
@@ -30,7 +30,7 @@
         </el-dropdown-menu>
       </el-dropdown>
 
-      <div class="el-dropdown-link" style="display: inline-block;" @click="clickName">
+      <div class="el-dropdown-link" style="display: inline-block;" @click="clickName" v-show="!autoAuth">
         <img src="../../common/images/default-photo.gif"/>
         <p>
           {{ user.nickName }}
@@ -43,7 +43,7 @@
 </template>
 <script>
 	import {mapGetters, mapMutations} from "vuex";
-	import {delCookie} from 'common/js/cookie'
+	import {delCookie, getCookie} from 'common/js/cookie'
 	import {
 		GetNoReadMessage,
 		GetMessageInfo,
@@ -62,6 +62,7 @@
 				},
 				noticeData: {},
 				dropdownStatus: true,
+				autoAuth: false,
 			};
 		},
 		computed: {
@@ -69,6 +70,7 @@
 		},
 		created() {
 			this.GetNoReadMessage()
+			this.autoAuth = getCookie('autoauth') ? true : false;
 		},
 		methods: {
 			GetNoReadMessage() {

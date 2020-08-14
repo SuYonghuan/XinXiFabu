@@ -117,14 +117,14 @@
       <el-table-column prop="screenMatch" label="屏幕适应"></el-table-column>
       <el-table-column label="关联店铺">
         <template slot-scope="scope">
-          <el-link type="primary" @click="handleEditShop(scope.row)">
+          <el-link type="primary" @click="handleEditShop(scope.row)" :disabled="!pageMenu.setprogshop">
             {{scope.row.shopInfo ? scope.row.shopInfo : '未关联'}}
           </el-link>
         </template>
       </el-table-column>
       <el-table-column label="设置标签">
         <template slot-scope="scope">
-          <el-link type="primary" @click="handleEditLabel(scope.row)">
+          <el-link type="primary" @click="handleEditLabel(scope.row)" :disabled="!pageMenu.setproglabel">
             {{scope.row.labels ? scope.row.labels : '未关联'}}
           </el-link>
         </template>
@@ -224,7 +224,7 @@
         </el-form-item>
         <el-form-item label="切换时间">
           <p style="display: flex;justify-content: space-between">
-            <el-input-number v-model="editForm.switchTime" @change="handleChange" :min="1"
+            <el-input-number v-model="editForm.switchTime" @change="handleChange" :min="1" :max="3600"
                              label="切换时间"></el-input-number>
           </p>
         </el-form-item>
@@ -266,13 +266,13 @@
                   :action="config.updateFile"
                   :on-change="handleProgress"
                   :on-success="handleAvatarSuccess1"
-                  :limit="1"
                   :show-file-list="false"
                   :auto-upload="true">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <el-card class="box-card file-list-card">
               <img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 260px" alt="">
-              <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 260px" v-else></video>
+              <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 260px"
+                     v-else></video>
             </el-card>
           </el-upload>
         </el-form-item>
@@ -294,7 +294,7 @@
         </el-form-item>
         <el-form-item label="切换时间">
           <p style="display: flex;justify-content: space-between">
-            <el-input-number v-model="updateForm.switchTime" @change="handleChange" :min="1"
+            <el-input-number v-model="updateForm.switchTime" @change="handleChange" :min="1" :max="3600"
                              label="切换时间"></el-input-number>
           </p>
         </el-form-item>
@@ -532,7 +532,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -543,7 +543,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -554,7 +554,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -573,7 +573,7 @@
 				DelProgram(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -608,7 +608,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -619,7 +619,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -652,7 +652,7 @@
 			},
 			//搜索
 			onSearch() {
-		    this.currentPage = 1
+				this.currentPage = 1
 				this.getList(this.pageSize, this.currentPage, this.search)
 			},
 			//店铺搜索
@@ -717,19 +717,15 @@
 			},
 			//关联店铺
 			handleEditShop(item) {
-				if (this.pageMenu.setproglabel) {
-					this.programInfo = item
-					this.dialogVisibleShop = true
-					this.QueryProgShopList()
-				}
+				this.programInfo = item
+				this.dialogVisibleShop = true
+				this.QueryProgShopList()
 			},
 			//设置标签
 			handleEditLabel(item) {
-				if (this.pageMenu.setprogshop) {
-					this.dialogVisibleLabel = true
-					this.programInfo = item
-					this.GetProgLabelList();
-				}
+				this.dialogVisibleLabel = true
+				this.programInfo = item
+				this.GetProgLabelList();
 			},
 			//关闭弹窗
 			handleClose() {
@@ -857,11 +853,11 @@
 				console.log(file, fileList);
 			},
 			handleProgress(file, fileList) {
-				const isLt2M = file.raw.size / 1024 / 1024 < 10;
-				const type = ['image/jpg', 'image/png', 'image/jpeg', 'video/mp4']
+				const isLt2M = file.raw.size / 1024 / 1024 < 500;
+				const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4']
 
 				if (type.indexOf(file.raw.type) === -1) {
-					this.$message.error('上传文件只能是 jpg、png、mp4格式!');
+					this.$message.error('上传文件只能是 jpg、png、mp4、gif格式!');
 					return false
 				}
 				if (!isLt2M) {
@@ -883,7 +879,6 @@
 			},
 			handleAvatarSuccess1(res, file) {
 				if (res.code === '200') {
-					console.log(file)
 					this.updateForm.progSrc = URL.createObjectURL(file.raw)
 					this.updateForm.progType = file.raw.type == 'video/mp4' ? '视频' : '图片'
 					this.updateForm.fileGuid = res.data.fileGuid

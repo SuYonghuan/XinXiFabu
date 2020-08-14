@@ -222,7 +222,8 @@
         </el-table>
 
         <!--  分页  -->
-        <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" @handleCurrentChange="handleCurrentChange1"
+        <pagination class="page-div" :list="tableData" :total="total" :page="currentPage"
+                    @handleCurrentChange="handleCurrentChange1"
                     :pageSize="pageSize"></pagination>
 
       </el-tab-pane>
@@ -314,7 +315,8 @@
     </el-dialog>
 
     <!--  发布设备  -->
-    <el-dialog title="发布设备" :visible.sync="dialogVisibleDevice" width="80%" :before-close="handleClose" append-to-body class="dialog">
+    <el-dialog title="发布设备" :visible.sync="dialogVisibleDevice" width="80%" :before-close="handleClose" append-to-body
+               class="dialog">
       <el-form :label-width="formLabelWidth" :model="deviceForm" :rules="rules" ref="editForm">
         <el-form-item label="设备组名称" prop="name">
           <el-input type="text" v-model="deviceForm.groupName" placeholder="请输入设备组名称"></el-input>
@@ -341,7 +343,8 @@
     </el-dialog>
 
     <!--  发布设备组  -->
-    <el-dialog title="发布设备组" :visible.sync="dialogVisibleDeviceGroup" width="80%" :before-close="handleClose" class="dialog"
+    <el-dialog title="发布设备组" :visible.sync="dialogVisibleDeviceGroup" width="80%" :before-close="handleClose"
+               class="dialog"
                append-to-body>
       <el-form :label-width="formLabelWidth" :model="deviceForm" :rules="rules" ref="editForm">
         <el-form-item label="节目组名称" prop="name">
@@ -639,7 +642,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -650,7 +653,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -661,7 +664,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -691,7 +694,7 @@
 				DelNewsGroup(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -734,7 +737,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -744,7 +747,7 @@
 				NewsStop(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -876,7 +879,7 @@
 			},
 			//搜索字幕
 			onSearchSub() {
-		    this.currentPage = 1
+				this.currentPage = 1
 				this.GetSubtitleList(this.pageSize, this.currentPage)
 			},
 			//重置搜索
@@ -979,6 +982,7 @@
 				this.dialogVisibleSubtitleDeviceGroup = false
 				this.transferStatus = false
 				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
+				this.newsForm = {}
 			},
 			//提交插播
 			submitUpForm(item) {
@@ -1181,11 +1185,11 @@
 				this.$refs.upload.submit();
 			},
 			handleProgress(file, fileList) {
-				const isLt2M = file.raw.size / 1024 / 1024 < 10;
-				const type = ['image/jpg', 'image/png', 'image/jpeg', 'video/mp4']
+				const isLt2M = file.raw.size / 1024 / 1024 < 500;
+				const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4']
 
 				if (type.indexOf(file.raw.type) === -1) {
-					this.$message.error('上传文件只能是 jpg、png、mp4格式!');
+					this.$message.error('上传文件只能是 jpg、png、gif、mp4格式!');
 					return false
 				}
 				if (!isLt2M) {
@@ -1201,6 +1205,7 @@
 						Size: file.size,
 						PreviewFileGUID: res.data.previewFileGUID
 					});
+					this.$forceUpdate()
 				} else {
 					this.$message.error('上传失败!');
 				}
@@ -1215,6 +1220,7 @@
 			//删除文件
 			handleDeleteFile(index) {
 				this.newsForm.progFiles.splice(index, 1)
+				this.$forceUpdate()
 			},
 			//点击同屏
 			clickSyn() {

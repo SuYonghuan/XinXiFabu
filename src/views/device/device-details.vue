@@ -60,7 +60,7 @@
             <img :src="item.filePath" alt="" class="program-img">
             <p>
               <i class="el-icon-date"></i>
-              {{timestampToTime(item.addTime,'y-m-d')}} 至 {{timestampToTime(item.launchTime,'y-m-d')}}
+              {{timestampToTime(item.launchTime,'y-m-d')}} 至 {{timestampToTime(item.expiryDate,'y-m-d')}}
             </p>
           </el-card>
         </div>

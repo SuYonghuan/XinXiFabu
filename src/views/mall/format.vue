@@ -218,6 +218,7 @@
 							this.childForm = [];
 							for (let i = 0; i < this.editForm.child.length; i++) {
 								this.childForm.push({
+									Code: this.editForm.child[i].code,
 									Name: this.editForm.child[i].name,
 									NameEn: this.editForm.child[i].nameEn
 								})

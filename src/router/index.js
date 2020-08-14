@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { getCookie } from '../common/js/cookie'
+import { getCookie,setCookie } from '../common/js/cookie'
 
 Vue.use(VueRouter)
 
@@ -13,6 +13,14 @@ const routes = [
     path: '/login',
     name: '登陆',
     component: () => import('views/login/login'),
+    meta: {
+      showBar: false
+    }
+  },
+  {
+    path: '/mallregister',
+    name: '注册',
+    component: () => import('views/mallregister/mallregister'),
     meta: {
       showBar: false
     }
@@ -161,9 +169,15 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login') {
+  if (to.path === '/login' && !getCookie('autoauth') ) {
     next()
   } else {
+    if ( getCookie('autoauth') ) {
+      let userInfo = decodeURIComponent(getCookie('userInfo'))
+      setCookie(userInfo, 'userInfo', 1)
+      next('/index/home')
+      return
+    }
     let userInfo = JSON.parse(getCookie('userInfo'))
     if (userInfo.userCode) {
       next()

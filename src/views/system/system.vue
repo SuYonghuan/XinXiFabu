@@ -42,7 +42,7 @@
       <div class="top-div">
         <p>
           素材到期提醒：提前
-          <el-input-number v-model="programMonitorList.days" :min="1"></el-input-number>
+          <el-input-number v-model="programMonitorList.days" :min="1" :max="365"></el-input-number>
           天 \ 提醒时间
           <el-time-picker
                   arrow-control
@@ -66,15 +66,15 @@
     <el-card class="box-card">
       <p class="switch-p" v-for="item of moduleList">
         {{ item.moduleName }}
-        <el-switch v-model="item.isOpen" @change="changeSwitch(item)" :disabled="!item.isHas"></el-switch>
+        <el-switch v-model="item.isOpen" @change="changeSwitch(item)" v-show="item.isHas"></el-switch>
       </p>
     </el-card>
 
     <!--  弹窗  -->
-    <el-dialog title="时间轴设置" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body>
+    <el-dialog title="时间轴设置" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body :close-on-click-modal="false">
       <p style="margin-bottom: 30px;text-align: center;">时间轴：{{timeRange[0]}}-{{timeRange[1]}}</p>
       <div class="slider-div">
-        <el-slider v-model="editForm.time" range show-stops :max="24" :marks="marks" @change="changeTime"></el-slider>
+        <el-slider v-model="editForm.time" range show-stops :max="24" :marks="marks" v-if="dialogVisible" @change="changeTime"></el-slider>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
@@ -218,10 +218,9 @@
 				getTimeAxis(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.timeList = res.data
-						// console.log(this.timeList)
 						if (this.timeList.timeRelateList.length > 0) {
 							this.timeRange[0] = this.timeList.timeRelateList[0].beginTimeSlot
-							this.timeRange[1] = this.timeList.timeRelateList[this.timeList.timeRelateList.length - 1].endTimeSlot
+							this.timeRange[1] = this.timeList.timeRelateList[this.timeList.timeRelateList.length - 1].beginTimeSlot
 							this.$forceUpdate()
 						}
 						const param = {"MallCode": this.timeList.timeAxis}
@@ -276,6 +275,7 @@
 			 * End
 			 */
 			handleEdit() {
+		    this.editForm.time = []
 				if (this.timeRange[0].slice(0, 1) == 0) {
 					this.editForm.time[0] = this.timeRange[0].slice(1, 2)
 				} else {

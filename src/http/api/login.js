@@ -45,3 +45,7 @@ export const SelfEdit = (param) =>
 //修改用户信息
 export const ChangeSelfWord = (param) =>
 	post(`${store.state.config.url}/api/Account/ChangeSelfWord?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Account/ChangeSelfWord"))}&time=${timeStamp()}`,param)
+
+//注册
+export const MallRegister = (param) =>
+	post(`${store.state.config.url}/api/Cdn/MallRegister?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Cdn/MallRegister"))}&time=${timeStamp()}`,param)
