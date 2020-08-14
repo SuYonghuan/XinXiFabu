@@ -175,7 +175,7 @@ router.beforeEach((to, from, next) => {
     if ( getCookie('autoauth') ) {
       let userInfo = decodeURIComponent(getCookie('userInfo'))
       setCookie(userInfo, 'userInfo', 1)
-      next('/index/home')
+      next()
       return
     }
     let userInfo = JSON.parse(getCookie('userInfo'))
