@@ -36,7 +36,7 @@
       <el-table-column prop="shelfTime" label="下架时间"></el-table-column>
       <el-table-column prop="appUrl" label="后台管理">
         <template slot-scope="scope">
-          <el-link type="primary" :underline="false" v-show="scope.row.appUrl" href="scope.row.appUrl" target="_blank">
+          <el-link type="primary" :underline="false" v-show="scope.row.appUrl" :href="scope.row.appUrl" target="_blank">
             点击跳转
           </el-link>
         </template>
