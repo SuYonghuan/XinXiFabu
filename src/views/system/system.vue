@@ -20,7 +20,7 @@
       </div>
       <el-collapse class="collapse-div">
         <el-collapse-item title="时间段" name="1">
-          <div class="grid-content" v-for="item of timeList.timeRelateList">
+          <div class="grid-content" v-for="item of timeRelateList" v-if="timeRelateList.length > 0">
             <span>{{item.beginTimeSlot}}-{{item.endTimeSlot}}</span>
             <span>
               开放给商家时间:
@@ -71,10 +71,12 @@
     </el-card>
 
     <!--  弹窗  -->
-    <el-dialog title="时间轴设置" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body :close-on-click-modal="false">
+    <el-dialog title="时间轴设置" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body
+               :close-on-click-modal="false">
       <p style="margin-bottom: 30px;text-align: center;">时间轴：{{timeRange[0]}}-{{timeRange[1]}}</p>
       <div class="slider-div">
-        <el-slider v-model="editForm.time" range show-stops :max="24" :marks="marks" v-if="dialogVisible" @change="changeTime"></el-slider>
+        <el-slider v-model="editForm.time" range show-stops :max="23" :marks="marks" v-if="dialogVisible"
+                   @change="changeTime"></el-slider>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
@@ -139,8 +141,9 @@
 				],
 				moduleList: [],
 				localModuleList: [],
-				timeList: [],
-				timeRange: [],
+				timeList: {},
+				timeRelateList: [],
+				timeRange: ['00:00', '00:00'],
 				programMonitorList: {days: '', clockTime: '', repeatExecution: 'false'},
 				pageMenu: {},
 			}
@@ -218,12 +221,13 @@
 				getTimeAxis(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.timeList = res.data
-						if (this.timeList.timeRelateList.length > 0) {
+						if (this.timeList != null && this.timeList.timeRelateList.length > 0) {
+							this.timeRelateList = this.timeList.timeRelateList
 							this.timeRange[0] = this.timeList.timeRelateList[0].beginTimeSlot
 							this.timeRange[1] = this.timeList.timeRelateList[this.timeList.timeRelateList.length - 1].beginTimeSlot
 							this.$forceUpdate()
 						}
-						const param = {"MallCode": this.timeList.timeAxis}
+						const param = {"MallCode": this.user.mallCode}
 						this.GetMallModuleList(param)
 					}
 				})
@@ -275,17 +279,20 @@
 			 * End
 			 */
 			handleEdit() {
-		    this.editForm.time = []
-				if (this.timeRange[0].slice(0, 1) == 0) {
-					this.editForm.time[0] = this.timeRange[0].slice(1, 2)
-				} else {
-					this.editForm.time[0] = this.timeRange[0].slice(0, 2)
+				this.editForm.time = []
+				if (this.timeRange.length > 1) {
+					if (this.timeRange[0].slice(0, 1) == 0) {
+						this.editForm.time[0] = this.timeRange[0].slice(1, 2)
+					} else {
+						this.editForm.time[0] = this.timeRange[0].slice(0, 2)
+					}
+					if (this.timeRange[1].slice(0, 1) == 0) {
+						this.editForm.time[1] = this.timeRange[1].slice(1, 2)
+					} else {
+						this.editForm.time[1] = this.timeRange[1].slice(0, 2)
+					}
 				}
-				if (this.timeRange[1].slice(0, 1) == 0) {
-					this.editForm.time[1] = this.timeRange[1].slice(1, 2)
-				} else {
-					this.editForm.time[1] = this.timeRange[1].slice(0, 2)
-				}
+
 				this.dialogVisible = true
 			},
 			//关闭弹窗
@@ -298,10 +305,10 @@
 			//设置时间轴
 			submitUpForm() {
 				const param = {
-					"MallCode": this.timeList.timeAxis.mallCode,
+					"MallCode": this.user.mallCode,
 					"BeginAxis": this.editForm.time[0],
 					"EndAxis": this.editForm.time[1],
-					"TimeAxisCode": this.timeList.timeAxis.code
+					"TimeAxisCode": this.timeList != null ? this.timeList.timeAxis.code : ''
 				}
 				this.SetTimeAxis(param)
 			},

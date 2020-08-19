@@ -24,7 +24,7 @@
       <el-table-column prop="name" label="应用名称"></el-table-column>
       <el-table-column prop="filePath" label="ICON">
         <template slot-scope="scope">
-          <img :src="scope.row.filePath" width="30" height="30">
+          <img :src="scope.row.logoPath" width="30" height="30">
         </template>
       </el-table-column>
       <el-table-column prop="appType" label="应用类型">
@@ -33,7 +33,11 @@
         </template>
       </el-table-column>
       <el-table-column prop="screen" label="分辨率"></el-table-column>
-      <el-table-column prop="shelfTime" label="下架时间"></el-table-column>
+      <el-table-column prop="shelfTime" label="下架时间">
+        <template slot-scope="scope">
+          {{timestampToTime(scope.row.shelfTime)}}
+        </template>
+      </el-table-column>
       <el-table-column prop="appUrl" label="后台管理">
         <template slot-scope="scope">
           <el-link type="primary" :underline="false" v-show="scope.row.appUrl" :href="scope.row.appUrl" target="_blank">
@@ -54,7 +58,8 @@
                 @handleCurrentChange="handleCurrentChange"></pagination>
 
     <!--  发布  -->
-    <el-dialog title="发布到设备" :visible.sync="dialogVisibleDevice" width="80%" :before-close="handleClose" append-to-body class="dialog">
+    <el-dialog title="发布到设备" :visible.sync="dialogVisibleDevice" width="80%" :before-close="handleClose" append-to-body
+               class="dialog">
       <el-form :model="deviceForm" ref="editForm">
         <el-form-item prop="intro">
           <transferView :List="staffList" ref="transferView" @changeTransfer="changeTransfer"
@@ -80,9 +85,11 @@
 	} from 'http/api/app'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
+	import {timeFormatting} from 'common/js/mixins'
 
 	export default {
 		name: "deptManager",
+		mixins: [timeFormatting],
 		data() {
 			return {
 				search: {Keywords: ''},
@@ -177,6 +184,10 @@
 			 * @param val
 			 */
 
+			//时间转换
+			timestampToTime(item) {
+				return this.dateFormat('y-m-d h:i:s', new Date(item))
+			},
 			//当前页码
 			handleCurrentChange(val) {
 				this.currentPage = val;

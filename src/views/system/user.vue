@@ -39,16 +39,16 @@
       </el-table-column>
       <el-table-column label="是否锁定">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.isLock" v-if="pageMenu.unLockUser" @change="lockUser(scope.row)"></el-switch>
+          <el-switch v-model="scope.row.isLock" v-if="pageMenu.unLockUser" @change="lockUser(scope.row)" :disabled="scope.row.roleName == '超级管理员'"></el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="240px">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editaccount">编辑
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editaccount" :disabled="scope.row.roleName == '超级管理员'">编辑
           </el-button>
-          <el-button type="warning" size="small" @click="handleEditPsd(scope.row)" v-if="pageMenu.changepwd">修改密码
+          <el-button type="warning" size="small" @click="handleEditPsd(scope.row)" v-if="pageMenu.changepwd" :disabled="scope.row.roleName == '超级管理员'">修改密码
           </el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delaccount">删除
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delaccount" :disabled="scope.row.roleName == '超级管理员'">删除
           </el-button>
         </template>
       </el-table-column>

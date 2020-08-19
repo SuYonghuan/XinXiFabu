@@ -55,7 +55,7 @@
                append-to-body>
       <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="楼层名称" prop="name">
-          <el-input type="text" v-model="editForm.name" placeholder="请输入楼栋名称"></el-input>
+          <el-input type="text" v-model="editForm.name" placeholder="请输入楼层名称" maxlength="5"></el-input>
         </el-form-item>
         <el-form-item label="地图" prop="image">
           <el-upload
@@ -326,7 +326,8 @@
 				}
 				const param = {
 					"Order": type == 1 ? item.order - 1 : item.order + 1,
-					"FloorCode": item.floorCode
+					"FloorCode": item.floorCode,
+					"MallCode": this.user.mallCode
 				}
 
 				this.FloorOrderEdit(param)

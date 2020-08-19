@@ -23,7 +23,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="组名称排序">
-        <el-select v-model="search.NameOrder" placeholder="组名称排序">
+        <el-select v-model="search.NameOrder" @change="changSelect(1)" placeholder="组名称排序">
           <el-option
                   v-for="item in sort"
                   :label="item.label"
@@ -32,7 +32,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="设备数量排序">
-        <el-select v-model="search.Order" placeholder="设备数量排序">
+        <el-select v-model="search.Order" @change="changSelect(2)" placeholder="设备数量排序">
           <el-option
                   v-for="item in sort"
                   :label="item.label"
@@ -585,6 +585,14 @@
 						});
 					});
 				}
+			},
+      //排序置空
+			changSelect(type) {
+				if (type == 2) {
+					this.search.NameOrder = ''
+					return
+				}
+				this.search.Order = ''
 			},
 		},
 		computed: {

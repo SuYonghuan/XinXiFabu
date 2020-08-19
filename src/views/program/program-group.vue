@@ -23,7 +23,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="search.NameOrder" placeholder="组名称排序">
+        <el-select v-model="search.NameOrder" placeholder="组名称排序" @change="changSelect(1)">
           <el-option
                   v-for="item in sort"
                   :label="item.label"
@@ -32,7 +32,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="search.Order" placeholder="节目组排序">
+        <el-select v-model="search.Order" placeholder="节目组排序" @change="changSelect(2)">
           <el-option
                   v-for="item in sort"
                   :label="item.label"
@@ -323,7 +323,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.this.getList(this.pageSize, this.currentPage)()
+						this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -334,7 +334,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.this.getList(this.pageSize, this.currentPage)()
+						this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -344,7 +344,7 @@
 				DelProgramGroup(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.this.getList(this.pageSize, this.currentPage)()
+						this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -371,7 +371,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.this.getList(this.pageSize, this.currentPage)()
+						this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -396,7 +396,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.this.getList(this.pageSize, this.currentPage)()
+						this.getList(this.pageSize, this.currentPage)()
 						return
 					}
 					this.$message.error(res.msg);
@@ -611,6 +611,14 @@
 				this.$nextTick(() => {
 					this.transferStatus = true;
 				})
+			},
+			//排序置空
+			changSelect(type) {
+				if (type == 2) {
+					this.search.NameOrder = ''
+					return
+				}
+				this.search.Order = ''
 			},
 		},
 		components: {

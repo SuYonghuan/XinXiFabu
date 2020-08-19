@@ -113,7 +113,6 @@
 			}
 		},
 		created() {
-			this.GetScreensaver()
 			this.GetRolePermissions()
 		},
 		methods: {
@@ -130,6 +129,7 @@
 						for (let a = 0; a < res.data.length; a++) {
 							this.pageMenu[res.data[a].actionId] = true;
 						}
+			      this.GetScreensaver()
 						console.log(this.pageMenu)
 					}
 				})

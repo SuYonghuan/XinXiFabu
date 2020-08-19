@@ -124,9 +124,9 @@
               </el-dropdown-item>
               <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除关机时间</p>
               </el-dropdown-item>
-<!--              <el-dropdown-item>-->
-<!--                <el-link :underline="false" href="https://element.eleme.io" target="_blank">远程协助</el-link>-->
-<!--              </el-dropdown-item>-->
+              <!--              <el-dropdown-item>-->
+              <!--                <el-link :underline="false" href="https://element.eleme.io" target="_blank">远程协助</el-link>-->
+              <!--              </el-dropdown-item>-->
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -140,6 +140,7 @@
       </el-button>
       <el-button size="small" @click="batchDelete(tableChecked)" v-if="pageMenu.devdel">删除</el-button>
       <p class="right-button">
+        <el-button type="info" @click="handleDeviceExcel({})" v-if="pageMenu.exportDevice">导出设备</el-button>
         <el-button type="info" @click="handleExcel({})" v-if="pageMenu.devexport">导出设备节目</el-button>
         <el-button type="success" @click="refresh()">刷新</el-button>
       </p>
@@ -283,21 +284,38 @@
 					}
 				})
 			},
-			getList(pageSize, page) {
+			getList(pageSize, page, Paging = 1) {
 				const param = {
 					"SearchKey": this.search.SearchKey,
 					"ScreenCode": this.search.ScreenCode,
 					"FloorCode": this.search.FloorCode,
 					"DevStatus": this.search.DevStatus,
 					"FontStatus": this.search.FontStatus,
-					"Paging": 1,
+					"Paging": Paging,
 					"PageIndex": page,
 					"PageSize": pageSize
 				}
 				GetDeviceList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data.list
-						this.total = res.data.allCount
+						if (Paging == 1) {
+							this.tableData = res.data.list
+							this.total = res.data.allCount
+						} else {
+							this.excelData = res.data
+							for (let i = 0; i < this.excelData.length; i++) {
+								this.excelData[i].deviceOnlineTxt = '设备不在线'
+								this.excelData[i].frontOnlineTxt = '前端不在线'
+
+								if (this.excelData[i].deviceOnline) {
+									this.excelData[i].deviceOnlineTxt = '设备在线'
+								}
+								if (this.excelData[i].frontOnline) {
+									this.excelData[i].frontOnlineTxt = '前端在线'
+								}
+							}
+							this.export2Excel1()
+						}
+
 						// console.log(this.tableData)
 					}
 				})
@@ -315,8 +333,8 @@
 					}
 				})
 			},
-			DeviceScreenshot() {
-				DeviceScreenshot({}).then(res => {
+			DeviceScreenshot(param) {
+				DeviceScreenshot(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.shotImg = res.data
 					}
@@ -427,7 +445,7 @@
 			},
 			//搜索
 			onSearch() {
-		    this.currentPage = 1
+				this.currentPage = 1
 				this.getList(this.pageSize, this.currentPage, this.search)
 			},
 			//重置搜索
@@ -677,6 +695,10 @@
 			handleExcel() {
 				this.ExportDevProgs();
 			},
+			//导出excel
+			handleDeviceExcel() {
+				this.getList(this.pageSize, this.currentPage, 0);
+			},
 			export2Excel() {
 				require.ensure([], () => {
 					const {export_json_to_excel} = require('../../vendor/Export2Excel');
@@ -689,6 +711,20 @@
 					//一个方法 我也不知道干嘛的
 					const data = this.formatJson(filterVal, list);
 					export_json_to_excel(tHeader, data, '设备节目单');
+				})
+			},
+			export2Excel1() {
+				require.ensure([], () => {
+					const {export_json_to_excel} = require('../../vendor/Export2Excel');
+					//头
+					const tHeader = ['设备名称', 'IP地址', '屏幕分辨率', '楼层', '关机时间', '设备状态', '前端状态'];
+					//对应的标签
+					const filterVal = ['devNum', 'ip', 'sName', 'floor', 'shutdownTime', 'deviceOnlineTxt', 'frontOnlineTxt'];
+					//标签对应的内容  是一个数组结构
+					const list = this.excelData;
+					//一个方法 我也不知道干嘛的
+					const data = this.formatJson(filterVal, list);
+					export_json_to_excel(tHeader, data, '设备列表');
 				})
 			},
 			formatJson(filterVal, jsonData) {

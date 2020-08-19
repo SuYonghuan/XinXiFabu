@@ -57,7 +57,8 @@
         <p>节目发布类型：</p>
         <div class="program-list">
           <el-card class="box-card program-item" v-for="item of programData">
-            <img :src="item.filePath" alt="" class="program-img">
+            <img :src="item.filePath" alt="" class="program-img" v-if="item.progType != '视频'">
+            <video :src="item.filePath" class="program-img" v-if="item.progType == '视频'"></video>
             <p>
               <i class="el-icon-date"></i>
               {{timestampToTime(item.launchTime,'y-m-d')}} 至 {{timestampToTime(item.expiryDate,'y-m-d')}}

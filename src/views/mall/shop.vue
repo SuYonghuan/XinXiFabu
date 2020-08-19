@@ -34,8 +34,8 @@
       </el-form-item>
       <el-form-item class="right-button">
         <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
-        <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出
-        </el-button>
+        <el-button @click="handleSysData()" v-if="pageMenu.syndata">同步数据</el-button>
+        <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出</el-button>
       </el-form-item>
     </el-form>
 
@@ -56,6 +56,7 @@
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editShop">编辑</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delShop">删除</el-button>
+          <el-button type="primary" size="small" @click="handleLabel(scope.row)" v-if="pageMenu.setshoplabel">标签</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,6 +122,26 @@
         <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!--  设置标签  -->
+    <el-dialog title="设置标签" :visible.sync="dialogVisibleLabel" width="50%" :before-close="handleClose"
+               :close-on-click-modal="true" append-to-body>
+
+      <el-form label-width="60">
+        <el-form-item label="选择标签">
+          <div>
+            <el-checkbox class="checkbox-div" v-for="item of labelList" v-model="labelActive" :label="item.code" border>
+              {{item.name}}
+            </el-checkbox>
+          </div>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="handleClose('editForm')">取 消</el-button>
+          <el-button type="primary" @click="submitLbForm('editForm')">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -140,6 +161,9 @@
 		ShopDel,
 		ChangeShopStatus,
 		QueryShopList,
+		GetSynData,
+		GetShopLabelList,
+		SetLabel,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -159,9 +183,9 @@
 				currentPage: 0,
 				pageSize: 10,
 				dialogVisible: false,
-				dialogVisibleDevice: false,
+				dialogVisibleLabel: false,
 				dialogTitle: '新增',
-				editForm: {logo: ''},
+				editForm: {logo: '', floorCode: '', secFormat: ''},
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
@@ -182,6 +206,9 @@
 				formatInfo: {},
 				floorList: [],
 				excelData: [],
+				labelList: [],
+				shopInfo: {},
+				labelActive: [],
 			}
 		},
 		created() {
@@ -204,7 +231,7 @@
 							this.pageMenu[res.data[a].actionId] = true;
 						}
 						this.getList(this.pageSize, this.currentPage)
-						// console.log(this.pageMenu)
+						console.log(this.pageMenu)
 					}
 				})
 			},
@@ -317,6 +344,15 @@
 					this.$message.error(res.msg);
 				})
 			},
+			GetSynData() {
+				GetSynData({}).then(res => {
+					if (res.code === ERR_OK) {
+						this.$message.success(res.msg);
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
 			QueryShopList() {
 				const param = {
 					"Name": this.search.Name,
@@ -334,6 +370,31 @@
 						this.excelData = res.data
 						this.export2Excel()
 					}
+				})
+			},
+			GetShopLabelList() {
+				const param = {
+					"ShopCode": this.shopInfo.code
+				}
+				GetShopLabelList(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.labelList = res.data.alreadylist.concat(res.data.labels)
+						if (res.data.alreadylist.length > 0) {
+							for (let i = 0; i < res.data.alreadylist.length; i++) {
+								this.labelActive.push(res.data.alreadylist[i].code)
+							}
+						}
+					}
+				})
+			},
+			SetLabel(param) {
+				SetLabel(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.handleClose()
+						this.$message.success(res.msg);
+						return
+					}
+					this.$message.error(res.msg);
 				})
 			},
 			/**
@@ -365,19 +426,18 @@
 					this.dialogTitle = '编辑'
 				}
 			},
-			//分配设备
-			handleEditDevice() {
-				this.dialogVisibleDevice = true
-			},
 			//关闭弹窗
 			handleClose() {
 				this.dialogVisible = false
-				this.dialogVisibleDevice = false
-				this.$refs["editForm"].resetFields()
-				this.editForm = {logo: ''}
+				this.dialogVisibleLabel = false
+				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
+				this.editForm = {logo: '', floorCode: '', secFormat: ''}
 				this.formatInfo = {}
 				this.floorList = []
 				this.imageUrl = ''
+				this.shopInfo = {}
+				this.labelList = []
+				this.labelActive = []
 			},
 			//提交
 			submitUpForm(item) {
@@ -424,7 +484,7 @@
 					cancelButtonText: "取消",
 					type: "warning"
 				}).then(() => {
-					const param = {"Code": item.code}
+					const param = {"Code": item.code, "MallCode": this.user.mallCode}
 					this.ShopDel(param)
 				}).catch(() => {
 					this.$message({
@@ -477,9 +537,29 @@
 				const param = {
 					"Code": item.code,
 					"IsShow": item.isShow,
-					"UserName": this.user.accountName
+					"UserName": this.user.accountName,
+					"MallCode": this.user.mallCode
 				}
 				this.ChangeShopStatus(param)
+			},
+			//同步数据
+			handleSysData() {
+				this.GetSynData()
+			},
+			//标签管理
+			handleLabel(item) {
+				this.shopInfo = item
+				this.GetShopLabelList()
+				this.dialogVisibleLabel = true
+			},
+			//设置标签
+			submitLbForm() {
+				const param = {
+					"LabelCodeList": this.labelActive,
+					"ObjectCode": this.shopInfo.code,
+					"MallCode": this.user.mallCode
+				}
+				this.SetLabel(param)
 			},
 			//导出excel
 			handleExcel() {
@@ -562,5 +642,11 @@
   .time-tag {
     margin: 2px;
     cursor: pointer;
+  }
+
+  .checkbox-div {
+    margin-top: 10px;
+    margin-right: 0;
+    margin-left: 10px;
   }
 </style>

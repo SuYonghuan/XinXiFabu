@@ -25,7 +25,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="search.NewsOrder" placeholder="素材数量排序">
+            <el-select v-model="search.NewsOrder" placeholder="素材数量排序" @change="changSelect(1)">
               <el-option
                       v-for="item in sort"
                       :label="item.label"
@@ -34,7 +34,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-select v-model="search.Order" placeholder="设备数量排序">
+            <el-select v-model="search.Order" placeholder="设备数量排序" @change="changSelect(2)">
               <el-option
                       v-for="item in sort"
                       :label="item.label"
@@ -185,7 +185,7 @@
           </el-table-column>
           <el-table-column label="设备数量">
             <template slot-scope="scope">
-              <el-link type="primary" @click="handleDeviceDetail(scope.row)">{{ scope.row.devCount }}</el-link>
+              <el-link type="primary" @click="handleDeviceDetail1(scope.row)">{{ scope.row.devCount }}</el-link>
             </template>
           </el-table-column>
           <el-table-column prop="beginTime" label="开始时间">
@@ -434,7 +434,7 @@
         </el-form-item>
         <el-form-item label="字体大小">
           <p style="display: flex;justify-content: space-between">
-            <el-input-number v-model="editForm.fontSize" :min="10" label="字体大小"></el-input-number>
+            <el-input-number v-model="editForm.fontSize" :min="10" :max="80" label="字体大小"></el-input-number>
           </p>
         </el-form-item>
         <el-form-item label="输入字幕文字">
@@ -500,6 +500,7 @@
 		GetGroupList,
 		PublishSubtitle,
 		SubtitleStop,
+	  GetDevicesBySubtitleCode,
 	} from 'http/api/program'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -623,7 +624,7 @@
 					"SearchKey": this.search.SearchKey,
 					"ScreenInfoCode": this.search.ScreenCode,
 					"Order": this.search.Order,
-					"NameOrder": this.search.NameOrder,
+					"NewsOrder": this.search.NewsOrder,
 					"State": this.search.State,
 					"Paging": 1,
 					"PageIndex": page,
@@ -764,6 +765,15 @@
 			},
 			GetDevicesByNewsGroupCode(param) {
 				GetDevicesByNewsGroupCode(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.newsProgram = res.data
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
+			GetDevicesBySubtitleCode(param) {
+				GetDevicesBySubtitleCode(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.newsProgram = res.data
 						return
@@ -950,6 +960,12 @@
 			handleDeviceDetail(item) {
 				const param = {"Code": item.code}
 				this.GetDevicesByNewsGroupCode(param)
+				this.dialogVisibleDeviceDetails = true
+			},
+			//设备详情
+			handleDeviceDetail1(item) {
+				const param = {"Code": item.code}
+				this.GetDevicesBySubtitleCode(param)
 				this.dialogVisibleDeviceDetails = true
 			},
 			//发布字幕
@@ -1234,6 +1250,14 @@
 			handleSubStop(item) {
 				this.SubtitleStop({"Codes": [item.code]})
 			},
+		//排序置空
+		changSelect(type) {
+			if (type == 2) {
+				this.search.NewsOrder = ''
+				return
+			}
+			this.search.Order = ''
+		},
 		},
 		components: {
 			pagination,

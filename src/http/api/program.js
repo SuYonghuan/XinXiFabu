@@ -154,6 +154,10 @@ export const getSubtitle = (param) =>
 export const DelSubtitle = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/Del?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/Del"))}&time=${timeStamp()}`,param)
 
+//获取字幕组设备数量
+export const GetDevicesBySubtitleCode = (param) =>
+	post(`${store.state.config.url}/api/Subtitle/GetDevicesBySubtitleCode?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/GetDevicesBySubtitleCode"))}&time=${timeStamp()}`,param)
+
 //获取字幕组设备
 export const GetGroupList = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/GetGroupList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/GetGroupList"))}&time=${timeStamp()}`,param)

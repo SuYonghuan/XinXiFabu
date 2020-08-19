@@ -67,10 +67,10 @@
         <el-tab-pane label="父级业态" name="父级业态">
           <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
             <el-form-item label="业态名称" prop="name">
-              <el-input type="text" v-model="editForm.name" placeholder="请输入业态名称"></el-input>
+              <el-input type="text" v-model="editForm.name" maxlength="8" placeholder="请输入业态名称"></el-input>
             </el-form-item>
             <el-form-item label="英文名称" prop="nameEn">
-              <el-input type="text" v-model="editForm.nameEn" placeholder="请输入业态英文名称"></el-input>
+              <el-input type="text" v-model="editForm.nameEn" maxlength="24" placeholder="请输入业态英文名称"></el-input>
             </el-form-item>
             <el-form-item label="业态图标" prop="iconFile">
               <el-upload
@@ -101,7 +101,7 @@
               <el-col :span="10">
                 <div class="grid-content bg-purple">
                   <el-form-item label="业态名称">
-                    <el-input type="text" v-model="item.Name" ref="childName"
+                    <el-input type="text" v-model="item.Name" ref="childName"  maxlength="8"
                               placeholder="请输入业态名称"></el-input>
                   </el-form-item>
                 </div>
@@ -109,7 +109,7 @@
               <el-col :span="10">
                 <div class="grid-content bg-purple">
                   <el-form-item label="英文名称">
-                    <el-input type="text" v-model="item.NameEn" ref="childNameEn"
+                    <el-input type="text" v-model="item.NameEn" ref="childNameEn" maxlength="24"
                               placeholder="请输入业态英文名称"></el-input>
                   </el-form-item>
                 </div>
@@ -164,7 +164,7 @@
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
-					name: [{required: true, message: '请输入楼栋名称', trigger: 'blur'}]
+					name: [{required: true, message: '请输入业态名称', trigger: 'blur'}]
 				},
 				imageUrl: '',
 				maxImg: '',
@@ -293,6 +293,7 @@
 				this.childNum = 1
 				this.imageUrl = ''
 				this.editForm = {}
+				this.childForm = [{Name: '', NameEn: ''}]
 			},
 			//提交
 			submitUpForm(item) {

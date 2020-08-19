@@ -113,3 +113,15 @@ export const OfficeDel = (param) =>
 //修改写字楼状态
 export const ChangeOfficeStatus = (param) =>
 	post(`${store.state.config.mallYunUrl}/API/Office/ChangeOfficeStatus?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Office/ChangeOfficeStatus"))}&time=${timeStamp()}`,param)
+
+//同步店铺数据
+export const GetSynData = (param) =>
+	post(`${store.state.config.url}/api/cdn/GetSynData?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/cdn/GetSynData"))}&time=${timeStamp()}`,param)
+
+//获取标签数据
+export const GetShopLabelList = (param) =>
+	post(`${store.state.config.url}/api/LabelToObject/GetShopLabelList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/GetShopLabelList"))}&time=${timeStamp()}`,param)
+
+//获取标签数据
+export const SetLabel = (param) =>
+	post(`${store.state.config.url}/api/LabelToObject/Set?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/Set"))}&time=${timeStamp()}`,param)

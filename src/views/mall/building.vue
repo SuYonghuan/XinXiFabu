@@ -30,7 +30,7 @@
                append-to-body>
       <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="楼栋名称" prop="name">
-          <el-input type="text" v-model="editForm.name" placeholder="请输入楼栋名称"></el-input>
+          <el-input type="text" v-model="editForm.name" maxlength="5" placeholder="请输入楼栋名称"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">

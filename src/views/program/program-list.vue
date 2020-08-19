@@ -310,19 +310,15 @@
                :close-on-click-modal="true" append-to-body>
       <el-table :data="postionList" style="width: 100%">
         <el-table-column type="index" label="序号"></el-table-column>
-        <el-table-column prop="name" label="设备名称">
-          <template slot-scope="scope">{{ scope.row.devlist[0].devNum }}</template>
-        </el-table-column>
-        <el-table-column prop="ip" label="IP地址">
-          <template slot-scope="scope">{{ scope.row.devlist[0].ip }}</template>
-        </el-table-column>
+        <el-table-column prop="devNum" label="设备名称"></el-table-column>
+        <el-table-column prop="ip" label="IP地址"></el-table-column>
         <el-table-column prop="floor" label="楼栋/楼层">
           <template slot-scope="scope">
-            {{ scope.row.devlist[0].buildingName }}/{{ scope.row.devlist[0].floorName }}
+            {{ scope.row.buildingName }}/{{ scope.row.floorName }}
           </template>
         </el-table-column>
         <el-table-column prop="mark" label="备注">
-          <template slot-scope="scope">{{ scope.row.devlist[0].mark }}</template>
+          <template slot-scope="scope">{{ scope.row.mark }}</template>
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -359,8 +355,8 @@
                :close-on-click-modal="true" append-to-body>
 
       <el-form :label-width="formLabelWidth" :model="search">
-        <el-form-item label="店铺名称">
-          <el-input v-model="programInfo.programName" :disabled="true" placeholder="店铺名称"></el-input>
+        <el-form-item label="节目名称">
+          <el-input v-model="programInfo.programName" :disabled="true" placeholder="节目名称"></el-input>
         </el-form-item>
         <el-form-item label="选择标签">
           <div>
@@ -582,7 +578,9 @@
 			GetPostionList(param) {
 				GetPostionList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.postionList = res.data
+						for (let i = 0; i < res.data.length; i++) {
+							this.postionList = this.postionList.concat(res.data[i].devlist)
+						}
 						return
 					}
 					this.$message.error(res.msg);
@@ -871,7 +869,7 @@
 						FileGUID: res.data.fileGuid,
 						ProgramName: file.name,
 						Size: file.size,
-						PreviewFileGUID: res.data.previewFileGUID
+						PreviewFileGUID: res.data.previewFileGuid
 					});
 				} else {
 					this.$message.error('上传失败!');
