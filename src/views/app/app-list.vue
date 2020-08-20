@@ -35,7 +35,7 @@
       <el-table-column prop="screen" label="分辨率"></el-table-column>
       <el-table-column prop="shelfTime" label="下架时间">
         <template slot-scope="scope">
-          {{timestampToTime(scope.row.shelfTime)}}
+          {{scope.row.shelfTime ? timestampToTime(scope.row.shelfTime) : '----'}}
         </template>
       </el-table-column>
       <el-table-column prop="appUrl" label="后台管理">

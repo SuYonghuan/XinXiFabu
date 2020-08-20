@@ -146,6 +146,10 @@ export const GetSubtitleList = (param) =>
 export const SetSubtitle = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/Set?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/Set"))}&time=${timeStamp()}`,param)
 
+//添加字幕
+export const UpdateSubtitle = (param) =>
+	post(`${store.state.config.url}/api/Subtitle/Update?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/Update"))}&time=${timeStamp()}`,param)
+
 //获取字幕详情
 export const getSubtitle = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/Get?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/Get"))}&time=${timeStamp()}`,param)

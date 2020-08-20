@@ -236,6 +236,7 @@
     .notice-list {
       height: 350px;
       overflow-y: auto;
+      overflow-x: hidden;
       border-bottom: 1px solid #DCDFE6;
 
       .notice-item {

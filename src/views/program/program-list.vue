@@ -519,7 +519,7 @@
 					if (res.code === ERR_OK) {
 						this.tableData = res.data.list
 						this.total = res.data.allCount
-						// console.log(this.tableData)
+						console.log(this.tableData)
 					}
 				})
 			},

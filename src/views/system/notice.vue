@@ -22,6 +22,8 @@
             <template slot-scope="scope">
               <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-show="tabTxt != '已读消息'">已读
               </el-button>
+              <el-button type="primary" size="small" @click="handleWatch(scope.row)">查看
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -30,6 +32,34 @@
                     @handleCurrentChange="handleCurrentChange" v-show="tabTxt == '已读消息'"></pagination>
       </el-tab-pane>
     </el-tabs>
+
+    <!--  查看详情  -->
+    <el-dialog title="详情" :visible.sync="dialogVisibleDevice" width="50%" :before-close="handleClose"
+               :close-on-click-modal="true" append-to-body>
+      <el-form :label-width="'120'" ref="editForm">
+        <el-form-item label="素材名称" prop="groupName">
+          <el-input type="text" v-model="editForm.programName" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="到期日期" prop="groupName">
+          <el-input type="text" v-model="editForm.expiryDate" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item :label="'已发布设备 '+editForm.device.length+' 台'">
+          <el-table :data="editForm.device" style="width: 100%;height: 400px">
+            <el-table-column type="index" label="序号"></el-table-column>
+            <el-table-column prop="devNum" label="设备名称"></el-table-column>
+            <el-table-column prop="ip" label="IP地址"></el-table-column>
+            <el-table-column prop="floor" label="楼栋/楼层">
+              <template slot-scope="scope">
+                {{ scope.row.buildingName }}/{{ scope.row.floorName }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="mark" label="备注">
+              <template slot-scope="scope">{{ scope.row.mark }}</template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -47,7 +77,7 @@
 
 	export default {
 		name: "notice",
-	  inject:['reload'],
+		inject: ['reload'],
 		mixins: [timeFormatting],
 		data() {
 			return {
@@ -59,6 +89,8 @@
 					'未读消息', '已读消息'
 				],
 				tabTxt: '',
+				dialogVisibleDevice: false,
+				editForm: {device: []},
 			}
 		},
 		created() {
@@ -89,13 +121,24 @@
 					}
 				})
 			},
-			GetMessageInfo(param) {
+			GetMessageInfo(param, type = 1) {
 				GetMessageInfo(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.GetNoReadMessage()
-						this.$message.success('操作成功');
-						this.reload()
-						return
+						if (type == 1) {
+							this.GetNoReadMessage()
+							this.$message.success('操作成功');
+							this.reload()
+							return
+						}
+						this.dialogVisibleDevice = true
+						this.editForm = res.data
+						this.editForm.device = [];
+						if (this.editForm.list.length > 0) {
+							for (let i = 0; i < this.editForm.list.length; i++) {
+								this.editForm.device = this.editForm.device.concat(this.editForm.list[i].devlist)
+							}
+						}
+						return;
 					}
 					this.$message.error(res.msg);
 				})
@@ -125,6 +168,18 @@
 			//已读
 			handleDelete(item) {
 				this.GetMessageInfo({'Code': item.code})
+			},
+			//查看
+			handleWatch(item) {
+				this.GetMessageInfo({'Code': item.code}, 2)
+			},
+			//关闭
+			handleClose() {
+				this.dialogVisibleDevice = false
+				if (this.tabTxt == '未读消息') {
+					this.GetNoReadMessage()
+					this.reload()
+				}
 			},
 		},
 		computed: {

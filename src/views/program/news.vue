@@ -199,7 +199,7 @@
           <el-table-column label="操作" width="250px">
             <template slot-scope="scope">
               <el-button type="primary" size="small" :disabled="scope.row.state != '未开始'"
-                         @click="handleSubtitle(scope.row)" v-if="pageMenu.addsubtitle">编辑
+                         @click="handleSubtitle(scope.row)" v-if="pageMenu.editsubtitle">编辑
               </el-button>
               <el-button type="danger" size="small" :disabled="scope.row.state == '进行中'"
                          @click="handleDelete(scope.row,2)" v-if="pageMenu.delsubtitle">删除
@@ -495,12 +495,13 @@
 		GetDevicesByNewsGroupCode,
 		GetSubtitleList,
 		SetSubtitle,
+		UpdateSubtitle,
 		getSubtitle,
 		DelSubtitle,
 		GetGroupList,
 		PublishSubtitle,
 		SubtitleStop,
-	  GetDevicesBySubtitleCode,
+		GetDevicesBySubtitleCode,
 	} from 'http/api/program'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -810,6 +811,17 @@
 					this.$message.error(res.msg);
 				})
 			},
+			UpdateSubtitle(param) {
+				UpdateSubtitle(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.handleClose()
+						this.$message.success(res.msg);
+						this.GetSubtitleList()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
 			getSubtitle(code) {
 				const param = {"Code": code}
 				getSubtitle(param).then(res => {
@@ -1035,9 +1047,13 @@
 							"EndTime": this.editForm.endTime,
 							"Location": this.editForm.location,
 							"Type": this.editForm.type,
-							"Code": this.editForm.code,
 							"FontSize": this.editForm.fontSize,
 							"FontColor": this.editForm.fontColor
+						}
+						if (this.editForm.code) {
+							param.Code = this.editForm.code
+							this.UpdateSubtitle(param)
+							return
 						}
 						this.SetSubtitle(param)
 					}
@@ -1250,14 +1266,14 @@
 			handleSubStop(item) {
 				this.SubtitleStop({"Codes": [item.code]})
 			},
-		//排序置空
-		changSelect(type) {
-			if (type == 2) {
-				this.search.NewsOrder = ''
-				return
-			}
-			this.search.Order = ''
-		},
+			//排序置空
+			changSelect(type) {
+				if (type == 2) {
+					this.search.NewsOrder = ''
+					return
+				}
+				this.search.Order = ''
+			},
 		},
 		components: {
 			pagination,

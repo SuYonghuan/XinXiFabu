@@ -183,8 +183,7 @@
     </el-dialog>
 
     <div class="max-div" v-show="shotImg" @click="clickMaxImg">
-      <!--      <img :src="shotImg" alt="">-->
-      <img src="../../common/images/pepo.jpeg" style="max-width: 1920px" alt="">
+      <img :src="shotImg" style="max-width: 1920px" alt="">
     </div>
   </div>
 </template>
@@ -337,6 +336,8 @@
 				DeviceScreenshot(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.shotImg = res.data
+						this.$message.success(res.msg);
+						return
 					}
 					this.$message.error(res.msg);
 				})
@@ -446,7 +447,7 @@
 			//搜索
 			onSearch() {
 				this.currentPage = 1
-				this.getList(this.pageSize, this.currentPage, this.search)
+				this.getList(this.pageSize, this.currentPage)
 			},
 			//重置搜索
 			replaySearch() {
@@ -613,6 +614,7 @@
 					type: "warning"
 				}).then(() => {
 					let param = {};
+					let ids = []
 					if (type == 1) {
 						for (var i = 0; i < item.length; i++) {
 							ids.push(item[i].code)
