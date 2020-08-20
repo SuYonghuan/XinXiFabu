@@ -169,7 +169,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login' && !getCookie('autoauth') ) {
+  if ((to.path === '/login' && !getCookie('autoauth')) || to.path === '/mallregister') {
     next()
   } else {
     if ( getCookie('autoauth') ) {
