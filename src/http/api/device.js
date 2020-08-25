@@ -106,3 +106,11 @@ export const GetProgramGroupByDeviceGroup = (param) =>
 export const DelProgramDevice = (param) =>
 	post(`${store.state.config.url}/api/DevGroup/DelProgramDevice?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/DevGroup/DelProgramDevice"))}&time=${timeStamp()}`,param)
 
+//获取点位信息
+export const GetDevCoordinate = (param) =>
+	post(`${store.state.config.url}/api/dev/GetDevCoordinate?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/dev/GetDevCoordinate"))}&time=${timeStamp()}`,param)
+
+//编辑设备点位信息
+export const DevCoordinateEdit = (param) =>
+	post(`${store.state.config.url}/api/Dev/DevCoordinateEdit?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Dev/DevCoordinateEdit"))}&time=${timeStamp()}`,param)
+

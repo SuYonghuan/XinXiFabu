@@ -465,7 +465,7 @@
 			handleDevice(item) {
 				console.log(item)
 				this.dialogVisibleDevice = true
-				this.GetDeviceByGroupCode(this.searchDeviceList[0].code, false)
+				this.GetDeviceByGroupCode(item.screenInfoCode, false)
 				this.deviceForm = {
 					groupName: this.dateFormat('y-m-d h:i:s') + ' 新建设备',
 					screenInfo: item.screenInfo,

@@ -53,7 +53,22 @@
     </el-card>
 
     <el-tabs value="1" type="border-card" @tab-click="clickTab" style="margin-top: 20px;">
-      <el-tab-pane label="节目列表" name="1">
+      <el-tab-pane label="设备位置" name="1">
+        <div class="device-map">
+          <p>
+            设备点位：
+            <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999"></el-input-number>
+          </p>
+          <p>
+            设备角度：
+            <el-input-number v-model="devCoordinate.angle" :min="-360" :max="360"></el-input-number>
+          </p>
+          <p>
+            <el-button type="primary" @click="clickMap">保存</el-button>
+          </p>
+        </div>
+      </el-tab-pane>
+      <el-tab-pane label="节目列表" name="2">
         <p>节目发布类型：</p>
         <div class="program-list">
           <el-card class="box-card program-item" v-for="item of programData">
@@ -66,7 +81,7 @@
           </el-card>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="管理部门列表" name="2">
+      <el-tab-pane label="管理部门列表" name="3">
         <el-table :data="departmentData">
           <el-table-column type="index" label="序号"></el-table-column>
           <el-table-column prop="name" label="部门名称"></el-table-column>
@@ -106,6 +121,8 @@
 		GetDeptListByDeviceCode,
 		DevNumEdit,
 		RemarksEdit,
+		GetDevCoordinate,
+		DevCoordinateEdit,
 	} from 'http/api/device'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -120,6 +137,7 @@
 				editForm: {},
 				type: 1,
 				deviceInfo: {},
+				devCoordinate: {},
 				programData: [],
 				departmentData: [],
 				code: this.$route.query.code,
@@ -127,7 +145,8 @@
 		},
 		created() {
 			this.GetDeviceInfo()
-			this.GetLocalProgram()
+			// this.GetLocalProgram()
+			this.GetDevCoordinate()
 		},
 		methods: {
 			/**
@@ -153,6 +172,17 @@
 					if (res.code === ERR_OK) {
 						this.programData = res.data
 						// console.log(this.programData)
+					}
+				})
+			},
+			GetDevCoordinate() {
+				const param = {
+					"Code": this.code
+				}
+				GetDevCoordinate(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.devCoordinate = res.data
+						console.log(this.devCoordinate)
 					}
 				})
 			},
@@ -189,20 +219,30 @@
 					this.$message.error(res.msg);
 				})
 			},
+			DevCoordinateEdit(param) {
+				DevCoordinateEdit(param).then(res => {
+					if (res.code === ERR_OK) {
+						this.$message.success(res.msg);
+						this.GetDevCoordinate()
+						return
+					}
+					this.$message.error(res.msg);
+				})
+			},
 			/**
 			 * End
 			 */
-      //时间转换
-      timestampToTime(item,type='y-m-d h:i:s') {
-        return this.dateFormat(type, new Date(item))
-      },
+			//时间转换
+			timestampToTime(item, type = 'y-m-d h:i:s') {
+				return this.dateFormat(type, new Date(item))
+			},
 			back() {
 				this.$router.back()
 			},
 			handleEdit(index) {
 				this.dialogVisible = true
 				this.type = index
-        this.editForm = JSON.parse(JSON.stringify(this.deviceInfo))
+				this.editForm = JSON.parse(JSON.stringify(this.deviceInfo))
 			},
 			handleClose() {
 				this.dialogVisible = false
@@ -220,10 +260,22 @@
 			//切换tab
 			clickTab(val) {
 				if (val.index == 0) {
+					this.GetDevCoordinate()
+				} else if (val.index == 1) {
 					this.GetLocalProgram()
 				} else {
 					this.GetDeptListByDeviceCode()
 				}
+			},
+			clickMap() {
+				const param = {
+					"Code": this.code,
+					"Xaxis": this.devCoordinate.yaxis,
+					"Yaxis": this.devCoordinate.yaxis,
+					"Angle": this.devCoordinate.angle,
+					"AreaCode": ""
+				}
+				this.DevCoordinateEdit(param)
 			},
 		},
 		computed: {
@@ -296,6 +348,14 @@
           height: 250px;
           max-width: 210px;
         }
+      }
+    }
+
+    .device-map {
+      p {
+        height: 60px;
+        display: flex;
+        align-items: center;
       }
     }
   }

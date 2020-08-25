@@ -117,8 +117,8 @@
 				rememberpwd: false,
 				dialogVisible: false,
 				ruleForm: {
-					username: 'admin',
-					password: '123456'
+					// username: 'admin',
+					// password: '123456'
 				},
 				//rules前端验证
 				rules: {
