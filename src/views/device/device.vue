@@ -183,7 +183,7 @@
     </el-dialog>
 
     <div class="max-div" v-show="shotImg" @click="clickMaxImg">
-      <img :src="shotImg" style="max-width: 1920px" alt="">
+      <img :src="shotImg" style="max-width: 1920px;max-height: 900px" alt="">
     </div>
   </div>
 </template>
