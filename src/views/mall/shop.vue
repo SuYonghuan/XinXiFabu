@@ -185,7 +185,7 @@
 				dialogVisible: false,
 				dialogVisibleLabel: false,
 				dialogTitle: '新增',
-				editForm: {logo: '', floorCode: '', secFormat: ''},
+				editForm: {logo: '', floorCode: '', secFormat: '',nameEn:'',introEn: ''},
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
@@ -431,7 +431,7 @@
 				this.dialogVisible = false
 				this.dialogVisibleLabel = false
 				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
-				this.editForm = {logo: '', floorCode: '', secFormat: ''}
+				this.editForm = {logo: '', floorCode: '', secFormat: '',nameEn:'',introEn: ''}
 				this.formatInfo = {}
 				this.floorList = []
 				this.imageUrl = ''
