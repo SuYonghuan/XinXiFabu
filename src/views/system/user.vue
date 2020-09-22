@@ -11,7 +11,7 @@
     <!--  搜索  -->
     <el-form :inline="true" :model="search" class="demo-form-inline">
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleAdd({})" v-if="pageMenu.addaccount">新增用户</el-button>
+        <el-button type="success" @click="handleAdd({})" v-if="pageMenu.addaccount">新增用户</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delaccount">删除</el-button>
       </el-form-item>
     </el-form>
@@ -19,7 +19,8 @@
     <!--  表格  -->
     <el-table
             :data="tableData"
-            @selection-change="handleDeletion" max-height="620px"
+            @selection-change="handleDeletion"
+            height="620px"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>

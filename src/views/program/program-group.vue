@@ -45,7 +45,7 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addproggroup">新增组</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addproggroup">新增组</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delproggroup">删除</el-button>
       </el-form-item>
     </el-form>
@@ -54,6 +54,7 @@
     <el-table
             :data="tableData"
             @selection-change="handleDeletion"
+            height="620"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
@@ -93,7 +94,7 @@
 
     <!--  分页  -->
     <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange"></pagination>
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="80%" :before-close="handleClose" class="dialog"
@@ -423,6 +424,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.pageSize = val;
+        this.currentPage = 1;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//搜索
 			onSearch() {
 				this.currentPage = 1

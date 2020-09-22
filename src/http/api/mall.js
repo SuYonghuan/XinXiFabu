@@ -125,3 +125,19 @@ export const GetShopLabelList = (param) =>
 //获取标签数据
 export const SetLabel = (param) =>
 	post(`${store.state.config.url}/api/LabelToObject/Set?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/Set"))}&time=${timeStamp()}`,param)
+
+//获取区域列表
+export const GetRegionList = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Area/GetList?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Area/GetList"))}&time=${timeStamp()}`,param)
+
+//添加区域
+export const AddRegion = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Area/Add?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Area/Add"))}&time=${timeStamp()}`,param)
+
+//编辑区域
+export const EditRegion = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Area/Edit?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Area/Edit"))}&time=${timeStamp()}`,param)
+
+//删除区域
+export const DelRegion = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Area/Del?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Area/Del"))}&time=${timeStamp()}`,param)

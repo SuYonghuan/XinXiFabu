@@ -20,7 +20,7 @@
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%" height="620">
       <el-table-column prop="name" label="应用名称"></el-table-column>
       <el-table-column prop="filePath" label="ICON">
         <template slot-scope="scope">
@@ -55,7 +55,7 @@
 
     <!--  分页  -->
     <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange"></pagination>
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  发布  -->
     <el-dialog title="发布到设备" :visible.sync="dialogVisibleDevice" width="80%" :before-close="handleClose" append-to-body
@@ -193,6 +193,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.pageSize = val;
+        this.currentPage = 1;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//搜索
 			onSearch() {
 				this.currentPage = 1

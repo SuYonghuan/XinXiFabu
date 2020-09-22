@@ -10,68 +10,80 @@
 
     <!--  搜索  -->
     <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item>
+      <el-form-item label="节目名称">
         <el-input v-model="search.searchKey" placeholder="节目名称"></el-input>
       </el-form-item>
-      <el-form-item>
-        <el-select v-model="search.progType" placeholder="节目类型">
-          <el-option
-                  v-for="item in programType"
-                  :label="item.label"
-                  :value="item.label">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="search.screenCode" placeholder="屏幕属性">
-          <el-option
-                  v-for="item in searchDeviceList"
-                  :label="item.sName"
-                  :value="item.code">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="search.progStatus" placeholder="节目状态">
-          <el-option
-                  v-for="item in programStatus"
-                  :label="item.label"
-                  :value="item.label">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="search.screenMatch" placeholder="屏幕适应">
-          <el-option
-                  v-for="item in screenAdapt"
-                  :label="item.label"
-                  :value="item.label">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-select v-model="search.switchMode" placeholder="切换效果">
-          <el-option
-                  v-for="item in programEffect"
-                  :label="item.label"
-                  :value="item.label">
-          </el-option>
-        </el-select>
-      </el-form-item>
+
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
+        <el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">
+          高级查询
+          <i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>
+          <i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>
+        </el-link>
       </el-form-item>
+
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>
-        <el-button type="info" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
+        <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>
+        <el-button type="success" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delprog">删除</el-button>
       </el-form-item>
+
+      <div v-show="otherSearch">
+        <el-form-item label="节目类型">
+          <el-select v-model="search.progType" placeholder="节目类型">
+            <el-option
+                    v-for="item in programType"
+                    :label="item.label"
+                    :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="屏幕属性">
+          <el-select v-model="search.screenCode" placeholder="屏幕属性">
+            <el-option
+                    v-for="item in searchDeviceList"
+                    :label="item.sName"
+                    :value="item.code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="节目状态">
+          <el-select v-model="search.progStatus" placeholder="节目状态">
+            <el-option
+                    v-for="item in programStatus"
+                    :label="item.label"
+                    :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="屏幕适应">
+          <el-select v-model="search.screenMatch" placeholder="屏幕适应">
+            <el-option
+                    v-for="item in screenAdapt"
+                    :label="item.label"
+                    :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="切换效果">
+          <el-select v-model="search.switchMode" placeholder="切换效果">
+            <el-option
+                    v-for="item in programEffect"
+                    :label="item.label"
+                    :value="item.label">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </div>
+
     </el-form>
 
     <!--  表格  -->
     <el-table
             :data="tableData"
+            height="620"
             @selection-change="handleDeletion"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
@@ -148,7 +160,7 @@
 
     <!--  分页  -->
     <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange"></pagination>
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
@@ -184,23 +196,26 @@
                   ref="upload"
                   :action="config.updateFile"
                   :on-change="handleProgress"
+                  :on-progress='uploaded'
                   :file-list="fileList"
                   :show-file-list="false"
                   :limit="5"
                   :auto-upload="true"
                   :on-success="handleAvatarSuccess">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-            <!--            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
             <el-card class="box-card file-list-card">
-              <div v-for="(item,index) of editForm.progFiles">
+              <div v-for="(item,index) of fileList" class="card-input">
                 <div>
-                  <el-input v-model="item.ProgramName" style="width: 300px"></el-input>
+                  <el-input v-model="item.name" style="width: 300px"
+                            @change="changeFileName(index,item.name)"></el-input>
                   /
-                  <span>{{fileSize(item.Size)}}</span>
+                  <span>{{fileSize(item.size)}}</span>
                 </div>
                 <p>
                   <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
                 </p>
+                <el-progress v-if="item.uid == uid && item.percentage < 100" :percentage="Math.round(item.percentage)"
+                             class="el-progress"></el-progress>
               </div>
             </el-card>
             <div slot="tip" class="el-upload__tip">支持最多5个素材文件;建议每个图片大小不超过5M，最大尺寸不超过5000x5000分辨率;视频大小不大于500M</div>
@@ -266,13 +281,19 @@
                   :action="config.updateFile"
                   :on-change="handleProgress"
                   :on-success="handleAvatarSuccess1"
+                  :on-progress='uploaded1'
                   :show-file-list="false"
                   :auto-upload="true">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <el-card class="box-card file-list-card">
-              <img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 260px" alt="">
-              <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 260px"
+              <img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 220px" alt="">
+              <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 220px"
                      v-else></video>
+              <div style="position: relative">
+                <el-progress v-if="fileList.length > 0 && fileList[0].uid == uid"
+                             :percentage="Math.round(fileList[0].percentage)"
+                             class="el-progress"></el-progress>
+              </div>
             </el-card>
           </el-upload>
         </el-form-item>
@@ -378,562 +399,592 @@
 </template>
 
 <script>
-	import pagination from 'components/pagination/pagination'
-	import transferView from 'components/transfer-view/transfer-view'
-	import {timeFormatting} from 'common/js/mixins'
-	import {
-		GetDeviceOptionsNew,
-		GetRolePermissions,
-		GetList,
-		ProgAddFast,
-		ProgAdd,
-		ProgEdit,
-		DelProgram_Pre,
-		DelProgram,
-		GetPostionList,
-		QueryProgShopList,
-		SetProgToShop,
-		GetProgLabelList,
-		SetLabel,
-	} from 'http/api/program'
-	import {ERR_OK} from 'http/config'
-	import {mapGetters} from 'vuex'
-	import bigImage from 'components/big-image/big-image'
+  import pagination from 'components/pagination/pagination'
+  import transferView from 'components/transfer-view/transfer-view'
+  import {timeFormatting} from 'common/js/mixins'
+  import {
+    GetDeviceOptionsNew,
+    GetRolePermissions,
+    GetList,
+    ProgAddFast,
+    ProgAdd,
+    ProgEdit,
+    DelProgram_Pre,
+    DelProgram,
+    GetPostionList,
+    QueryProgShopList,
+    SetProgToShop,
+    GetProgLabelList,
+    SetLabel,
+  } from 'http/api/program'
+  import {ERR_OK} from 'http/config'
+  import {mapGetters} from 'vuex'
+  import bigImage from 'components/big-image/big-image'
 
-	export default {
-		name: "deptManager",
-		mixins: [timeFormatting],
-		data() {
-			return {
-				search: {},
-				search1: {},
-				tableData: [],
-				total: 0,
-				currentPage: 0,
-				pageSize: 10,
-				dialogVisible: false,
-				dialogVisibleDetails: false,
-				dialogVisibleDevice: false,
-				dialogVisibleShop: false,
-				dialogVisibleLabel: false,
-				dialogTitle: '快速发布',
-				editForm: {},
-				updateForm: {},
-				formLabelWidth: "120px",
-				rules: {
-					screenInfo: [{required: true, message: '请选择分辨率', trigger: 'blur'}],
-					time: [{required: true, message: '请选择时间范围', trigger: 'blur'}],
-					progFiles: [{required: true, message: '请上传素材', trigger: 'blur'}],
-				},
-				tableChecked: [],
-				deviceForm: {},
-				staffList: [
-					{key: 28, phone: "补货员", nickName: "补货员"},
-					{key: 29, phone: "测试员", nickName: "测试员"}
-				],
-				selectedStaffList: [],
-				screenData: [
-					{label: '1920*1080横屏', value: 1},
-					{label: '1920*1080竖屏', value: 2}
-				],
-				programType: [
-					{label: '视频', value: 1},
-					{label: '图片', value: 2}
-				],
-				programStatus: [
-					{label: '未开始', value: 1},
-					{label: '排期中', value: 2},
-					{label: '已过期', value: 3}
-				],
-				programEffect: [
-					{label: '随机', value: 1},
-					{label: '马赛克', value: 2},
-					{label: '上下滑动', value: 3},
-					{label: '左右滑动', value: 4},
-					{label: '渐入', value: 5}
-				],
-				screenAdapt: [
-					{label: '无', value: 1},
-					{label: '填充', value: 2},
-					{label: '适应', value: 3},
-					{label: '拉伸', value: 4},
-					{label: '平铺', value: 5},
-					{label: '居中', value: 6}
-				],
-				fileList: [],
-				releaseType: 1,
-				pageMenu: {},
-				searchDeviceList: {},
-				delError: '',
-				postionList: [],
-				shopList: [],
-				programInfo: {},
-				labelList: [],
-				labelActive: [],
-				bigFile: null,
-			}
-		},
-		created() {
-			this.GetRolePermissions()
-			this.GetDeviceOptionsNew()
-		},
-		methods: {
-			/**
-			 * 网络请求
-			 * @param val
-			 */
-			GetRolePermissions() {
-				const param = {
-					MenuCode: this.presentMenu.code,
-				}
-				GetRolePermissions(param).then(res => {
-					if (res.code === ERR_OK) {
-						for (let a = 0; a < res.data.length; a++) {
-							this.pageMenu[res.data[a].actionId] = true;
-						}
-						this.getList(this.pageSize, this.currentPage)
-						// console.log(this.pageMenu)
-					}
-				})
-			},
-			GetDeviceOptionsNew() {
-				GetDeviceOptionsNew({}).then(res => {
-					if (res.code === ERR_OK) {
-						this.searchDeviceList = res.data.screenInfos
-					}
-				})
-			},
-			getList(pageSize, page) {
-				const param = {
-					"SearchKey": this.search.searchKey,
-					"ProgType": this.search.progType,
-					"ScreenCode": this.search.screenCode,
-					"SwitchMode": this.search.switchMode,
-					"ScreenMatch": this.search.screenMatch,
-					"ProgStatus": this.search.progStatus,
-					"paging": 1,
-					"PageIndex": page,
-					"PageSize": pageSize
-				}
-				GetList(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.tableData = res.data.list
-						this.total = res.data.allCount
-						console.log(this.tableData)
-					}
-				})
-			},
-			ProgAddFast(param) {
-				ProgAddFast(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.handleClose()
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			ProgAdd(param) {
-				ProgAdd(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.handleClose()
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			ProgEdit(param) {
-				ProgEdit(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.handleClose()
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			DelProgram_Pre(param) {
-				DelProgram_Pre(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.delError = res.data
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			DelProgram(param) {
-				DelProgram(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			GetPostionList(param) {
-				GetPostionList(param).then(res => {
-					if (res.code === ERR_OK) {
-						for (let i = 0; i < res.data.length; i++) {
-							this.postionList = this.postionList.concat(res.data[i].devlist)
-						}
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			QueryProgShopList(name = '') {
-				const param = {
-					"ProgramCode": this.programInfo.code,
-					"Name": name,
-					"FloorCode": "",
-					"ShopFormatCode": ""
-				}
-				QueryProgShopList(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.shopList = res.data
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			SetProgToShop(param) {
-				SetProgToShop(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.handleClose()
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			SetLabel(param) {
-				SetLabel(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.handleClose()
-						this.$message.success(res.msg);
-						this.getList(this.pageSize, this.currentPage)
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			GetProgLabelList() {
-				const param = {"ShopCode": this.programInfo.code}
-				GetProgLabelList(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.labelList = res.data.alreadylist.concat(res.data.labels)
-						if (res.data.alreadylist.length > 0) {
-							for (let i = 0; i < res.data.alreadylist.length; i++) {
-								this.labelActive.push(res.data.alreadylist[i].code)
-							}
-						}
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			/**
-			 * End
-			 * @param val
-			 */
+  export default {
+    name: "deptManager",
+    mixins: [timeFormatting],
+    data() {
+      return {
+        search: {},
+        search1: {},
+        tableData: [],
+        total: 0,
+        currentPage: 0,
+        pageSize: 10,
+        dialogVisible: false,
+        dialogVisibleDetails: false,
+        dialogVisibleDevice: false,
+        dialogVisibleShop: false,
+        dialogVisibleLabel: false,
+        dialogTitle: '快速发布',
+        editForm: {},
+        updateForm: {},
+        formLabelWidth: "120px",
+        rules: {
+          screenInfo: [{required: true, message: '请选择分辨率', trigger: 'blur'}],
+          time: [{required: true, message: '请选择时间范围', trigger: 'blur'}],
+          progFiles: [{required: true, message: '请上传素材', trigger: 'blur'}],
+        },
+        tableChecked: [],
+        deviceForm: {},
+        staffList: [
+          {key: 28, phone: "补货员", nickName: "补货员"},
+          {key: 29, phone: "测试员", nickName: "测试员"}
+        ],
+        selectedStaffList: [],
+        screenData: [
+          {label: '1920*1080横屏', value: 1},
+          {label: '1920*1080竖屏', value: 2}
+        ],
+        programType: [
+          {label: '视频', value: 1},
+          {label: '图片', value: 2}
+        ],
+        programStatus: [
+          {label: '未开始', value: 1},
+          {label: '排期中', value: 2},
+          {label: '已过期', value: 3}
+        ],
+        programEffect: [
+          {label: '随机', value: 1},
+          {label: '马赛克', value: 2},
+          {label: '上下滑动', value: 3},
+          {label: '左右滑动', value: 4},
+          {label: '渐入', value: 5}
+        ],
+        screenAdapt: [
+          {label: '无', value: 1},
+          {label: '填充', value: 2},
+          {label: '适应', value: 3},
+          {label: '拉伸', value: 4},
+          {label: '平铺', value: 5},
+          {label: '居中', value: 6}
+        ],
+        fileList: [],
+        releaseType: 1,
+        pageMenu: {},
+        searchDeviceList: {},
+        delError: '',
+        postionList: [],
+        shopList: [],
+        programInfo: {},
+        labelList: [],
+        labelActive: [],
+        bigFile: null,
+        otherSearch: false,
+        uid: 1,
+      }
+    },
+    created() {
+      this.GetRolePermissions()
+      this.GetDeviceOptionsNew()
+    },
+    methods: {
+      /**
+       * 网络请求
+       * @param val
+       */
+      GetRolePermissions() {
+        const param = {
+          MenuCode: this.presentMenu.code,
+        }
+        GetRolePermissions(param).then(res => {
+          if (res.code === ERR_OK) {
+            for (let a = 0; a < res.data.length; a++) {
+              this.pageMenu[res.data[a].actionId] = true;
+            }
+            this.getList(this.pageSize, this.currentPage)
+            // console.log(this.pageMenu)
+          }
+        })
+      },
+      GetDeviceOptionsNew() {
+        GetDeviceOptionsNew({}).then(res => {
+          if (res.code === ERR_OK) {
+            this.searchDeviceList = res.data.screenInfos
+          }
+        })
+      },
+      getList(pageSize, page) {
+        const param = {
+          "SearchKey": this.search.searchKey,
+          "ProgType": this.search.progType,
+          "ScreenCode": this.search.screenCode,
+          "SwitchMode": this.search.switchMode,
+          "ScreenMatch": this.search.screenMatch,
+          "ProgStatus": this.search.progStatus,
+          "paging": 1,
+          "PageIndex": page,
+          "PageSize": pageSize
+        }
+        GetList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.tableData = res.data.list
+            this.total = res.data.allCount
+            // console.log(this.tableData)
+          }
+        })
+      },
+      ProgAddFast(param) {
+        ProgAddFast(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      ProgAdd(param) {
+        ProgAdd(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      ProgEdit(param) {
+        ProgEdit(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      DelProgram_Pre(param) {
+        DelProgram_Pre(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.delError = res.data
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      DelProgram(param) {
+        DelProgram(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      GetPostionList(param) {
+        GetPostionList(param).then(res => {
+          if (res.code === ERR_OK) {
+            for (let i = 0; i < res.data.length; i++) {
+              this.postionList = this.postionList.concat(res.data[i].devlist)
+            }
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      QueryProgShopList(name = '') {
+        const param = {
+          "ProgramCode": this.programInfo.code,
+          "Name": name,
+          "FloorCode": "",
+          "ShopFormatCode": ""
+        }
+        QueryProgShopList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.shopList = res.data
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      SetProgToShop(param) {
+        SetProgToShop(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      SetLabel(param) {
+        SetLabel(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      GetProgLabelList() {
+        const param = {"ShopCode": this.programInfo.code}
+        GetProgLabelList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.labelList = res.data.alreadylist.concat(res.data.labels)
+            if (res.data.alreadylist.length > 0) {
+              for (let i = 0; i < res.data.alreadylist.length; i++) {
+                this.labelActive.push(res.data.alreadylist[i].code)
+              }
+            }
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      /**
+       * End
+       * @param val
+       */
 
-			//当前页码
-			handleCurrentChange(val) {
-				this.currentPage = val;
-				this.getList(this.pageSize, val)
-			},
-			//搜索
-			onSearch() {
-				this.currentPage = 1
-				this.getList(this.pageSize, this.currentPage, this.search)
-			},
-			//店铺搜索
-			onSearch1() {
-				this.QueryProgShopList(this.search1.name)
-			},
-			//重置搜索
-			replaySearch() {
-				this.search = {}
-				this.currentPage = 1
-				this.getList(this.pageSize, this.currentPage)
-			},
-			//打开新增弹窗
-			handleAdd(item) {
-				this.dialogVisible = true
-				this.releaseType = item
-				this.editForm = {
-					"screenInfo": "",
-					"launchTime": "",
-					"expiryDate": "",
-					"switchMode": "随机",
-					"switchTime": "15",
-					"screenMatch": "无",
-					"groupName": "",
-					"progFiles": []
-				}
-				this.editForm.groupName = this.dateFormat("y-m-d h:i:s") + ' 新建节目组'
-				this.dialogTitle = '快速发布'
-				if (item == 2) {
-					this.dialogTitle = '新增素材'
-				}
-			},
-			//复制
-			handleCopy(item) {
-				this.dialogVisible = true
-				this.dialogTitle = '新增素材'
-				this.releaseType = 2
-				this.editForm = {
-					"time": [item.launchTime, item.expiryDate],
-					"screenInfo": item.progScreenInfo,
-					"launchTime": item.launchTime,
-					"expiryDate": item.expiryDate,
-					"switchMode": item.switchMode,
-					"switchTime": item.switchTime,
-					"screenMatch": item.screenMatch,
-					"groupName": item.groupName,
-					"progFiles": []
-				}
-			},
-			//打开编辑弹窗
-			handleEdit(item) {
-				let data = JSON.parse(JSON.stringify(item));
-				data.time = [data.launchTime, data.expiryDate]
-				this.updateForm = data
-				this.dialogVisibleDetails = true
-			},
-			//已发布设备
-			handleDevice(item) {
-				this.dialogVisibleDevice = true
-				const param = {"Code": item.code}
-				this.GetPostionList(param)
-			},
-			//关联店铺
-			handleEditShop(item) {
-				this.programInfo = item
-				this.dialogVisibleShop = true
-				this.QueryProgShopList()
-			},
-			//设置标签
-			handleEditLabel(item) {
-				this.dialogVisibleLabel = true
-				this.programInfo = item
-				this.GetProgLabelList();
-			},
-			//关闭弹窗
-			handleClose() {
-				this.dialogVisible = false
-				this.dialogVisibleDetails = false
-				this.dialogVisibleDevice = false
-				this.dialogVisibleShop = false
-				this.dialogVisibleLabel = false
-				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
-				this.labelActive = [];
-				this.$refs.videoRef && this.$refs.videoRef.pause()
-			},
-			//提交
-			submitUpForm(item) {
-				this.$refs[item].validate(valid => {
-					if (valid) {
-						const param = {
-							"ScreenInfo": this.editForm.screenInfo,
-							"LaunchTime": this.editForm.time[0],
-							"ExpiryDate": this.editForm.time[1],
-							"SwitchMode": this.editForm.switchMode,
-							"SwitchTime": this.editForm.switchTime,
-							"ScreenMatch": this.editForm.screenMatch,
-							"ProgFiles": this.editForm.progFiles
-						}
+      //当前页码
+      handleCurrentChange(val) {
+        this.currentPage = val;
+        this.getList(this.pageSize, val)
+      },
+      //每页数量
+      handleSizeChange(val) {
+        this.pageSize = val;
+        this.currentPage = 1;
+        this.getList(this.pageSize, this.currentPage)
+      },
+      //搜索
+      onSearch() {
+        this.currentPage = 1
+        this.getList(this.pageSize, this.currentPage, this.search)
+      },
+      //店铺搜索
+      onSearch1() {
+        this.QueryProgShopList(this.search1.name)
+      },
+      //重置搜索
+      replaySearch() {
+        this.search = {}
+        this.currentPage = 1
+        this.getList(this.pageSize, this.currentPage)
+      },
+      //打开新增弹窗
+      handleAdd(item) {
+        this.dialogVisible = true
+        this.releaseType = item
+        this.editForm = {
+          "screenInfo": "",
+          "launchTime": "",
+          "expiryDate": "",
+          "switchMode": "随机",
+          "switchTime": "15",
+          "screenMatch": "无",
+          "groupName": "",
+          "progFiles": []
+        }
+        this.editForm.groupName = this.dateFormat("y-m-d h:i:s") + ' 新建节目组'
+        this.dialogTitle = '快速发布'
+        if (item == 2) {
+          this.dialogTitle = '新增素材'
+        }
+      },
+      //复制
+      handleCopy(item) {
+        this.dialogVisible = true
+        this.dialogTitle = '新增素材'
+        this.releaseType = 2
+        this.editForm = {
+          "time": [item.launchTime, item.expiryDate],
+          "screenInfo": item.progScreenInfo,
+          "launchTime": item.launchTime,
+          "expiryDate": item.expiryDate,
+          "switchMode": item.switchMode,
+          "switchTime": item.switchTime,
+          "screenMatch": item.screenMatch,
+          "groupName": item.groupName,
+          "progFiles": []
+        }
+      },
+      //打开编辑弹窗
+      handleEdit(item) {
+        let data = JSON.parse(JSON.stringify(item));
+        data.time = [data.launchTime, data.expiryDate]
+        this.updateForm = data
+        this.dialogVisibleDetails = true
+      },
+      //已发布设备
+      handleDevice(item) {
+        this.dialogVisibleDevice = true
+        const param = {"Code": item.code}
+        this.GetPostionList(param)
+      },
+      //关联店铺
+      handleEditShop(item) {
+        this.programInfo = item
+        this.dialogVisibleShop = true
+        this.QueryProgShopList()
+      },
+      //设置标签
+      handleEditLabel(item) {
+        this.dialogVisibleLabel = true
+        this.programInfo = item
+        this.GetProgLabelList();
+      },
+      //关闭弹窗
+      handleClose() {
+        this.dialogVisible = false
+        this.dialogVisibleDetails = false
+        this.dialogVisibleDevice = false
+        this.dialogVisibleShop = false
+        this.dialogVisibleLabel = false
+        this.$refs["editForm"] && this.$refs["editForm"].resetFields()
+        this.labelActive = [];
+        this.$refs.videoRef && this.$refs.videoRef.pause()
+        this.fileList = []
+      },
+      //提交
+      submitUpForm(item) {
+        this.$refs[item].validate(valid => {
+          if (valid) {
+            const param = {
+              "ScreenInfo": this.editForm.screenInfo,
+              "LaunchTime": this.editForm.time[0],
+              "ExpiryDate": this.editForm.time[1],
+              "SwitchMode": this.editForm.switchMode,
+              "SwitchTime": this.editForm.switchTime,
+              "ScreenMatch": this.editForm.screenMatch,
+              "ProgFiles": this.editForm.progFiles
+            }
 
-						//快速发布
-						if (this.releaseType == 1) {
-							param.GroupName = this.editForm.groupName
-							this.ProgAddFast(param)
-							return
-						}
-						//素材发布
-						this.ProgAdd(param)
-					}
-				})
-			},
-			//编辑提交
-			submitEdForm(item) {
-				this.$refs[item].validate(valid => {
-					if (valid) {
-						const param = {
-							"Code": this.updateForm.code,
-							"ScreenInfo": this.updateForm.progScreenInfo,
-							"LaunchTime": this.updateForm.time[0],
-							"ExpiryDate": this.updateForm.time[1],
-							"SwitchMode": this.updateForm.switchMode,
-							"SwitchTime": this.updateForm.switchTime,
-							"ScreenMatch": this.updateForm.screenMatch,
-							"ProgramName": this.updateForm.programName,
-							"FileGUID": this.updateForm.fileGuid,
-							"PreviewFileGUID": this.updateForm.previewFileGUID,
-						}
+            //快速发布
+            if (this.releaseType == 1) {
+              param.GroupName = this.editForm.groupName
+              this.ProgAddFast(param)
+              return
+            }
+            //素材发布
+            this.ProgAdd(param)
+          }
+        })
+      },
+      //编辑提交
+      submitEdForm(item) {
+        this.$refs[item].validate(valid => {
+          if (valid) {
+            const param = {
+              "Code": this.updateForm.code,
+              "ScreenInfo": this.updateForm.progScreenInfo,
+              "LaunchTime": this.updateForm.time[0],
+              "ExpiryDate": this.updateForm.time[1],
+              "SwitchMode": this.updateForm.switchMode,
+              "SwitchTime": this.updateForm.switchTime,
+              "ScreenMatch": this.updateForm.screenMatch,
+              "ProgramName": this.updateForm.programName,
+              "FileGUID": this.updateForm.fileGuid,
+              "PreviewFileGUID": this.updateForm.previewFileGUID,
+            }
 
-						this.ProgEdit(param)
-					}
-				})
-			},
-			//删除
-			handleDelete(item) {
-				this.DelProgram_Pre({"Codes": [item.code]});
-				this.$confirm("此操作将永久删除, 是否继续?" + this.delError, "提示", {
-					confirmButtonText: "确定",
-					cancelButtonText: "取消",
-					type: "warning"
-				}).then(() => {
-					this.DelProgram({"Codes": [item.code]})
-				}).catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消删除'
-					});
-				});
-			},
-			//批量删除
-			handleDeletion(val) {
-				this.tableChecked = val
-			},
-			//获取用户的选中
-			batchDelete(row) {
-				if (row.length === 0) {
-					this.$message.error("请选择您要删除的选项");
-					return
-				} else {
-					this.$confirm("此操作将永久删除, 是否继续?", "提示", {
-						confirmButtonText: "确定",
-						cancelButtonText: "取消",
-						type: "warning"
-					}).then(() => {
-						let ids = []
-						for (let i = 0; i < row.length; i++) {
-							ids.push(row[i].code)
-						}
-						const param = {
-							Codes: ids
-						}
-						this.DelProgram(param)
-					}).catch(() => {
-						this.$message({
-							type: 'info',
-							message: '已取消删除'
-						});
-					});
-				}
-			},
-			//分配设备
-			submitDeForm() {
-				console.log(this.selectedStaffList)
-			},
-			//获取选中值
-			changeTransfer(item) {
-				this.selectedStaffList = item
-			},
-			//数字加减
-			handleChange(value) {
-				console.log(value);
-			},
-			/**
-			 * 上传素材
-			 */
-			submitUpload() {
-				this.$refs.upload.submit();
-			},
-			handleRemove(file, fileList) {
-				console.log(file, fileList);
-			},
-			handleProgress(file, fileList) {
-				const isLt2M = file.raw.size / 1024 / 1024 < 500;
-				const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4']
+            this.ProgEdit(param)
+          }
+        })
+      },
+      //删除
+      handleDelete(item) {
+        this.DelProgram_Pre({"Codes": [item.code]});
+        this.$confirm("此操作将永久删除, 是否继续?" + this.delError, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.DelProgram({"Codes": [item.code]})
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      },
+      //批量删除
+      handleDeletion(val) {
+        this.tableChecked = val
+      },
+      //获取用户的选中
+      batchDelete(row) {
+        if (row.length === 0) {
+          this.$message.error("请选择您要删除的选项");
+          return
+        } else {
+          this.$confirm("此操作将永久删除, 是否继续?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+            let ids = []
+            for (let i = 0; i < row.length; i++) {
+              ids.push(row[i].code)
+            }
+            const param = {
+              Codes: ids
+            }
+            this.DelProgram(param)
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });
+          });
+        }
+      },
+      //分配设备
+      submitDeForm() {
+        console.log(this.selectedStaffList)
+      },
+      //获取选中值
+      changeTransfer(item) {
+        this.selectedStaffList = item
+      },
+      //数字加减
+      handleChange(value) {
+        console.log(value);
+      },
+      /**
+       * 上传素材
+       */
+      submitUpload() {
+        this.$refs.upload.submit();
+      },
+      uploaded(event, file, fileList) {
+        this.uid = file.uid
+        this.fileList = fileList
+      },
+      uploaded1(event, file, fileList) {
+        this.uid = file.uid
+        this.fileList = [fileList[fileList.length-1]]
+        console.log(file)
+      },
+      //修改文件名
+      changeFileName(index, name) {
+        this.editForm.progFiles[index].programName = name
+      },
+      handleProgress(file, fileList) {
+        const isLt2M = file.raw.size / 1024 / 1024 < 500;
+        const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4', 'video/avi', 'video/flv', 'video/3gpp']
 
-				if (type.indexOf(file.raw.type) === -1) {
-					this.$message.error('上传文件只能是 jpg、png、mp4、gif格式!');
-					return false
-				}
-				if (!isLt2M) {
-					this.$message.error('上传文件大小不能超过 500MB!');
-					return false
-				}
-			},
-			handleAvatarSuccess(res, file) {
-				if (res.code === '200') {
-					this.editForm.progFiles.push({
-						FileGUID: res.data.fileGuid,
-						ProgramName: file.name,
-						Size: file.size,
-						PreviewFileGUID: res.data.previewFileGuid
-					});
-				} else {
-					this.$message.error('上传失败!');
-				}
-			},
-			handleAvatarSuccess1(res, file) {
-				if (res.code === '200') {
-					this.updateForm.progSrc = URL.createObjectURL(file.raw)
-					this.updateForm.progType = file.raw.type == 'video/mp4' ? '视频' : '图片'
-					this.updateForm.fileGuid = res.data.fileGuid
-					this.updateForm.previewFileGUID = res.data.previewFileGUID
-					this.updateForm.programName = file.raw.name
-				} else {
-					this.$message.error('上传失败!');
-				}
-			},
-			//大小换算
-			fileSize(item) {
-				if (item > 1048576) {
-					return (item / 1024 / 1024).toFixed(2) + 'M';
-				}
-				return (item / 1024).toFixed(2) + 'K';
-			},
-			//删除文件
-			handleDeleteFile(index) {
-				this.editForm.progFiles.splice(index, 1)
-			},
-			//关联店铺
-			progToShop(item) {
-				const param = {
-					"ProgramCode": this.programInfo.code,
-					"ShopCode": item.code
-				}
-				this.SetProgToShop(param)
-			},
-			//设置标签
-			submitLbForm() {
-				const param = {
-					"LabelCodeList": this.labelActive,
-					"ObjectCode": this.programInfo.code
-				}
-				this.SetLabel(param)
-			},
-			//放大图片
-			clickImage(item) {
-				this.bigFile = {}
-				this.bigFile.src = item.progSrc
-				this.bigFile.type = item.progType
-			},
-			//关闭放大
-			closeImg() {
-				this.bigFile = null
-			},
-		},
-		computed: {
-			...mapGetters(['presentMenu', 'config'])
-		},
-		components: {
-			pagination,
-			transferView,
-			bigImage,
-		},
+        if (type.indexOf(file.raw.type) === -1 && file.raw.name.substr(-3) !== 'flv') {
+          this.$message.error('上传文件只能是 jpg、png、gif、mp4、avi、3gp、flv格式!');
+          return false
+        }
+        if (!isLt2M) {
+          this.$message.error('上传文件大小不能超过 500MB!');
+          return false
+        }
 
-	}
+        this.fileList = []
+        this.fileList = fileList
+      },
+      handleAvatarSuccess(res, file) {
+        if (res.code === '200') {
+          this.uid = 1
+          this.editForm.progFiles.push({
+            FileGUID: res.data.fileGuid,
+            ProgramName: file.name,
+            Size: file.size,
+            PreviewFileGUID: res.data.previewFileGUID
+          });
+        } else {
+          this.$message.error('上传失败!');
+        }
+      },
+      handleAvatarSuccess1(res, file) {
+        if (res.code === '200') {
+          this.uid = 1
+          this.updateForm.progSrc = URL.createObjectURL(file.raw)
+          let type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
+          this.updateForm.progType = type.indexOf(file.raw.type) === -1 ? '视频' : '图片'
+          this.updateForm.fileGuid = res.data.fileGuid
+          this.updateForm.previewFileGUID = res.data.previewFileGUID
+          this.updateForm.programName = file.raw.name
+        } else {
+          this.$message.error('上传失败!');
+        }
+      },
+      //大小换算
+      fileSize(item) {
+        if (item > 1048576) {
+          return (item / 1024 / 1024).toFixed(2) + 'M';
+        }
+        return (item / 1024).toFixed(2) + 'K';
+      },
+      //删除文件
+      handleDeleteFile(index) {
+        this.editForm.progFiles.splice(index, 1)
+        this.fileList.splice(index, 1)
+      },
+      //关联店铺
+      progToShop(item) {
+        const param = {
+          "ProgramCode": this.programInfo.code,
+          "ShopCode": item.code
+        }
+        this.SetProgToShop(param)
+      },
+      //设置标签
+      submitLbForm() {
+        const param = {
+          "LabelCodeList": this.labelActive,
+          "ObjectCode": this.programInfo.code
+        }
+        this.SetLabel(param)
+      },
+      //放大图片
+      clickImage(item) {
+        this.bigFile = {}
+        this.bigFile.src = item.progSrc
+        this.bigFile.type = item.progType
+      },
+      //关闭放大
+      closeImg() {
+        this.bigFile = null
+      },
+      //打开更多搜索
+      clickSearchOther() {
+        this.otherSearch = !this.otherSearch
+      },
+    },
+    computed: {
+      ...mapGetters(['presentMenu', 'config'])
+    },
+    components: {
+      pagination,
+      transferView,
+      bigImage,
+    },
+
+  }
 </script>
 
 <style lang="scss">
@@ -957,6 +1008,12 @@
   .file-list-card {
     margin-top: 20px;
     height: 300px;
+    position: relative;
+
+    .card-input{
+      width: 100%;
+      position: relative;
+    }
 
     div {
       display: flex;
@@ -980,5 +1037,15 @@
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
+  }
+
+  .demo-form-inline .el-select {
+    width: 202px;
+  }
+
+  .el-progress {
+    position: absolute;
+    width: 100%;
+    bottom: -20px;
   }
 </style>

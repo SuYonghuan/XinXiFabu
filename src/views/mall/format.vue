@@ -10,14 +10,14 @@
 
     <el-form :inline="true" :model="search" class="demo-form-inline">
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addformat">新增业态</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addformat">新增业态</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delformat">删除</el-button>
       </el-form-item>
     </el-form>
 
     <!--  表格  -->
     <el-table :data="tableData" @selection-change="handleDeletion" style="width: 100%;margin-top: 20px;"
-              max-height="700px">
+              height="700px">
       <el-table-column align="center" type="selection" width="60"></el-table-column>
       <el-table-column prop="name" label="业态名称"></el-table-column>
       <el-table-column prop="nameEn" label="业态英文"></el-table-column>
@@ -25,6 +25,11 @@
         <template slot-scope="scope">
           <img :src="scope.row.iconFilePath" v-if="scope.row.iconFilePath" style="height: 30px"
                @click="clickImg(scope.row.iconFilePath)" alt="">
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="关联店铺数量">
+        <template slot-scope="scope">
+          {{ scope.row.shopCount }}
         </template>
       </el-table-column>
       <el-table-column prop="name" label="子业态">

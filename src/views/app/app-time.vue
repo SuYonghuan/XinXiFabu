@@ -9,7 +9,7 @@
     </el-breadcrumb>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%;margin-top: 20px;">
+    <el-table :data="tableData" style="width: 100%;margin-top: 20px;" height="620">
       <el-table-column prop="devNum" label="设备名称"></el-table-column>
       <el-table-column prop="ip" label="IP地址"></el-table-column>
       <el-table-column prop="floor" label="楼层/楼栋"></el-table-column>
@@ -25,7 +25,7 @@
 
     <!--  分页  -->
     <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange"></pagination>
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  发布  -->
     <el-dialog title="管理应用" :visible.sync="dialogVisibleDevice" width="50%" :before-close="handleClose" append-to-body>
@@ -186,6 +186,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.pageSize = val;
+        this.currentPage = 1;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//分配设备
 			handleEditDevice(item) {
 				this.GetAppListByDev(item.devCode)

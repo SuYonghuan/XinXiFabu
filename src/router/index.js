@@ -129,6 +129,11 @@ const routes = [
         component: () => import('views/mall/building'),
       },
       {
+        path: '/mall/region',
+        name: '区域管理',
+        component: () => import('views/mall/region'),
+      },
+      {
         path: '/mall/floor',
         name: '楼层管理',
         component: () => import('views/mall/floor'),

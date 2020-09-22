@@ -43,7 +43,7 @@
         <p>
           素材到期提醒：提前
           <el-input-number v-model="programMonitorList.days" :min="1" :max="365"></el-input-number>
-          天 \ 提醒时间
+          天 <span style="margin-left: 30px"></span>提醒时间
           <el-time-picker
                   arrow-control
                   v-model="programMonitorList.clockTime"
@@ -54,7 +54,8 @@
                   :value-format="'HH:mm'"
                   placeholder="提醒时间">
           </el-time-picker>
-          \ 提醒频率
+          <span style="margin-left: 30px"></span>
+          提醒频率
           <el-radio v-model="programMonitorList.repeatExecution" label="false">仅一次</el-radio>
           <el-radio v-model="programMonitorList.repeatExecution" label="true">每天一次</el-radio>
         </p>

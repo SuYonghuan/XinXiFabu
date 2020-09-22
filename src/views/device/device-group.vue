@@ -45,7 +45,7 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleEditDevice({})" v-if="pageMenu.adddevgroup">新增组</el-button>
+        <el-button type="success" @click="handleEditDevice({})" v-if="pageMenu.adddevgroup">新增组</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.deldevgroup">删除</el-button>
       </el-form-item>
     </el-form>
@@ -54,6 +54,7 @@
     <el-table
             :data="tableData"
             @selection-change="handleDeletion"
+            height="620"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>

@@ -46,9 +46,6 @@
           <p>关机时间： <span>{{deviceInfo.shutdownTime ? deviceInfo.shutdownTime : '-'}}</span></p>
           <p>备注： <span>{{deviceInfo.remarks ? deviceInfo.remarks : '-'}}</span></p>
         </div>
-        <div>
-          <p>店铺可见性： <span>{{deviceInfo.isShow ? '可见' : '不可见'}}</span></p>
-        </div>
       </div>
     </el-card>
 

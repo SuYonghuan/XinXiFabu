@@ -10,17 +10,17 @@
 
     <el-form :inline="true" :model="search" class="demo-form-inline">
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addbuild">新增楼栋</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addarea">新增区域</el-button>
       </el-form-item>
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%;margin-top: 20px;" height="620">
-      <el-table-column prop="name" label="楼栋名称"></el-table-column>
+    <el-table :data="tableData" height="620" style="width: 100%;margin-top: 20px;">
+      <el-table-column prop="areaName" label="区域名称"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editbuild">编辑</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delbuild">删除</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.delarea">编辑</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delarea">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -29,8 +29,8 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
                append-to-body>
       <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
-        <el-form-item label="楼栋名称" prop="name">
-          <el-input type="text" v-model="editForm.name" maxlength="5" placeholder="请输入楼栋名称"></el-input>
+        <el-form-item label="区域名称" prop="areaName">
+          <el-input type="text" v-model="editForm.areaName" placeholder="请输入区域名称"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -46,10 +46,10 @@
 	import transferView from 'components/transfer-view/transfer-view'
 	import {
 		GetRolePermissions,
-		GetBuildingList,
-		AddBuilding,
-		EditBuilding,
-		DelBuilding,
+    GetRegionList,
+    AddRegion,
+    EditRegion,
+    DelRegion,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -70,7 +70,7 @@
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
-					name: [{required: true, message: '请输入楼栋名称', trigger: 'blur'}]
+          areaName: [{required: true, message: '请输入区域名称', trigger: 'blur'}]
 				},
 				pageMenu: {},
 			}
@@ -93,26 +93,26 @@
 							this.pageMenu[res.data[a].actionId] = true;
 						}
 						this.getList(this.pageSize, this.currentPage)
-						// console.log(this.pageMenu)
+						console.log(this.pageMenu)
 					}
 				})
 			},
 			getList(pageSize, page) {
 				const param = {
-					"UserName": this.user.accountName,
-					"MallCode": this.user.mallCode,
 					"Paging": "0",
 					"PageIndex": "",
-					"PageSize": ""
+					"PageSize": "",
+          "MallCode": this.user.mallCode,
 				}
-				GetBuildingList(param).then(res => {
+        GetRegionList(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.tableData = res.data
+            console.log(this.tableData)
 					}
 				})
 			},
-			AddBuilding(param) {
-				AddBuilding(param).then(res => {
+      AddRegion(param) {
+        AddRegion(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -122,8 +122,8 @@
 					this.$message.error(res.msg);
 				})
 			},
-			EditBuilding(param) {
-				EditBuilding(param).then(res => {
+      EditRegion(param) {
+        EditRegion(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -133,8 +133,8 @@
 					this.$message.error(res.msg);
 				})
 			},
-			DelBuilding(param) {
-				DelBuilding(param).then(res => {
+      DelRegion(param) {
+        DelRegion(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
 						this.getList()
@@ -173,16 +173,15 @@
 				this.$refs[item].validate(valid => {
 					if (valid) {
 						const param = {
-							"BuildingName": this.editForm.name,
-							"MallCode": this.user.mallCode,
-							"UserName": this.user.accountName
+							"AreaName": this.editForm.areaName,
+              "MallCode": this.user.mallCode,
 						}
 						if (this.editForm.code) {
-							param.BuildingCode = this.editForm.code
-							this.EditBuilding(param)
+							param.AreaCode = this.editForm.code
+							this.EditRegion(param)
 							return
 						}
-						this.AddBuilding(param)
+						this.AddRegion(param)
 					}
 				})
 			},
@@ -194,11 +193,9 @@
 					type: "warning"
 				}).then(() => {
 					const param = {
-						"Code": [item.code],
-						"MallCode": this.user.mallCode,
-						"UserName": this.user.accountName
+						"Code": [item.code]
 					}
-					this.DelBuilding(param)
+					this.DelRegion(param)
 				}).catch(() => {
 					this.$message({
 						type: 'info',

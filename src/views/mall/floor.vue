@@ -12,12 +12,12 @@
       <el-tab-pane v-for="item of buildingData" :label="item.name" :name="item.code">
         <el-form :inline="true" :model="search" class="demo-form-inline">
           <el-form-item class="right-button">
-            <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addfloor">新增楼层</el-button>
+            <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addfloor">新增楼层</el-button>
           </el-form-item>
         </el-form>
 
         <!--  表格  -->
-        <el-table :data="tableData" style="width: 100%;margin-top: 20px;" max-height="630px">
+        <el-table :data="tableData" style="width: 100%;margin-top: 20px;" height="630px">
           <el-table-column prop="name" label="楼层名称"></el-table-column>
           <el-table-column prop="addTime" label="添加时间">
             <template slot-scope="scope">{{ timestampToTime(scope.row.addTime) }}</template>

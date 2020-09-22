@@ -33,14 +33,14 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
         <el-button @click="handleSysData()" v-if="pageMenu.syndata">同步数据</el-button>
         <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出</el-button>
       </el-form-item>
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%;">
+    <el-table :data="tableData" style="width: 100%;" height="620">
       <el-table-column prop="name" label="店铺名称"></el-table-column>
       <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
       <el-table-column prop="floorName" label="所属楼层"></el-table-column>
@@ -63,7 +63,7 @@
 
     <!--  分页  -->
     <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange"></pagination>
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :close-on-click-modal="false"
@@ -407,6 +407,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.pageSize = val;
+        this.currentPage = 1;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//搜索
 			onSearch() {
 				this.currentPage = 1
