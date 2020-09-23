@@ -25,6 +25,10 @@
       </el-table-column>
     </el-table>
 
+    <!--  分页  -->
+    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
+
     <!--  发布  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
                append-to-body>
@@ -99,14 +103,15 @@
 			},
 			getList(pageSize, page) {
 				const param = {
-					"Paging": "0",
-					"PageIndex": "",
-					"PageSize": "",
+					"Paging": 1,
+					"PageIndex": page,
+					"PageSize": pageSize,
           "MallCode": this.user.mallCode,
 				}
         GetRegionList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data
+						this.tableData = res.data.list
+            this.total = res.data.allCount
             console.log(this.tableData)
 					}
 				})
@@ -116,7 +121,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -127,7 +132,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -137,7 +142,7 @@
         DelRegion(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -153,6 +158,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.currentPage = 1;
+        this.pageSize = val;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//打开弹窗
 			handleEdit(item) {
 				this.dialogVisible = true
@@ -225,7 +236,7 @@
   }
 
   .page-div {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 
   .time-tag {

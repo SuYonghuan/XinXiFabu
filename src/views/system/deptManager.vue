@@ -49,7 +49,8 @@
     </el-table>
 
     <!--  分页  -->
-    <!--    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"></pagination>-->
+    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
@@ -151,11 +152,12 @@
 					PageIndex: page,
 					PageSize: pageSize,
 					KeyWord: keyWord,
-					Paging: 0
+					Paging: 1
 				}
 				getDeptList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data
+						this.tableData = res.data.list
+            this.total = res.data.allCount
 						// console.log(res)
 					}
 				})
@@ -226,17 +228,23 @@
 			//当前页码
 			handleCurrentChange(val) {
 				this.currentPage = val;
-				this.getList(this.pageSize, val)
+				this.getList(val, this.pageSize)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.currentPage = 1;
+        this.pageSize = val;
+        this.getList(this.currentPage, this.pageSize)
+      },
 			//搜索
 			onSearch() {
-				this.getList(this.pageSize, this.currentPage, this.search.name)
+				this.getList(this.currentPage, this.pageSize, this.search.name)
 			},
 			//重置搜索
 			replaySearch() {
 				this.search = {}
 				this.currentPage = 1
-				this.getList(this.pageSize, this.currentPage)
+				this.getList(this.currentPage,this.pageSize)
 			},
 			//打开弹窗
 			handleEdit(item) {
@@ -361,6 +369,6 @@
   }
 
   .page-div {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 </style>

@@ -34,6 +34,10 @@
       </el-table-column>
     </el-table>
 
+    <!--  分页  -->
+    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
+
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" max-height="620px"
                append-to-body>
@@ -95,7 +99,7 @@
 				tableData: [],
 				total: 0,
 				currentPage: 0,
-				pageSize: 0,
+				pageSize: 10,
 				dialogVisible: false,
 				dialogTitle: '新增',
 				editForm: {},
@@ -136,11 +140,16 @@
 					}
 				})
 			},
-			getList() {
-				const param = {}
+			getList(page, pageSize) {
+				const param = {
+          PageIndex: page,
+          PageSize: pageSize,
+          Paging: 1
+        }
 				getRolesList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data
+						this.tableData = res.data.list
+            this.total = res.data.allCount
 						// console.log(res)
 					}
 				})
@@ -178,7 +187,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.currentPage, this.pageSize)
 						return
 					}
 					this.$message.error(res.msg);
@@ -189,7 +198,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.currentPage, this.pageSize)
 						return
 					}
 					this.$message.error(res.msg);
@@ -199,7 +208,7 @@
 				delRoles(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.currentPage, this.pageSize)
 						return
 					}
 					this.$message.error(res.msg);
@@ -209,7 +218,17 @@
 			 * End
 			 * @param val
 			 */
-
+      //当前页码
+      handleCurrentChange(val) {
+        this.currentPage = val;
+        this.getList(val, this.pageSize)
+      },
+      //每页数量
+      handleSizeChange(val) {
+        this.currentPage = 1;
+        this.pageSize = val;
+        this.getList(this.currentPage, this.pageSize)
+      },
 			//打开弹窗
 			handleEdit(item) {
 				this.treeData.length < 1 && this.GetMenuActionTree();
@@ -325,6 +344,6 @@
   }
 
   .page-div {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 </style>

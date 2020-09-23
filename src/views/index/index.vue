@@ -24,7 +24,7 @@
   z-index: 5;
   .child-view{
     margin-left: 170px;
-    padding: 40px;
+    padding: 40px 40px 0px 40px;
   }
 }
 </style>

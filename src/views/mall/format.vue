@@ -17,7 +17,7 @@
 
     <!--  表格  -->
     <el-table :data="tableData" @selection-change="handleDeletion" style="width: 100%;margin-top: 20px;"
-              height="700px">
+              height="620px">
       <el-table-column align="center" type="selection" width="60"></el-table-column>
       <el-table-column prop="name" label="业态名称"></el-table-column>
       <el-table-column prop="nameEn" label="业态英文"></el-table-column>
@@ -59,6 +59,10 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <!--  分页  -->
+    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  图片放大  -->
     <div class="max-img" v-show="maxImg" @click="maxDiv">
@@ -195,18 +199,22 @@
 						for (let a = 0; a < res.data.length; a++) {
 							this.pageMenu[res.data[a].actionId] = true;
 						}
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						// console.log(this.pageMenu)
 					}
 				})
 			},
-			getList() {
+			getList(pageSize, page) {
 				const param = {
-					"MallCode": this.user.mallCode
+					"MallCode": this.user.mallCode,
+          "Paging": 1,
+          "PageIndex": page,
+          "PageSize": pageSize
 				}
 				GetShopFormatList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data
+						this.tableData = res.data.list
+            this.total = res.data.allCount
 						// console.log(this.tableData)
 					}
 				})
@@ -237,7 +245,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -248,7 +256,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -258,7 +266,7 @@
 				ShopFormatDel(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -277,6 +285,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.currentPage = 1;
+        this.pageSize = val;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//打开弹窗
 			handleEdit(item) {
 				this.tabDefa = '父级业态'
@@ -474,7 +488,7 @@
   }
 
   .page-div {
-    margin-top: 80px;
+    margin-top: 40px;
   }
 
   .time-tag {

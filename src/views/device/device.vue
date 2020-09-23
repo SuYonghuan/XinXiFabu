@@ -29,32 +29,37 @@
                 :props="floorProps">
         </el-cascader>
       </el-form-item>
-      <el-form-item label="设备状态">
-        <el-select v-model="search.DevStatus" placeholder="设备状态">
-          <el-option
-                  v-for="item in status"
-                  :label="item.label"
-                  :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="前端状态">
-        <el-select v-model="search.FontStatus" placeholder="前端状态">
-          <el-option
-                  v-for="item in status"
-                  :label="item.label"
-                  :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
+      <!--<el-form-item label="设备状态">-->
+        <!--<el-select v-model="search.DevStatus" placeholder="设备状态">-->
+          <!--<el-option-->
+                  <!--v-for="item in status"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="前端状态">-->
+        <!--<el-select v-model="search.FontStatus" placeholder="前端状态">-->
+          <!--<el-option-->
+                  <!--v-for="item in status"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
+      <p class="right-button">
+        <el-button type="success" @click="handleDeviceExcel({})" v-if="pageMenu.exportDevice">导出设备</el-button>
+        <el-button type="success" @click="handleExcel({})" v-if="pageMenu.devexport">导出设备节目</el-button>
+        <el-button type="success" @click="refresh()">刷新</el-button>
+      </p>
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" @selection-change="handleDeletion" height="620" style="width: 100%">
+    <el-table :data="tableData" @selection-change="handleDeletion" height="620" style="width: 100%" ref="table" @filter-change="filterTag">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
       <el-table-column prop="devNum" label="设备名称" min-width="150px">
@@ -91,13 +96,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="shutdownTime" label="关机时间"></el-table-column>
-      <el-table-column prop="name" label="设备状态">
+      <el-table-column prop="name" label="设备状态" column-key="deviceOnline" :filters=status :filter-multiple="false">
         <template slot-scope="scope">
           <el-tag type="success" v-show="scope.row.deviceOnline">在线</el-tag>
           <el-tag type="danger" v-show="!scope.row.deviceOnline">离线</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="前端状态">
+      <el-table-column prop="name" label="前端状态" column-key="frontOnline" :filters=status :filter-multiple="false">
         <template slot-scope="scope">
           <el-tooltip placement="bottom">
             <div slot="content">
@@ -146,11 +151,6 @@
       <el-button size="small" @click="cleanShutTime(tableChecked,1)" v-if="pageMenu.devclearshutdowntime">清除关机时间
       </el-button>
       <el-button size="small" @click="batchDelete(tableChecked)" v-if="pageMenu.devdel">删除</el-button>
-      <p class="right-button">
-        <el-button type="success" @click="handleDeviceExcel({})" v-if="pageMenu.exportDevice">导出设备</el-button>
-        <el-button type="success" @click="handleExcel({})" v-if="pageMenu.devexport">导出设备节目</el-button>
-        <el-button type="success" @click="refresh()">刷新</el-button>
-      </p>
     </div>
 
     <!--  分页  -->
@@ -237,15 +237,8 @@
         formLabelWidth: "120px",
         tableChecked: [],
         status: [
-          {
-            label: '全部', value: -1
-          },
-          {
-            label: '在线', value: 1
-          },
-          {
-            label: '离线', value: 0
-          }
+          { text: '在线', value: 1 },
+          { text: '离线', value: 0 }
         ],
         pageMenu: [],
         searchDeviceList: [],
@@ -471,6 +464,20 @@
           "FontStatus": -1
         }
         this.currentPage = 1
+        this.$refs.table.clearFilter()
+        this.getList(this.pageSize, this.currentPage)
+      },
+      //表格筛选
+      filterTag(value) {
+        //设备状态
+        if ( value.deviceOnline ) {
+          this.search.DevStatus = value.deviceOnline[0]
+        }
+        //前端状态
+        if ( value.frontOnline ) {
+          this.search.FontStatus = value.frontOnline[0]
+        }
+
         this.getList(this.pageSize, this.currentPage)
       },
       //打开弹窗
@@ -777,12 +784,13 @@
     margin-top: 20px;
   }
 
+  .right-button {
+    float: right;
+  }
+
   .bottom-button {
     margin-top: 20px;
-
-    .right-button {
-      float: right;
-    }
+    float: right;
   }
 
   .el-icon-edit {

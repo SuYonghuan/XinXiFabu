@@ -22,24 +22,24 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="组名称排序">
-        <el-select v-model="search.NameOrder" @change="changSelect(1)" placeholder="组名称排序">
-          <el-option
-                  v-for="item in sort"
-                  :label="item.label"
-                  :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="设备数量排序">
-        <el-select v-model="search.Order" @change="changSelect(2)" placeholder="设备数量排序">
-          <el-option
-                  v-for="item in sort"
-                  :label="item.label"
-                  :value="item.value">
-          </el-option>
-        </el-select>
-      </el-form-item>
+      <!--<el-form-item label="组名称排序">-->
+        <!--<el-select v-model="search.NameOrder" @change="changSelect(1)" placeholder="组名称排序">-->
+          <!--<el-option-->
+                  <!--v-for="item in sort"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
+      <!--<el-form-item label="设备数量排序">-->
+        <!--<el-select v-model="search.Order" @change="changSelect(2)" placeholder="设备数量排序">-->
+          <!--<el-option-->
+                  <!--v-for="item in sort"-->
+                  <!--:label="item.label"-->
+                  <!--:value="item.value">-->
+          <!--</el-option>-->
+        <!--</el-select>-->
+      <!--</el-form-item>-->
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
@@ -54,14 +54,16 @@
     <el-table
             :data="tableData"
             @selection-change="handleDeletion"
+            ref="table"
+            @filter-change="filterTag"
             height="620"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
-      <el-table-column prop="gName" label="组名称" width="360px"></el-table-column>
+      <el-table-column prop="gName" label="组名称" width="360px" column-key="NameOrder" :filters=sort :filter-multiple="false"></el-table-column>
       <el-table-column prop="sName" label="屏幕属性" width="160px"></el-table-column>
       <el-table-column prop="typeStr" label="类型" width="60px"></el-table-column>
-      <el-table-column label="设备数量" width="100px">
+      <el-table-column label="设备数量" width="100px" column-key="Order" :filters=sort :filter-multiple="false">
         <template slot-scope="scope">
           <el-link type="primary" @click="handleEdit(scope.row)">{{scope.row.devCount}}</el-link>
         </template>
@@ -233,8 +235,8 @@
 				staffList: {includeDevice: [], unIncludeDevice: []},
 				selectedStaffList: [],
 				sort: [
-					{label: '升序', value: 'ASC'},
-					{label: '降序', value: 'Desc'}
+					{text: '升序', value: 'ASC'},
+					{text: '降序', value: 'Desc'}
 				],
 				pageMenu: [],
 				searchDeviceList: [],
@@ -413,8 +415,22 @@
 					"ScreenInfoCode": ''
 				}
 				this.currentPage = 1
+        this.$refs.table.clearFilter()
 				this.getList(this.pageSize, this.currentPage)
 			},
+      //表格筛选
+      filterTag(value) {
+        //设备状态
+        if ( value.NameOrder ) {
+          this.search.NameOrder = value.NameOrder[0]
+        }
+        //前端状态
+        if ( value.Order ) {
+          this.search.Order = value.Order[0]
+        }
+
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//打开弹窗
 			handleEdit(item) {
 				this.dialogVisible = true

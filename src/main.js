@@ -13,7 +13,7 @@ Vue.config.productionTip = false
 
 //引入Excel
 import Blob from './vendor/Blob'
-import Export2Excel from './vendor/Export2Excel.js'
+// import Export2Excel from './vendor/Export2Excel.js'
 
 // 引入echarts
 import echarts from "echarts";

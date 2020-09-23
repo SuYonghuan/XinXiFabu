@@ -15,15 +15,24 @@
           <el-form-item label="插播名称">
             <el-input v-model="search.SearchKey" placeholder="插播名称"></el-input>
           </el-form-item>
+          <el-form-item label="屏幕属性">
+            <el-select v-model="search.ScreenCode" placeholder="屏幕属性">
+              <el-option
+                      v-for="item in searchDeviceList"
+                      :label="item.sName"
+                      :value="item.code">
+              </el-option>
+            </el-select>
+          </el-form-item>
 
           <el-form-item>
             <el-button @click="onSearch">查询</el-button>
             <el-button @click="replaySearch">清空</el-button>
-            <el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">
-              高级查询
-              <i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>
-              <i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>
-            </el-link>
+            <!--<el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">-->
+            <!--高级查询-->
+            <!--<i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>-->
+            <!--<i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>-->
+            <!--</el-link>-->
           </el-form-item>
           <el-form-item class="right-button">
             <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addnewsgroup">新增插播</el-button>
@@ -31,42 +40,34 @@
           </el-form-item>
 
           <div v-show="otherSearch">
-            <el-form-item label="屏幕属性">
-              <el-select v-model="search.ScreenCode" placeholder="屏幕属性">
-                <el-option
-                        v-for="item in searchDeviceList"
-                        :label="item.sName"
-                        :value="item.code">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="素材数量排序">
-              <el-select v-model="search.NewsOrder" placeholder="素材数量排序">
-                <el-option
-                        v-for="item in sort"
-                        :label="item.label"
-                        :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="设备数量排序">
-              <el-select v-model="search.Order" placeholder="设备数量排序">
-                <el-option
-                        v-for="item in sort"
-                        :label="item.label"
-                        :value="item.value">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="设备状态">
-              <el-select v-model="search.State" placeholder="设备状态">
-                <el-option
-                        v-for="item in stateList"
-                        :label="item.label"
-                        :value="item.label">
-                </el-option>
-              </el-select>
-            </el-form-item>
+
+            <!--<el-form-item label="素材数量排序">-->
+            <!--<el-select v-model="search.NewsOrder" placeholder="素材数量排序">-->
+            <!--<el-option-->
+            <!--v-for="item in sort"-->
+            <!--:label="item.label"-->
+            <!--:value="item.value">-->
+            <!--</el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="设备数量排序">-->
+            <!--<el-select v-model="search.Order" placeholder="设备数量排序">-->
+            <!--<el-option-->
+            <!--v-for="item in sort"-->
+            <!--:label="item.label"-->
+            <!--:value="item.value">-->
+            <!--</el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="设备状态">-->
+            <!--<el-select v-model="search.State" placeholder="设备状态">-->
+            <!--<el-option-->
+            <!--v-for="item in stateList"-->
+            <!--:label="item.text"-->
+            <!--:value="item.text">-->
+            <!--</el-option>-->
+            <!--</el-select>-->
+            <!--</el-form-item>-->
           </div>
         </el-form>
 
@@ -74,6 +75,8 @@
         <el-table
                 :data="tableData"
                 @selection-change="handleDeletion"
+                ref="table"
+                @filter-change="filterTag"
                 height="560"
                 style="width: 100%">
           <el-table-column align="center" type="selection" width="60">
@@ -84,12 +87,12 @@
             </template>
           </el-table-column>
           <el-table-column prop="sName" label="屏幕属性" min-width="100"></el-table-column>
-          <el-table-column label="素材数量">
+          <el-table-column label="素材数量" column-key="NewsOrder" :filters=sort :filter-multiple="false">
             <template slot-scope="scope">
               <el-link type="primary" @click="handleProgramDetail(scope.row)">{{ scope.row.pgCount }}</el-link>
             </template>
           </el-table-column>
-          <el-table-column label="设备数量">
+          <el-table-column label="设备数量" column-key="Order" :filters=sort :filter-multiple="false">
             <template slot-scope="scope">
               <el-link type="primary" @click="handleDeviceDetail(scope.row)">{{ scope.row.devCount }}</el-link>
             </template>
@@ -107,7 +110,7 @@
           <el-table-column prop="expiryDate" label="结束时间" min-width="100">
             <template slot-scope="scope">{{ timestampToTime(scope.row.expiryDate) }}</template>
           </el-table-column>
-          <el-table-column prop="state" label="状态"></el-table-column>
+          <el-table-column prop="state" label="状态" column-key="State" :filters=stateList :filter-multiple="false"></el-table-column>
           <el-table-column prop="founderName" label="创建用户"></el-table-column>
           <el-table-column label="操作" width="250px">
             <template slot-scope="scope">
@@ -149,24 +152,24 @@
           <el-form-item label="字幕名称">
             <el-input v-model="search.SearchKey" placeholder="字幕名称"></el-input>
           </el-form-item>
-          <el-form-item label="设备数量排序">
-            <el-select v-model="search.Order" placeholder="设备数量排序">
-              <el-option
-                      v-for="item in sort"
-                      :label="item.label"
-                      :value="item.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="设备状态">
-            <el-select v-model="search.State" placeholder="设备状态">
-              <el-option
-                      v-for="item in stateList"
-                      :label="item.label"
-                      :value="item.label">
-              </el-option>
-            </el-select>
-          </el-form-item>
+          <!--<el-form-item label="设备数量排序">-->
+          <!--<el-select v-model="search.Order" placeholder="设备数量排序">-->
+          <!--<el-option-->
+          <!--v-for="item in sort"-->
+          <!--:label="item.label"-->
+          <!--:value="item.value">-->
+          <!--</el-option>-->
+          <!--</el-select>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="设备状态">-->
+          <!--<el-select v-model="search.State" placeholder="设备状态">-->
+          <!--<el-option-->
+          <!--v-for="item in stateList"-->
+          <!--:label="item.label"-->
+          <!--:value="item.label">-->
+          <!--</el-option>-->
+          <!--</el-select>-->
+          <!--</el-form-item>-->
           <el-form-item>
             <el-button @click="onSearchSub">查询</el-button>
             <el-button @click="replaySearchSub">清空</el-button>
@@ -181,6 +184,8 @@
         <el-table
                 :data="tableData"
                 @selection-change="handleDeletion"
+                ref="table1"
+                @filter-change="filterTag1"
                 height="560"
                 style="width: 100%">
           <el-table-column align="center" type="selection" width="60">
@@ -194,9 +199,9 @@
           <el-table-column prop="type" label="播放模式">
             <template slot-scope="scope">{{ scope.row.type == 'Immediate' ? '即时播报' : '定时播报' }}</template>
           </el-table-column>
-          <el-table-column label="设备数量">
+          <el-table-column label="设备数量" column-key="Order" :filters=sort :filter-multiple="false">
             <template slot-scope="scope">
-              <el-link type="primary" @click="handleDeviceDetail1(scope.row)">{{ scope.row.devCount }}</el-link>
+              <el-link type="primary" @click="handleDeviceDetail(scope.row)">{{ scope.row.devCount }}</el-link>
             </template>
           </el-table-column>
           <el-table-column prop="beginTime" label="开始时间">
@@ -205,12 +210,12 @@
           <el-table-column prop="endTime" label="结束时间">
             <template slot-scope="scope">{{ timestampToTime(scope.row.endTime) }}</template>
           </el-table-column>
-          <el-table-column prop="state" label="状态"></el-table-column>
+          <el-table-column prop="state" label="状态" column-key="State" :filters=stateList :filter-multiple="false"></el-table-column>
           <el-table-column prop="founderName" label="创建用户"></el-table-column>
           <el-table-column label="操作" width="250px">
             <template slot-scope="scope">
               <el-button type="primary" size="small" :disabled="scope.row.state != '未开始'"
-                         @click="handleSubtitle(scope.row)" v-if="pageMenu.editsubtitle">编辑
+                         @click="handleSubtitle(scope.row)" v-if="pageMenu.addsubtitle">编辑
               </el-button>
               <el-button type="danger" size="small" :disabled="scope.row.state == '进行中'"
                          @click="handleDelete(scope.row,2)" v-if="pageMenu.delsubtitle">删除
@@ -557,13 +562,13 @@
         staffList: [],
         selectedStaffList: [],
         sort: [
-          {label: '升序', value: 'ASC'},
-          {label: '降序', value: 'Desc'}
+          {text: '升序', value: 'ASC'},
+          {text: '降序', value: 'Desc'}
         ],
         stateList: [
-          {label: '未开始', value: 1},
-          {label: '进行中', value: 2},
-          {label: '已结束', value: 3}
+          {text: '未开始', value: '未开始'},
+          {text: '进行中', value: '进行中'},
+          {text: '已结束', value: '已结束'}
         ],
         fileList: [],
         newsPlayType: [
@@ -799,7 +804,7 @@
         const param = {
           "SearchKey": this.search.SearchKey,
           "Order": this.search.Order,
-          "NameOrder": this.search.NameOrder,
+          "NewsOrder": this.search.NewsOrder,
           "State": this.search.State,
           "Paging": 1,
           "PageIndex": page,
@@ -935,6 +940,7 @@
           "SearchKey": "", "ScreenInfoCode": "", "Order": "", "NameOrder": "", "State": "", "NewsOrder": ""
         }
         this.currentPage = 1
+        this.$refs.table.clearFilter()
         this.getList(this.pageSize, this.currentPage)
       },
       //重置搜索字幕
@@ -943,6 +949,37 @@
           "SearchKey": "", "Order": "", "NameOrder": "", "State": "", "NewsOrder": ""
         }
         this.currentPage = 1
+        this.$refs.table1.clearFilter()
+        this.GetSubtitleList(this.pageSize, this.currentPage)
+      },
+      //表格筛选
+      filterTag(value) {
+        //素材数量
+        if ( value.NewsOrder ) {
+          this.search.NewsOrder = value.NewsOrder[0]
+        }
+        //设备数量
+        if ( value.Order ) {
+          this.search.Order = value.Order[0]
+        }
+        //前端状态
+        if ( value.State ) {
+          this.search.State = value.State[0]
+        }
+
+        this.getList(this.pageSize, this.currentPage)
+      },
+      //表格筛选
+      filterTag1(value) {
+        //设备数量
+        if ( value.Order ) {
+          this.search.Order = value.Order[0]
+        }
+        //前端状态
+        if ( value.State ) {
+          this.search.State = value.State[0]
+        }
+
         this.GetSubtitleList(this.pageSize, this.currentPage)
       },
       //打开弹窗
@@ -1073,6 +1110,7 @@
               "EndTime": this.editForm.endTime,
               "Location": this.editForm.location,
               "Type": this.editForm.type,
+              "Code": this.editForm.code,
               "FontSize": this.editForm.fontSize,
               "FontColor": this.editForm.fontColor
             }
@@ -1235,6 +1273,8 @@
         } else if (this.tabName == '字幕') {
           this.GetSubtitleList(this.pageSize, this.currentPage)
         }
+        this.$refs.table.clearFilter()
+        this.$refs.table1.clearFilter()
       },
       /**
        * 上传素材

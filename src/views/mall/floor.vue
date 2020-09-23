@@ -17,7 +17,7 @@
         </el-form>
 
         <!--  表格  -->
-        <el-table :data="tableData" style="width: 100%;margin-top: 20px;" height="630px">
+        <el-table :data="tableData" style="width: 100%;margin-top: 20px;" height="560px">
           <el-table-column prop="name" label="楼层名称"></el-table-column>
           <el-table-column prop="addTime" label="添加时间">
             <template slot-scope="scope">{{ timestampToTime(scope.row.addTime) }}</template>
@@ -42,6 +42,10 @@
             </template>
           </el-table-column>
         </el-table>
+
+        <!--  分页  -->
+        <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                    @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
       </el-tab-pane>
     </el-tabs>
 
@@ -154,18 +158,22 @@
 					if (res.code === ERR_OK) {
 						this.buildingData = res.data
 						this.buildingCode = this.buildingData[0].code
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						this.$forceUpdate()
 					}
 				})
 			},
-			getList() {
+			getList(pageSize, page) {
 				const param = {
-					"Code": this.buildingCode
+					"Code": this.buildingCode,
+          "Paging": 1,
+          "PageIndex": page,
+          "PageSize": pageSize
 				}
 				GetFloorList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.tableData = res.data
+						this.tableData = res.data.list
+            this.total = res.data.allCount
 						// console.log(this.tableData)
 					}
 				})
@@ -175,7 +183,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -186,7 +194,7 @@
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -196,7 +204,7 @@
 				FloorDel(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -206,7 +214,7 @@
 				FloorOrderEdit(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
-						this.getList()
+						this.getList(this.pageSize, this.currentPage)
 						return
 					}
 					this.$message.error(res.msg);
@@ -225,6 +233,12 @@
 				this.currentPage = val;
 				this.getList(this.pageSize, val)
 			},
+      //每页数量
+      handleSizeChange(val) {
+        this.currentPage = 1;
+        this.pageSize = val;
+        this.getList(this.pageSize, this.currentPage)
+      },
 			//打开弹窗
 			handleEdit(item) {
 				this.dialogVisible = true
@@ -288,7 +302,7 @@
 			//切换tab卡
 			tabClick(e) {
 				this.buildingCode = e.name
-				this.getList()
+				this.getList(this.pageSize, this.currentPage)
 			},
 			//放大图片
 			clickImg(item) {
@@ -380,7 +394,7 @@
   }
 
   .page-div {
-    margin-top: 80px;
+    margin-top: 20px;
   }
 
   .time-tag {

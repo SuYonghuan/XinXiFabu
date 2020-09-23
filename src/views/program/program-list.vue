@@ -13,15 +13,24 @@
       <el-form-item label="节目名称">
         <el-input v-model="search.searchKey" placeholder="节目名称"></el-input>
       </el-form-item>
+      <el-form-item label="屏幕属性">
+        <el-select v-model="search.screenCode" placeholder="屏幕属性">
+          <el-option
+                  v-for="item in searchDeviceList"
+                  :label="item.sName"
+                  :value="item.code">
+          </el-option>
+        </el-select>
+      </el-form-item>
 
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
-        <el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">
-          高级查询
-          <i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>
-          <i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>
-        </el-link>
+        <!--<el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">-->
+        <!--高级查询-->
+        <!--<i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>-->
+        <!--<i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>-->
+        <!--</el-link>-->
       </el-form-item>
 
       <el-form-item class="right-button">
@@ -31,51 +40,51 @@
       </el-form-item>
 
       <div v-show="otherSearch">
-        <el-form-item label="节目类型">
-          <el-select v-model="search.progType" placeholder="节目类型">
-            <el-option
-                    v-for="item in programType"
-                    :label="item.label"
-                    :value="item.label">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="屏幕属性">
-          <el-select v-model="search.screenCode" placeholder="屏幕属性">
-            <el-option
-                    v-for="item in searchDeviceList"
-                    :label="item.sName"
-                    :value="item.code">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="节目状态">
-          <el-select v-model="search.progStatus" placeholder="节目状态">
-            <el-option
-                    v-for="item in programStatus"
-                    :label="item.label"
-                    :value="item.label">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="屏幕适应">
-          <el-select v-model="search.screenMatch" placeholder="屏幕适应">
-            <el-option
-                    v-for="item in screenAdapt"
-                    :label="item.label"
-                    :value="item.label">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="切换效果">
-          <el-select v-model="search.switchMode" placeholder="切换效果">
-            <el-option
-                    v-for="item in programEffect"
-                    :label="item.label"
-                    :value="item.label">
-            </el-option>
-          </el-select>
-        </el-form-item>
+        <!--<el-form-item label="节目类型">-->
+        <!--<el-select v-model="search.progType" placeholder="节目类型">-->
+        <!--<el-option-->
+        <!--v-for="item in programType"-->
+        <!--:label="item.label"-->
+        <!--:value="item.label">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="屏幕属性">-->
+        <!--<el-select v-model="search.screenCode" placeholder="屏幕属性">-->
+        <!--<el-option-->
+        <!--v-for="item in searchDeviceList"-->
+        <!--:label="item.sName"-->
+        <!--:value="item.code">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="节目状态">-->
+        <!--<el-select v-model="search.progStatus" placeholder="节目状态">-->
+        <!--<el-option-->
+        <!--v-for="item in programStatus"-->
+        <!--:label="item.label"-->
+        <!--:value="item.label">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="屏幕适应">-->
+        <!--<el-select v-model="search.screenMatch" placeholder="屏幕适应">-->
+        <!--<el-option-->
+        <!--v-for="item in screenAdapt"-->
+        <!--:label="item.label"-->
+        <!--:value="item.label">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="切换效果">-->
+        <!--<el-select v-model="search.switchMode" placeholder="切换效果">-->
+        <!--<el-option-->
+        <!--v-for="item in programEffect"-->
+        <!--:label="item.label"-->
+        <!--:value="item.label">-->
+        <!--</el-option>-->
+        <!--</el-select>-->
+        <!--</el-form-item>-->
       </div>
 
     </el-form>
@@ -85,6 +94,8 @@
             :data="tableData"
             height="620"
             @selection-change="handleDeletion"
+            ref="table"
+            @filter-change="filterTag"
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
@@ -99,7 +110,7 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column prop="programName" label="节目名称" min-width="200">
+      <el-table-column prop="programName" label="节目名称" min-width="180">
         <template slot-scope="scope">
           <el-popover placement="top-start" trigger="hover">
             <div>
@@ -112,21 +123,21 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column prop="progType" label="节目类型" min-width="80"></el-table-column>
+      <el-table-column prop="progType" label="节目类型" min-width="80" column-key="progType" :filters=programType :filter-multiple="false"></el-table-column>
       <el-table-column prop="sName" label="屏幕属性" min-width="130"></el-table-column>
       <el-table-column prop="name" label="有效期" min-width="300">
         <template slot-scope="scope">
           {{ scope.row.launchTime }} ~ {{ scope.row.expiryDate }}
         </template>
       </el-table-column>
-      <el-table-column prop="status" label="节目状态">
+      <el-table-column prop="status" label="节目状态" column-key="progStatus" :filters=programStatus :filter-multiple="false">
         <template slot-scope="scope">
           <span :style="scope.row.status == '排期中' ? 'color:#67C23A;' : 'color:#909399;'">{{ scope.row.status }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="switchMode" label="切换效果"></el-table-column>
+      <el-table-column prop="switchMode" label="切换效果" column-key="switchMode" :filters=programEffect :filter-multiple="false"></el-table-column>
       <el-table-column prop="switchTime" label="切换间隔"></el-table-column>
-      <el-table-column prop="screenMatch" label="屏幕适应"></el-table-column>
+      <el-table-column prop="screenMatch" label="屏幕适应" column-key="screenMatch" :filters=screenAdapt :filter-multiple="false"></el-table-column>
       <el-table-column label="关联店铺">
         <template slot-scope="scope">
           <el-link type="primary" @click="handleEditShop(scope.row)" :disabled="!pageMenu.setprogshop">
@@ -376,8 +387,8 @@
                :close-on-click-modal="true" append-to-body>
 
       <el-form :label-width="formLabelWidth" :model="search">
-        <el-form-item label="节目名称">
-          <el-input v-model="programInfo.programName" :disabled="true" placeholder="节目名称"></el-input>
+        <el-form-item label="店铺名称">
+          <el-input v-model="programInfo.programName" :disabled="true" placeholder="店铺名称"></el-input>
         </el-form-item>
         <el-form-item label="选择标签">
           <div>
@@ -448,38 +459,35 @@
         },
         tableChecked: [],
         deviceForm: {},
-        staffList: [
-          {key: 28, phone: "补货员", nickName: "补货员"},
-          {key: 29, phone: "测试员", nickName: "测试员"}
-        ],
+        staffList: [],
         selectedStaffList: [],
         screenData: [
           {label: '1920*1080横屏', value: 1},
           {label: '1920*1080竖屏', value: 2}
         ],
         programType: [
-          {label: '视频', value: 1},
-          {label: '图片', value: 2}
+          {text: '视频', value: '视频'},
+          {text: '图片', value: '图片'}
         ],
         programStatus: [
-          {label: '未开始', value: 1},
-          {label: '排期中', value: 2},
-          {label: '已过期', value: 3}
+          {text: '未开始', value: '未开始'},
+          {text: '排期中', value: '排期中'},
+          {text: '已过期', value: '已过期'}
         ],
         programEffect: [
-          {label: '随机', value: 1},
-          {label: '马赛克', value: 2},
-          {label: '上下滑动', value: 3},
-          {label: '左右滑动', value: 4},
-          {label: '渐入', value: 5}
+          {text: '随机', value: '随机'},
+          {text: '马赛克', value: '马赛克'},
+          {text: '上下滑动', value: '上下滑动'},
+          {text: '左右滑动', value: '左右滑动'},
+          {text: '渐入', value: '渐入'}
         ],
         screenAdapt: [
-          {label: '无', value: 1},
-          {label: '填充', value: 2},
-          {label: '适应', value: 3},
-          {label: '拉伸', value: 4},
-          {label: '平铺', value: 5},
-          {label: '居中', value: 6}
+          {text: '无', value: '无'},
+          {text: '填充', value: '填充'},
+          {text: '适应', value: '适应'},
+          {text: '拉伸', value: '拉伸'},
+          {text: '平铺', value: '平铺'},
+          {text: '居中', value: '居中'}
         ],
         fileList: [],
         releaseType: 1,
@@ -690,6 +698,28 @@
       replaySearch() {
         this.search = {}
         this.currentPage = 1
+        this.$refs.table.clearFilter()
+        this.getList(this.pageSize, this.currentPage)
+      },
+      //表格筛选
+      filterTag(value) {
+        //节目类型
+        if ( value.progType ) {
+          this.search.progType = value.progType[0]
+        }
+        //切换效果
+        if ( value.switchMode ) {
+          this.search.switchMode = value.switchMode[0]
+        }
+        //屏幕适应
+        if ( value.screenMatch ) {
+          this.search.screenMatch = value.screenMatch[0]
+        }
+        //节目状态
+        if ( value.progStatus ) {
+          this.search.progStatus = value.progStatus[0]
+        }
+
         this.getList(this.pageSize, this.currentPage)
       },
       //打开新增弹窗
