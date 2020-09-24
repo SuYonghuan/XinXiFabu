@@ -99,8 +99,15 @@
       </el-table-column>
       <el-table-column prop="name" label="前端状态">
         <template slot-scope="scope">
-          <el-tag type="success" v-show="scope.row.frontOnline">在线</el-tag>
-          <el-tag type="danger" v-show="!scope.row.frontOnline">离线</el-tag>
+          <el-tooltip placement="bottom">
+            <div slot="content">
+              <p>前端应用：{{ scope.row.appName }}</p>
+              <p>应用版本号：{{ scope.row.appVersion }}</p>
+              <p>容器版本号：{{ scope.row.containerVersion }}</p>
+            </div>
+            <el-tag type="success" v-if="scope.row.frontOnline">在线</el-tag>
+            <el-tag type="danger" v-if="!scope.row.frontOnline">离线</el-tag>
+          </el-tooltip>
         </template>
       </el-table-column>
       <el-table-column label="同屏设备">
