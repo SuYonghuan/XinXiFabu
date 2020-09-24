@@ -42,122 +42,122 @@
   </el-menu>
 </template>
 <script>
-	import {mapGetters, mapMutations} from "vuex";
-	import {delCookie, getCookie} from 'common/js/cookie'
-	import {
-		GetNoReadMessage,
-		GetMessageInfo,
-	} from 'http/api/login'
-	import {ERR_OK} from 'http/config'
+  import {mapGetters, mapMutations} from "vuex";
+  import {delCookie, getCookie} from 'common/js/cookie'
+  import {
+    GetNoReadMessage,
+    GetMessageInfo,
+  } from 'http/api/login'
+  import {ERR_OK} from 'http/config'
 
-	export default {
-		name: "navcon",
-		data() {
-			return {
-				collapsed: true,
-				dialogFormVisible: false,
-				ruleForm: {
-					pass: "",
-					checkPass: ""
-				},
-				noticeData: {},
-				dropdownStatus: true,
-				autoAuth: false,
-			};
-		},
-		computed: {
-			...mapGetters(["user"])
-		},
-		created() {
-			this.GetNoReadMessage()
-			this.autoAuth = getCookie('autoauth') ? true : false;
-		},
-		methods: {
-			GetNoReadMessage() {
-				GetNoReadMessage({}).then(res => {
-					if (res.code === ERR_OK) {
-						this.noticeData = res.data
-						// console.log(res.data)
-					}
-				})
-			},
-			GetMessageInfo(param) {
-				GetMessageInfo(param).then(res => {
-					if (res.code === ERR_OK) {
-						this.GetNoReadMessage()
-						this.$message.success('操作成功');
-						return
-					}
-					this.$message.error(res.msg);
-				})
-			},
-			cancel() {
-				this.dialogFormVisible = false;
-				this.resetForm();
-			},
-			submitForm(formName) {
-				this.$refs[formName].validate(valid => {
-					if (valid) {
-						this._resetPwd(
-							this.ruleForm.pass,
-							this.ruleForm.checkPass,
-							this.user.userCode
-						);
-					} else {
-						console.log("error submit!!");
-						return false;
-					}
-				});
-			},
-			resetForm() {
-				this.$refs["ruleForm"].resetFields();
-			},
-			// 退出登录
-			exit() {
-				this.$confirm("退出登录, 是否继续?", "提示", {
-					confirmButtonText: "确定",
-					cancelButtonText: "取消",
-					type: "warning"
-				}).then(() => {
-					this.$router.push({path: "/login"});
-					this.setuser("");
-					delCookie('userInfo')
-					delCookie('presentMenu')
-					// delCookie()
-				}).catch(() => {
-					this.$message({
-						type: "info",
-						message: "已取消"
-					});
-				});
-			},
-			//展开消息
-			clickNoticeIcon() {
-				this.dropdownStatus = !this.dropdownStatus
-			},
-			//消息中心
-			clickNotice() {
-				this.dropdownStatus = true
-				this.$router.push('/system/notice')
-			},
-			//删除消息
-			delNotice(item) {
-				this.GetMessageInfo({'Code': item.code})
-			},
-			//用户信息
-			clickName() {
-				this.$router.push('/system/personal')
-			},
-			...mapMutations({
-				setuser: "SET_USER"
-			})
-		},
-		watch: {
-			$route(val) {
-				this.GetNoReadMessage()
-			}
-		},
-	};
+  export default {
+    name: "navcon",
+    data() {
+      return {
+        collapsed: true,
+        dialogFormVisible: false,
+        ruleForm: {
+          pass: "",
+          checkPass: ""
+        },
+        noticeData: {},
+        dropdownStatus: true,
+        autoAuth: false,
+      };
+    },
+    computed: {
+      ...mapGetters(["user"])
+    },
+    created() {
+      this.GetNoReadMessage()
+      this.autoAuth = getCookie('autoauth') ? true : false;
+    },
+    methods: {
+      GetNoReadMessage() {
+        GetNoReadMessage({}).then(res => {
+          if (res.code === ERR_OK) {
+            this.noticeData = res.data
+            // console.log(res.data)
+          }
+        })
+      },
+      GetMessageInfo(param) {
+        GetMessageInfo(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.GetNoReadMessage()
+            this.$message.success('操作成功');
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      cancel() {
+        this.dialogFormVisible = false;
+        this.resetForm();
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate(valid => {
+          if (valid) {
+            this._resetPwd(
+                this.ruleForm.pass,
+                this.ruleForm.checkPass,
+                this.user.userCode
+            );
+          } else {
+            console.log("error submit!!");
+            return false;
+          }
+        });
+      },
+      resetForm() {
+        this.$refs["ruleForm"].resetFields();
+      },
+      // 退出登录
+      exit() {
+        this.$confirm("退出登录, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          this.$router.push({path: "/login"});
+          this.setuser("");
+          delCookie('userInfo')
+          delCookie('presentMenu')
+          // delCookie()
+        }).catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消"
+          });
+        });
+      },
+      //展开消息
+      clickNoticeIcon() {
+        this.dropdownStatus = !this.dropdownStatus
+      },
+      //消息中心
+      clickNotice() {
+        this.dropdownStatus = true
+        this.$router.push('/system/notice')
+      },
+      //删除消息
+      delNotice(item) {
+        this.GetMessageInfo({'Code': item.code})
+      },
+      //用户信息
+      clickName() {
+        this.$router.push('/system/personal')
+      },
+      ...mapMutations({
+        setuser: "SET_USER"
+      })
+    },
+    watch: {
+      $route(val) {
+        this.GetNoReadMessage()
+      }
+    },
+  };
 </script>
 <style scoped lang="scss">
   :focus {
@@ -193,7 +193,7 @@
     height: 31px;
     color: rgba(255, 255, 255, 1);
     margin-left: 42px;
-    background-color: rgba(255, 141, 26, 1);
+    background-color: #409EFF;
   }
 
   .el-menu-demo {

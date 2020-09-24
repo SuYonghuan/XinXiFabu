@@ -34,7 +34,7 @@
       </el-form-item>
       <el-form-item class="right-button">
         <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
-        <el-button @click="handleSysData()" v-if="pageMenu.syndata">同步数据</el-button>
+        <el-button type="primary" @click="handleSysData()" v-if="pageMenu.syndata" :loading="loadingStatus">同步数据</el-button>
         <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出</el-button>
       </el-form-item>
     </el-form>
@@ -209,6 +209,7 @@
 				labelList: [],
 				shopInfo: {},
 				labelActive: [],
+        loadingStatus: false,
 			}
 		},
 		created() {
@@ -346,6 +347,7 @@
 			},
 			GetSynData() {
 				GetSynData({}).then(res => {
+          this.loadingStatus = false
 					if (res.code === ERR_OK) {
 						this.$message.success(res.msg);
 						return
@@ -550,6 +552,7 @@
 			},
 			//同步数据
 			handleSysData() {
+			  this.loadingStatus = true
 				this.GetSynData()
 			},
 			//标签管理
