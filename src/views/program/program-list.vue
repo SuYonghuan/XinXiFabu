@@ -192,11 +192,11 @@
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <!--            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
             <el-card class="box-card file-list-card">
-              <div v-for="(item,index) of editForm.progFiles">
+              <div v-for="(item,index) of fileList">
                 <div>
-                  <el-input v-model="item.ProgramName" style="width: 300px"></el-input>
+                  <el-input v-model="item.name" style="width: 300px"></el-input>
                   /
-                  <span>{{fileSize(item.Size)}}</span>
+                  <span>{{fileSize(item.size)}}</span>
                 </div>
                 <p>
                   <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
@@ -735,6 +735,7 @@
 				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
 				this.labelActive = [];
 				this.$refs.videoRef && this.$refs.videoRef.pause()
+        this.fileList = []
 			},
 			//提交
 			submitUpForm(item) {
@@ -862,6 +863,9 @@
 					this.$message.error('上传文件大小不能超过 500MB!');
 					return false
 				}
+
+        this.fileList = []
+        this.fileList = fileList
 			},
 			handleAvatarSuccess(res, file) {
 				if (res.code === '200') {
@@ -896,6 +900,7 @@
 			//删除文件
 			handleDeleteFile(index) {
 				this.editForm.progFiles.splice(index, 1)
+        this.fileList.splice(index, 1)
 			},
 			//关联店铺
 			progToShop(item) {
