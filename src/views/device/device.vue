@@ -123,7 +123,7 @@
       <el-table-column label="操作" width="250">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleDetail(scope.row)" v-if="pageMenu.devoper">管理</el-button>
-          <el-button type="warning" size="small" @click="screenshot(scope.row)" v-if="pageMenu.devicescreenshot">截图
+          <el-button type="warning" size="small" @click="screenshot(scope.row)" v-if="pageMenu.devicescreenshot" :loading="loadingStatus">截图
           </el-button>
           <el-dropdown style="margin-left: 15px">
             <el-button type="primary" size="small">
@@ -258,6 +258,7 @@
         },
         downType: 1,
         shotImg: '',
+        loadingStatus: false,
       }
     },
     created() {
@@ -333,6 +334,7 @@
       },
       DeviceScreenshot(param) {
         DeviceScreenshot(param).then(res => {
+          this.loadingStatus = false
           if (res.code === ERR_OK) {
             this.shotImg = res.data
             this.$message.success(res.msg);
@@ -757,6 +759,7 @@
           this.$message.error('设备离线');
           return
         }
+        this.loadingStatus = true
         const param = {"Code": item.code}
         this.DeviceScreenshot(param)
       },
