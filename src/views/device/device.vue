@@ -123,7 +123,7 @@
       <el-table-column label="操作" width="250">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleDetail(scope.row)" v-if="pageMenu.devoper">管理</el-button>
-          <el-button type="warning" size="small" @click="screenshot(scope.row)" v-if="pageMenu.devicescreenshot" :loading="loadingStatus">截图
+          <el-button type="warning" size="small" @click="screenshot(scope.row,scope.$index)" v-if="pageMenu.devicescreenshot" :ref="'shotRef'+scope.$index" :loading="false">截图
           </el-button>
           <el-dropdown style="margin-left: 15px">
             <el-button type="primary" size="small">
@@ -258,7 +258,7 @@
         },
         downType: 1,
         shotImg: '',
-        loadingStatus: false,
+        loadingStatus: null,
       }
     },
     created() {
@@ -334,7 +334,8 @@
       },
       DeviceScreenshot(param) {
         DeviceScreenshot(param).then(res => {
-          this.loadingStatus = false
+          this.loadingStatus.loading = false
+          this.loadingStatus = null
           if (res.code === ERR_OK) {
             this.shotImg = res.data
             this.$message.success(res.msg);
@@ -754,12 +755,16 @@
         return jsonData.map(v => filterVal.map(j => v[j]))
       },
       //截图
-      screenshot(item) {
+      screenshot(item,row) {
         if (!item.frontOnline) {
           this.$message.error('设备离线');
           return
         }
-        this.loadingStatus = true
+        if ( this.loadingStatus ) {
+          return this.$message.error('只能对一台设备截图，请稍等...');
+        }
+        this.loadingStatus = this.$refs[`shotRef${row}`]
+        this.loadingStatus.loading = true
         const param = {"Code": item.code}
         this.DeviceScreenshot(param)
       },

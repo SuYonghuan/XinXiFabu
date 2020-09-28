@@ -120,11 +120,11 @@ export const GetSynData = (param) =>
 
 //获取标签数据
 export const GetShopLabelList = (param) =>
-	post(`${store.state.config.url}/api/LabelToObject/GetShopLabelList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/GetShopLabelList"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/LabelToObject/GetShopLabelList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/GetShopLabelList"))}&time=${timeStamp()}`,param)
 
-//获取标签数据
+//设置标签数据
 export const SetLabel = (param) =>
-	post(`${store.state.config.url}/api/LabelToObject/Set?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/Set"))}&time=${timeStamp()}`,param)
+	post(`${store.state.config.mallYunUrl}/api/LabelToObject/Set?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/LabelToObject/Set"))}&time=${timeStamp()}`,param)
 
 //获取区域列表
 export const GetRegionList = (param) =>

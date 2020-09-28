@@ -11,7 +11,7 @@
     <!--  搜索  -->
     <el-form :inline="true" :model="search" class="demo-form-inline">
       <el-form-item label="店铺名称">
-        <el-input v-model="search.Name" placeholder="店铺名称"></el-input>
+        <el-input v-model="search.Name" placeholder="店铺名称、店铺编号"></el-input>
       </el-form-item>
       <el-form-item label="楼栋">
         <el-select v-model="search.BuildingCode" placeholder="请选择" @change="changeBuilding1()">
@@ -90,6 +90,12 @@
             <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="所属区域" prop="areaCode">
+          <el-select v-model="editForm.areaCode" placeholder="请选择区域" @change="changeFormat()">
+            <el-option label="暂无区域"></el-option>
+            <el-option v-for="item in regionList" :label="item.areaName" :value="item.code"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="门牌号" prop="houseNum">
           <el-input type="text" v-model="editForm.houseNum" class="" placeholder="请输入门牌号"></el-input>
         </el-form-item>
@@ -164,6 +170,7 @@
 		GetSynData,
 		GetShopLabelList,
 		SetLabel,
+    GetRegionList,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -210,12 +217,14 @@
 				shopInfo: {},
 				labelActive: [],
         loadingStatus: false,
+        regionList: [],
 			}
 		},
 		created() {
 			this.GetRolePermissions()
 			this.GetBuildingList()
 			this.GetShopFormatList()
+			this.GetRegionList()
 		},
 		methods: {
 			/**
@@ -399,6 +408,17 @@
 					this.$message.error(res.msg);
 				})
 			},
+      GetRegionList() {
+        const param = {
+          "MallCode": this.user.mallCode,
+        }
+        GetRegionList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.regionList = res.data
+            console.log(this.regionList)
+          }
+        })
+      },
 			/**
 			 * End
 			 * @param val
@@ -469,7 +489,7 @@
 							"SupportQueuing": 0,
 							"Intro": this.editForm.intro,
 							"FileID": "",
-							"AreaCode": "",
+							"AreaCode": this.editForm.areaCode,
 							"IntroEN": this.editForm.introEn,
 							"MallCode": this.user.mallCode,
 							"UserName": this.user.accountName,

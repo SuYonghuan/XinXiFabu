@@ -34,7 +34,7 @@
                append-to-body>
       <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="区域名称" prop="areaName">
-          <el-input type="text" v-model="editForm.areaName" placeholder="请输入区域名称"></el-input>
+          <el-input type="text" v-model="editForm.areaName" :maxlength="20" show-word-limit placeholder="请输入区域名称"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -204,7 +204,8 @@
 					type: "warning"
 				}).then(() => {
 					const param = {
-						"Code": [item.code]
+						"Code": [item.code],
+            "MallCode": this.user.mallCode,
 					}
 					this.DelRegion(param)
 				}).catch(() => {

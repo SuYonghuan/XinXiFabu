@@ -236,15 +236,15 @@
           <el-select v-model="editForm.screenMatch" placeholder="屏幕适应">
             <el-option
                     v-for="item in screenAdapt"
-                    :label="item.label"
-                    :value="item.label">
+                    :label="item.text"
+                    :value="item.text">
             </el-option>
           </el-select>
           <el-select v-model="editForm.switchMode" placeholder="切换效果" style="margin-left: 20px">
             <el-option
                     v-for="item in programEffect"
-                    :label="item.label"
-                    :value="item.label">
+                    :label="item.text"
+                    :value="item.text">
             </el-option>
           </el-select>
         </el-form-item>
@@ -312,15 +312,15 @@
           <el-select v-model="updateForm.screenMatch" placeholder="屏幕适应">
             <el-option
                     v-for="item in screenAdapt"
-                    :label="item.label"
-                    :value="item.label">
+                    :label="item.text"
+                    :value="item.text">
             </el-option>
           </el-select>
           <el-select v-model="updateForm.switchMode" placeholder="切换效果" style="margin-left: 20px">
             <el-option
                     v-for="item in programEffect"
-                    :label="item.label"
-                    :value="item.label">
+                    :label="item.text"
+                    :value="item.text">
             </el-option>
           </el-select>
         </el-form-item>
@@ -943,8 +943,9 @@
             FileGUID: res.data.fileGuid,
             ProgramName: file.name,
             Size: file.size,
-            PreviewFileGUID: res.data.previewFileGUID
+            PreviewFileGUID: res.data.previewFileGuid
           });
+          console.log(this.editForm.progFiles)
         } else {
           this.$message.error('上传失败!');
         }
@@ -956,7 +957,7 @@
           let type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
           this.updateForm.progType = type.indexOf(file.raw.type) === -1 ? '视频' : '图片'
           this.updateForm.fileGuid = res.data.fileGuid
-          this.updateForm.previewFileGUID = res.data.previewFileGUID
+          this.updateForm.previewFileGUID = res.data.previewFileGuid
           this.updateForm.programName = file.raw.name
         } else {
           this.$message.error('上传失败!');

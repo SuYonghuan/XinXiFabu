@@ -48,10 +48,10 @@ axios.interceptors.response.use(response => {
 })
 
 //封装post方法
-export function post(url, params) {
+export function post(url, params, flag=true) {
   return new Promise((resolve, reject) => {
     axios
-      .post(url, encrypt(JSON.stringify(params)))
+      .post(url, encrypt(JSON.stringify(params)), {withCredentials: flag})
       .then(res => {
         resolve(res)
       })
