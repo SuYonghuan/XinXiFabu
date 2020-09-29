@@ -42,6 +42,7 @@
     <!--  表格  -->
     <el-table :data="tableData" style="width: 100%;" height="620">
       <el-table-column prop="name" label="店铺名称"></el-table-column>
+      <el-table-column prop="nameEn" label="英文名称"></el-table-column>
       <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
       <el-table-column prop="floorName" label="所属楼层"></el-table-column>
       <el-table-column prop="houseNum" label="门牌号"></el-table-column>

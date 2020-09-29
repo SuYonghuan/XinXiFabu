@@ -280,7 +280,8 @@
                   class="upload-demo"
                   ref="upload"
                   :action="config.updateFile"
-                  :on-change="handleProgress"
+                  :before-upload="handleProgress"
+                  :on-change="changeProgress"
                   :on-progress='uploaded'
                   :file-list="fileList"
                   :show-file-list="false"
@@ -299,7 +300,7 @@
                 <p>
                   <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
                 </p>
-                <el-progress v-if="item.uid == uid && item.percentage < 100" :percentage="Math.round(item.percentage)"
+                <el-progress v-if="item.uid == uid" :percentage="Math.round(item.percentage)"
                              class="el-progress"></el-progress>
               </div>
             </el-card>
@@ -1291,11 +1292,11 @@
       changeFileName(index, name) {
         this.editForm.progFiles[index].programName = name
       },
-      handleProgress(file, fileList) {
-        const isLt2M = file.raw.size / 1024 / 1024 < 500;
+      handleProgress(file) {
+        const isLt2M = file.size / 1024 / 1024 < 500;
         const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4', 'video/avi', 'video/flv', 'video/3gpp']
 
-        if (type.indexOf(file.raw.type) === -1 && file.raw.name.substr(-3) !== 'flv') {
+        if (type.indexOf(file.type) === -1 && file.name.substr(-3) !== 'flv') {
           this.$message.error('上传文件只能是 jpg、png、gif、mp4、avi、3gp、flv格式!');
           return false
         }
@@ -1303,7 +1304,8 @@
           this.$message.error('上传文件大小不能超过 500MB!');
           return false
         }
-
+      },
+      changeProgress(file, fileList) {
         this.fileList = []
         this.fileList = fileList
       },
