@@ -46,15 +46,15 @@
       </div>
       <p>图标效果</p>
       <p class="radio-p">
-        <el-radio v-for="item of effectType" v-model="list.effectType" :label="item.value">{{item.label}}</el-radio>
+        <el-radio v-for="item of screenEffect" v-model="list.screenEffect" :label="item.value">{{item.label}}</el-radio>
       </p>
       <div class="radio-p">
-        <p v-show="list.effectType == 0">
-          <el-radio v-for="item of screenEffect[0]" v-model="list.screenEffect" :label="item.value">{{item.label}}
+        <p v-show="list.screenEffect == 0">
+          <el-radio v-for="item of effectType[0]" v-model="list.effectType" :label="item.value">{{item.label}}
           </el-radio>
         </p>
-        <p v-show="list.effectType == 1">
-          <el-radio v-for="item of screenEffect[1]" v-model="list.screenEffect" :label="item.value">{{item.label}}
+        <p v-show="list.screenEffect == 1">
+          <el-radio v-for="item of effectType[1]" v-model="list.effectType" :label="item.value">{{item.label}}
           </el-radio>
         </p>
       </div>
@@ -105,8 +105,8 @@
 				imageUrl: '',
 				list: {},
 				pageMenu: {},
-				effectType: [{label: '固定位置', value: 0}, {label: '自由运动', value: 1}],
-				screenEffect: [
+        screenEffect: [{label: '固定位置', value: 0}, {label: '自由运动', value: 1}],
+        effectType: [
 					[{label: '右下角显示', value: 0}, {label: '居中显示', value: 1}],
 					[{label: '左右移动', value: 0}, {label: '随机移动', value: 1}]
 				],
@@ -166,7 +166,8 @@
 					"ScreenType": this.active,
 					"ScreenFile": this.list.screenFile,
 					"ScreenEffect": this.list.screenEffect,
-					"EffectType": this.list.effectType
+					"EffectType": this.list.effectType,
+          "MallCode": this.user.mallCode,
 				}
 				this.SetScreensaver(param);
 			},

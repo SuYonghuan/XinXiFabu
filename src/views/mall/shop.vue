@@ -79,7 +79,7 @@
           <el-select v-model="editForm.shopFormat" placeholder="请选择业态" @change="changeFormat()">
             <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
           </el-select>
-          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态">
+          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态" @change="changeFloor()">
             <el-option v-for="item in formatInfo.child" :label="item.name" :value="item.code"></el-option>
           </el-select>
         </el-form-item>
@@ -87,12 +87,12 @@
           <el-select v-model="editForm.buildingCode" placeholder="请选择楼栋" @change="changeBuilding()">
             <el-option v-for="item in buildingList" :label="item.name" :value="item.code"></el-option>
           </el-select>
-          <el-select v-model="editForm.floorCode" style="margin-left: 10px;" placeholder="请选择楼层">
+          <el-select v-model="editForm.floorCode" style="margin-left: 10px;" placeholder="请选择楼层" @change="changeFloor()">
             <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="所属区域" prop="areaCode">
-          <el-select v-model="editForm.areaCode" placeholder="请选择区域" @change="changeFormat()">
+          <el-select v-model="editForm.areaCode" placeholder="请选择区域">
             <el-option label="暂无区域"></el-option>
             <el-option v-for="item in regionList" :label="item.areaName" :value="item.code"></el-option>
           </el-select>
@@ -118,9 +118,9 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="简介" prop="intro">
-          <el-input type="textarea" style="width: 40%;" rows="5" v-model="editForm.intro"
+          <el-input type="textarea" style="width: 40%;" rows="5" maxlength="2000" v-model="editForm.intro"
                     placeholder="请输入中文简介"></el-input>
-          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5"
+          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5" maxlength="2000"
                     v-model="editForm.introEn" placeholder="请输入英文简介"></el-input>
         </el-form-item>
       </el-form>
@@ -556,6 +556,10 @@
 				this.editForm.floorCode = ''
 				this.GetFloorList(this.editForm.buildingCode)
 			},
+      //选中楼层
+      changeFloor() {
+        this.$forceUpdate()
+      },
 			//选中楼栋
 			changeBuilding1() {
 				this.floorList = []

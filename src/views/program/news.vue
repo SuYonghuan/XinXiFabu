@@ -1304,6 +1304,10 @@
           this.$message.error('上传文件大小不能超过 500MB!');
           return false
         }
+        if ( this.uid > 1 ) {
+          this.$message.error('文件正在上传中，请稍后操作');
+          return false
+        }
       },
       changeProgress(file, fileList) {
         this.fileList = []
