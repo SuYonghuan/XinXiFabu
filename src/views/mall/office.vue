@@ -29,6 +29,7 @@
       </el-form-item>
       <el-form-item class="right-button">
         <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addOffice">新增租户</el-button>
+        <el-button type="primary" @click="handleSysData()" :loading="loadingStatus">同步数据</el-button>
       </el-form-item>
     </el-form>
 
@@ -112,6 +113,7 @@
 		OfficeEdit,
 		OfficeDel,
 		ChangeOfficeStatus,
+    GetSynData,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -143,6 +145,7 @@
 				pageMenu: {},
 				buildingList: [],
 				floorList: [],
+        loadingStatus: false,
 			}
 		},
 		created() {
@@ -257,6 +260,16 @@
 					this.$message.error(res.msg);
 				})
 			},
+      GetSynData() {
+        GetSynData({}).then(res => {
+          this.loadingStatus = false
+          if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
 			/**
 			 * End
 			 * @param val
@@ -342,6 +355,11 @@
 				}
 				this.ChangeOfficeStatus(param)
 			},
+      //同步数据
+      handleSysData() {
+        this.loadingStatus = true
+        this.GetSynData()
+      },
 		},
 		computed: {
 			...mapGetters(['presentMenu', 'user', 'config'])
