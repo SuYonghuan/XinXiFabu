@@ -455,7 +455,7 @@
       //搜索
       onSearch() {
         this.currentPage = 1
-        this.getList(this.pageSize, this.currentPage, this.search)
+        this.getList(this.pageSize, this.currentPage)
       },
       //重置搜索
       replaySearch() {
