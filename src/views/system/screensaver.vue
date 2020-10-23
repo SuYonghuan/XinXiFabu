@@ -58,10 +58,36 @@
           </el-radio>
         </p>
       </div>
+
+      <!--  表格  -->
+      <p>默认屏保</p>
+      <el-table :data="tableData" style="width: 100%;margin-bottom: 20px" height="320px">
+        <el-table-column type="index" label="序号"></el-table-column>
+        <el-table-column prop="type" label="分辨率"></el-table-column>
+        <el-table-column label="默认图片">
+          <template slot-scope="scope">
+            <el-upload
+                    class="upload-demo"
+                    :action="config.updateFile"
+                    :show-file-list="false"
+                    :on-success="handleScreenSuccess"
+                    :before-upload="beforeAvatarUpload"
+                    multiple
+                    :limit="1">
+              <img :src="scope.row.img" v-if="scope.row.img" alt="">
+              <el-button size="small" type="primary" v-else>点击上传</el-button>
+            </el-upload>
+          </template>
+        </el-table-column>
+      </el-table>
       <p class="button-p">
         <el-button type="primary" @click="clickSubmit" v-if="pageMenu.setScreen">确定</el-button>
       </p>
     </el-card>
+    <!--  图片放大  -->
+    <div class="max-img" v-show="maxImg" @click="maxDiv">
+      <img :src="maxImg" alt="">
+    </div>
   </div>
 </template>
 
@@ -110,6 +136,8 @@
 					[{label: '右下角显示', value: 0}, {label: '居中显示', value: 1}],
 					[{label: '左右移动', value: 0}, {label: '随机移动', value: 1}]
 				],
+        tableData: [{type:'1920'}],
+        maxImg: '',
 			}
 		},
 		created() {
@@ -193,6 +221,22 @@
 					return false
 				}
 			},
+      //默认屏保
+      handleScreenSuccess(res, file) {
+        if (res.code === '200') {
+
+        } else {
+          this.$message.error('上传失败!');
+        }
+      },
+      //放大图片
+      clickImg(item) {
+        this.maxImg = item;
+      },
+      //关闭大图
+      maxDiv() {
+        this.maxImg = '';
+      },
 		},
 		computed: {
 			...mapGetters(['config', 'user', "config", 'presentMenu'])
@@ -313,5 +357,23 @@
 
   .button-p {
     text-align: center;
+  }
+
+  .max-img {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-height: 1080px;
+      max-width: 1920px;
+    }
   }
 </style>

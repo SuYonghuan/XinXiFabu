@@ -1,0 +1,374 @@
+{
+  "code": "200",
+  "msg": "获取成功",
+  "data": [
+    {
+      "floorOrder": 0,
+      "shopList": []
+    },
+    {
+      "floorOrder": 1,
+      "shopList": []
+    },
+    {
+      "floorOrder": 2,
+      "shopList": []
+    },
+    {
+      "floorOrder": 3,
+      "shopList": []
+    },
+    {
+      "floorOrder": 4,
+      "shopList": []
+    },
+    {
+      "floorOrder": 5,
+      "shopList": [
+        {
+          "areaCode": null,
+          "areaCoordinates": null,
+          "areaName": "",
+          "borderColor": null,
+          "buildingCode": "A84BDCCC-F396-4D1C-95A7-8DCCA0C1C299",
+          "businessHours": null,
+          "code": "85980526-c2a5-46af-ac61-18c80c9df980",
+          "floorCode": "967EFCB0-772D-49EE-B37F-E6BB1B72869D",
+          "floorName": "L2",
+          "floorOrder": 5,
+          "formatColor": null,
+          "houseNum": "L201",
+          "initials": "HDKJJRYXGS",
+          "intro": null,
+          "isShow": true,
+          "logo": null,
+          "logoPath": "",
+          "name": "惠东科技金融有限公司",
+          "nameEn": "HUIDONG TECHNOLOGY FINANCE CO.,LTD",
+          "navXaxis": null,
+          "navYaxis": null,
+          "phone": null,
+          "secFormat": null,
+          "shopFormat": null,
+          "shopFormatCode": null,
+          "spelling": "hui dong ke ji jin rong you xian gong si",
+          "xaxis": [
+            "205"
+          ],
+          "yaxis": "78"
+        },
+        {
+          "areaCode": null,
+          "areaCoordinates": null,
+          "areaName": "",
+          "borderColor": null,
+          "buildingCode": "A84BDCCC-F396-4D1C-95A7-8DCCA0C1C299",
+          "businessHours": null,
+          "code": "a8664d5f-7d4e-48a8-b79d-b543aa0cd1fd",
+          "floorCode": "967EFCB0-772D-49EE-B37F-E6BB1B72869D",
+          "floorName": "L2",
+          "floorOrder": 5,
+          "formatColor": null,
+          "houseNum": "L907",
+          "initials": "HLLRSJSKJYXGS",
+          "intro": null,
+          "isShow": true,
+          "logo": null,
+          "logoPath": "",
+          "name": "恒隆拉瑞斯金属科技有限公司",
+          "nameEn": "HUIDONG TECHNOLOGY FINANCE CO.,LTD",
+          "navXaxis": null,
+          "navYaxis": null,
+          "phone": null,
+          "secFormat": null,
+          "shopFormat": null,
+          "shopFormatCode": null,
+          "spelling": "heng long la rui si jin shu ke ji you xian gong si",
+          "xaxis": [
+            "103"
+          ],
+          "yaxis": "470"
+        },
+        {
+          "areaCode": null,
+          "areaCoordinates": null,
+          "areaName": "",
+          "borderColor": null,
+          "buildingCode": "A84BDCCC-F396-4D1C-95A7-8DCCA0C1C299",
+          "businessHours": null,
+          "code": "b4ad0931-2966-4f9a-8702-a0b6d7162ef2",
+          "floorCode": "967EFCB0-772D-49EE-B37F-E6BB1B72869D",
+          "floorName": "L2",
+          "floorOrder": 5,
+          "formatColor": null,
+          "houseNum": "L902",
+          "initials": "HWSCLSBYXGS",
+          "intro": null,
+          "isShow": true,
+          "logo": null,
+          "logoPath": "",
+          "name": "宏旺水处理设备有限公司",
+          "nameEn": "HUIDONG TECHNOLOGY FINANCE CO.,LTD",
+          "navXaxis": null,
+          "navYaxis": null,
+          "phone": null,
+          "secFormat": null,
+          "shopFormat": null,
+          "shopFormatCode": null,
+          "spelling": "hong wang shui chu li she bei you xian gong si",
+          "xaxis": [
+            "380"
+          ],
+          "yaxis": "92"
+        }
+      ]
+    },
+    {
+      "floorOrder": 6,
+      "shopList": []
+    },
+    {
+      "floorOrder": 7,
+      "shopList": []
+    },
+    {
+      "floorOrder": 8,
+      "shopList": []
+    },
+    {
+      "floorOrder": 9,
+      "shopList": [
+        {
+          "areaCode": "",
+          "areaCoordinates": null,
+          "areaName": "",
+          "borderColor": null,
+          "buildingCode": "A84BDCCC-F396-4D1C-95A7-8DCCA0C1C299",
+          "businessHours": "",
+          "code": "d785b12c-6ab3-4819-9ed4-e42ba46d30be",
+          "floorCode": "A9F6E828-E2F2-4FCC-9A01-AAAE2E6D13FF",
+          "floorName": "L5",
+          "floorOrder": 9,
+          "formatColor": "",
+          "houseNum": "501-514",
+          "initials": "ZGPARSBXGFYXGSHBFGS",
+          "intro": "",
+          "isShow": true,
+          "logo": "47961d2a-de25-4f62-8957-1497d0913766",
+          "logoPath": "\\Files\\47961d2a-de25-4f62-8957-1497d0913766\\组 700.png",
+          "name": "中国平安人寿保险股份有限公司湖北分公司",
+          "nameEn": "Ping An Life Insurance Company Of China, LTD. Hubei Branch",
+          "navXaxis": null,
+          "navYaxis": null,
+          "phone": "",
+          "secFormat": "",
+          "shopFormat": "生活品味",
+          "shopFormatCode": "a2fe97a5-843a-47c6-9a35-ea533c4b7574",
+          "spelling": "zhong guo ping an ren shou bao xian gu fen you xian gong si hu bei fen gong si",
+          "xaxis": null,
+          "yaxis": null
+        }
+      ]
+    },
+    {
+      "floorOrder": 10,
+      "shopList": []
+    },
+    {
+      "floorOrder": 11,
+      "shopList": []
+    },
+    {
+      "floorOrder": 12,
+      "shopList": []
+    },
+    {
+      "floorOrder": 13,
+      "shopList": []
+    },
+    {
+      "floorOrder": 14,
+      "shopList": []
+    },
+    {
+      "floorOrder": 15,
+      "shopList": []
+    },
+    {
+      "floorOrder": 16,
+      "shopList": []
+    },
+    {
+      "floorOrder": 17,
+      "shopList": []
+    },
+    {
+      "floorOrder": 18,
+      "shopList": []
+    },
+    {
+      "floorOrder": 19,
+      "shopList": []
+    },
+    {
+      "floorOrder": 20,
+      "shopList": []
+    },
+    {
+      "floorOrder": 21,
+      "shopList": []
+    },
+    {
+      "floorOrder": 22,
+      "shopList": []
+    },
+    {
+      "floorOrder": 23,
+      "shopList": []
+    },
+    {
+      "floorOrder": 24,
+      "shopList": []
+    },
+    {
+      "floorOrder": 25,
+      "shopList": []
+    },
+    {
+      "floorOrder": 26,
+      "shopList": []
+    },
+    {
+      "floorOrder": 27,
+      "shopList": []
+    },
+    {
+      "floorOrder": 28,
+      "shopList": []
+    },
+    {
+      "floorOrder": 29,
+      "shopList": []
+    },
+    {
+      "floorOrder": 30,
+      "shopList": []
+    },
+    {
+      "floorOrder": 31,
+      "shopList": []
+    },
+    {
+      "floorOrder": 32,
+      "shopList": []
+    },
+    {
+      "floorOrder": 33,
+      "shopList": []
+    },
+    {
+      "floorOrder": 34,
+      "shopList": []
+    },
+    {
+      "floorOrder": 35,
+      "shopList": []
+    },
+    {
+      "floorOrder": 36,
+      "shopList": []
+    },
+    {
+      "floorOrder": 37,
+      "shopList": []
+    },
+    {
+      "floorOrder": 38,
+      "shopList": []
+    },
+    {
+      "floorOrder": 39,
+      "shopList": []
+    },
+    {
+      "floorOrder": 40,
+      "shopList": []
+    },
+    {
+      "floorOrder": 41,
+      "shopList": []
+    },
+    {
+      "floorOrder": 42,
+      "shopList": []
+    },
+    {
+      "floorOrder": 43,
+      "shopList": []
+    },
+    {
+      "floorOrder": 44,
+      "shopList": []
+    },
+    {
+      "floorOrder": 45,
+      "shopList": []
+    },
+    {
+      "floorOrder": 46,
+      "shopList": []
+    },
+    {
+      "floorOrder": 47,
+      "shopList": []
+    },
+    {
+      "floorOrder": 48,
+      "shopList": []
+    },
+    {
+      "floorOrder": 49,
+      "shopList": []
+    },
+    {
+      "floorOrder": 50,
+      "shopList": []
+    },
+    {
+      "floorOrder": 51,
+      "shopList": []
+    },
+    {
+      "floorOrder": 52,
+      "shopList": []
+    },
+    {
+      "floorOrder": 53,
+      "shopList": []
+    },
+    {
+      "floorOrder": 54,
+      "shopList": []
+    },
+    {
+      "floorOrder": 55,
+      "shopList": []
+    },
+    {
+      "floorOrder": 56,
+      "shopList": []
+    },
+    {
+      "floorOrder": 57,
+      "shopList": []
+    },
+    {
+      "floorOrder": 58,
+      "shopList": []
+    },
+    {
+      "floorOrder": 59,
+      "shopList": []
+    }
+  ]
+}

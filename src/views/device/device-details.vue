@@ -51,19 +51,23 @@
 
     <el-tabs value="1" type="border-card" @tab-click="clickTab" style="margin-top: 20px;">
       <el-tab-pane label="设备位置" name="1">
-        <div class="device-map">
-          <p>
-            设备点位：
-            <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999"></el-input-number>
-          </p>
-          <p>
-            设备角度：
-            <el-input-number v-model="devCoordinate.angle" :min="-360" :max="360"></el-input-number>
-          </p>
-          <p>
-            <el-button type="primary" @click="clickMap">保存</el-button>
-          </p>
+        <div class="map-div">
+          <div id="threeDiv" @click="clickThree"></div>
+          <div class="device-map">
+            <p>
+              设备点位：
+              <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999"></el-input-number>
+            </p>
+            <p>
+              设备角度：
+              <el-input-number @change="changeAngle" v-model="devCoordinate.angle" :min="-180" :max="180"></el-input-number>
+            </p>
+            <p>
+              <el-button type="primary" @click="clickMap">保存</el-button>
+            </p>
+          </div>
         </div>
+
       </el-tab-pane>
       <el-tab-pane label="节目列表" name="2">
         <p>节目发布类型：</p>
@@ -144,6 +148,7 @@
 			this.GetDeviceInfo()
 			// this.GetLocalProgram()
 			this.GetDevCoordinate()
+      Config.getMapInfo("9d9ccf33-9ee6-49d7-8cc3-e1aaa75f896c","http://saas.1000my.com:8013","nbfbc",0);
 		},
 		methods: {
 			/**
@@ -157,6 +162,8 @@
 				GetDeviceInfo(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.deviceInfo = res.data
+            //商场Code，云地址，名称，当前楼层，当前楼栋
+            // Config.getMapInfo(this.code,this.config.mallYunUrl,this.config.mapKey,this.deviceInfo.building);
 					}
 				})
 			},
@@ -264,6 +271,18 @@
 					this.GetDeptListByDeviceCode()
 				}
 			},
+      //点击地图
+      clickThree() {
+			  setTimeout(()=>{
+			    if ( deviceSite.x > 0 ) {
+            this.devCoordinate.yaxis = deviceSite.navPoint
+            this.devCoordinate.angle = deviceSite.angle
+          }
+        },10)
+      },
+      changeAngle() {
+        Map_QM.rotateSite(this.devCoordinate.angle)
+      },
 			clickMap() {
 				const param = {
 					"Code": this.code,
@@ -276,7 +295,7 @@
 			},
 		},
 		computed: {
-			...mapGetters(['presentMenu'])
+			...mapGetters(['presentMenu','config'])
 		},
 	}
 </script>
@@ -353,6 +372,22 @@
         height: 60px;
         display: flex;
         align-items: center;
+      }
+    }
+
+    .map-div{
+      display: flex;
+      #threeDiv{
+        width:1200px;
+        height:370px;
+        overflow: hidden
+      }
+      .device-map{
+        width: 350px;
+        padding: 50px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
       }
     }
   }

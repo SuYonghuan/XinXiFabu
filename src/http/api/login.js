@@ -49,3 +49,7 @@ export const ChangeSelfWord = (param) =>
 //注册
 export const MallRegister = (param) =>
 	post(`${store.state.config.url}/api/Cdn/MallRegister?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Cdn/MallRegister"))}&time=${timeStamp()}`,param)
+
+//已读消息删除
+export const DelMessage = (param) =>
+    post(`${store.state.config.url}/api/Detection/DelMessage?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Detection/DelMessage"))}&time=${timeStamp()}`,param)

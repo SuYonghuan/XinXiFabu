@@ -4,5 +4,6 @@
   "mallYunUrl": "http://test.1000my.com:8013",
   "updateFile": "http://192.168.1.194:8012/api/FileManage/UpLoadFilesSec",
   "yunUpdateFile": "http://test.1000my.com:8011/api/MallFileManage/UpLoadFilesSec",
+  "mapKey": "A",
   "version": "千目智能应用发布系统V1.0"
 }

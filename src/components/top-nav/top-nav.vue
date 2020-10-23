@@ -31,7 +31,7 @@
       </el-dropdown>
 
       <div class="el-dropdown-link" style="display: inline-block;" @click="clickName" v-show="!autoAuth">
-        <img src="../../common/images/default-photo.gif"/>
+        <!--<img src="../../common/images/default-photo.gif"/>-->
         <p>
           {{ user.nickName }}
         </p>

@@ -147,6 +147,7 @@
     </el-table>
     <div class="bottom-button">
       <el-button size="small" @click="shut(tableChecked,1)" v-if="pageMenu.devshutdown">关机</el-button>
+      <el-button size="small" @click="reboot(tableChecked,1)" v-if="pageMenu.devrestart">重启</el-button>
       <el-button size="small" @click="handleEdit(tableChecked,1)" v-if="pageMenu.devsetshutdowntime">关机时间</el-button>
       <el-button size="small" @click="cleanShutTime(tableChecked,1)" v-if="pageMenu.devclearshutdowntime">清除关机时间
       </el-button>
@@ -574,14 +575,29 @@
         this.getList(this.pageSize, this.currentPage)
       },
       //重启
-      reboot(item) {
+      reboot(item, type = 0) {
+        if (type == 1 && item.length === 0) {
+          this.$message.error("请选择您要操作的选项");
+          return
+        }
         this.$confirm("此操作将重启设备, 是否继续?", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
-          const param = {
-            "Code": [item.code]
+          let ids = [];
+          let param = {};
+          if (type == 1) {
+            for (var i = 0; i < item.length; i++) {
+              ids.push(item[i].code)
+            }
+            param = {
+              "Code": ids
+            }
+          } else {
+            param = {
+              "Code": [item.code]
+            }
           }
           this.DeviceCommandReStart(param)
         }).catch(() => {

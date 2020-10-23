@@ -20,10 +20,9 @@
           <el-table-column prop="msg" label="内容"></el-table-column>
           <el-table-column prop="name" label="操作">
             <template slot-scope="scope">
-              <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-show="tabTxt != '已读消息'">已读
-              </el-button>
-              <el-button type="primary" size="small" @click="handleWatch(scope.row)">查看
-              </el-button>
+              <el-button type="primary" size="small" @click="handleWatch(scope.row)">查看</el-button>
+              <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="tabTxt != '已读消息'">已读</el-button>
+              <el-button type="danger" size="small" @click="handleDeleteNotice(scope.row)" v-else>删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -71,6 +70,7 @@
 		GetNoReadMessage,
 		GetAlreadyReadMessage,
 		GetMessageInfo,
+    DelMessage,
 	} from 'http/api/login'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -119,6 +119,16 @@
 						this.tableData = res.data.list
 						this.total = res.data.count
 					}
+				})
+			},
+      DelMessage(param) {
+        DelMessage(param).then(res => {
+					if (res.code === ERR_OK) {
+            this.GetAlreadyReadMessage(this.pageSize, this.currentPage)
+            this.$message.success(res.msg);
+            return
+					}
+          this.$message.error(res.msg);
 				})
 			},
 			GetMessageInfo(param, type = 1) {
@@ -172,6 +182,10 @@
 			//查看
 			handleWatch(item) {
 				this.GetMessageInfo({'Code': item.code}, 2)
+			},
+			//删除已读消息
+      handleDeleteNotice(item) {
+				this.DelMessage({'Code': item.code})
 			},
 			//关闭
 			handleClose() {
