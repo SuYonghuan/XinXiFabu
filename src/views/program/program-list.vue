@@ -34,7 +34,7 @@
       </el-form-item>
 
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>
+        <!--<el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>-->
         <el-button type="success" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delprog">删除</el-button>
       </el-form-item>
@@ -182,7 +182,7 @@
                     placeholder="请输入节目组名称"></el-input>
         </el-form-item>
         <el-form-item label="分辨率" prop="screenInfo">
-          <el-select v-model="editForm.screenInfo" placeholder="分辨率">
+          <el-select v-model="editForm.screenInfo" placeholder="分辨率" @change="changeScreen">
             <el-option
                     v-for="item in searchDeviceList"
                     :label="item.sName"
@@ -211,7 +211,7 @@
                   :on-progress='uploaded'
                   :file-list="fileList"
                   :show-file-list="false"
-                  :limit="5"
+                  :limit="uploadNum"
                   :auto-upload="true"
                   :on-success="handleAvatarSuccess">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
@@ -293,22 +293,49 @@
                   :action="config.updateFile"
                   :before-upload="handleProgress"
                   :on-change="changeProgress"
-                  :on-success="handleAvatarSuccess1"
                   :on-progress='uploaded1'
+                  :file-list="fileList"
                   :show-file-list="false"
-                  :auto-upload="true">
+                  :limit="uploadNum"
+                  :auto-upload="true"
+                  :on-success="handleAvatarSuccess1">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <el-card class="box-card file-list-card">
-              <img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 220px" alt="">
-              <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 220px"
-                     v-else></video>
-              <div style="position: relative">
-                <el-progress v-if="fileList.length > 0 && fileList[0].uid == uid"
-                             :percentage="Math.round(fileList[0].percentage)"
+              <div v-for="(item,index) of fileList" class="card-input">
+                <div>
+                  <p>item.name</p>
+                </div>
+                <p>
+                  <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
+                </p>
+                <el-progress v-if="item.uid == uid" :percentage="Math.round(item.percentage)"
                              class="el-progress"></el-progress>
               </div>
             </el-card>
+            <div slot="tip" class="el-upload__tip">支持最多5个素材文件;建议每个图片大小不超过5M，最大尺寸不超过5000x5000分辨率;视频大小不大于500M</div>
           </el-upload>
+          <!--<el-upload-->
+                  <!--class="upload-demo"-->
+                  <!--ref="upload"-->
+                  <!--:action="config.updateFile"-->
+                  <!--:before-upload="handleProgress"-->
+                  <!--:on-change="changeProgress"-->
+                  <!--:on-success="handleAvatarSuccess1"-->
+                  <!--:on-progress='uploaded1'-->
+                  <!--:show-file-list="false"-->
+                  <!--:auto-upload="true">-->
+            <!--<el-button slot="trigger" size="small" type="primary">选取文件</el-button>-->
+            <!--<el-card class="box-card file-list-card">-->
+              <!--<img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 220px" alt="">-->
+              <!--<video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 220px"-->
+                     <!--v-else></video>-->
+              <!--<div style="position: relative">-->
+                <!--<el-progress v-if="fileList.length > 0 && fileList[0].uid == uid"-->
+                             <!--:percentage="Math.round(fileList[0].percentage)"-->
+                             <!--class="el-progress"></el-progress>-->
+              <!--</div>-->
+            <!--</el-card>-->
+          <!--</el-upload>-->
         </el-form-item>
         <el-form-item label="屏幕设置">
           <el-select v-model="updateForm.screenMatch" placeholder="屏幕适应">
@@ -504,6 +531,7 @@
         bigFile: null,
         otherSearch: false,
         uid: 1,
+        uploadNum: 1,
       }
     },
     created() {
@@ -904,6 +932,21 @@
       handleChange(value) {
         console.log(value);
       },
+      //修改屏幕分辨率
+      changeScreen() {
+        for ( let i=0;i<this.searchDeviceList.length;i++ ) {
+          if ( this.searchDeviceList[i].code === this.editForm.screenInfo ) {
+            if ( this.searchDeviceList[i].sName.includes('横屏') ) {
+              this.uploadNum = 1;
+              if ( this.fileList.length > 1 ) {
+                this.handleDeleteFile(1)
+              }
+            } else {
+              this.uploadNum = 2;
+            }
+          }
+        }
+      },
       /**
        * 上传素材
        */
@@ -924,6 +967,19 @@
         this.editForm.progFiles[index].programName = name
       },
       handleProgress(file) {
+
+        //限制两个文件上传的组合方式
+        if ( this.fileList.length > 1 ) {
+          const typeImg = ['jpg', 'png', 'jpeg', 'gif']
+          const typeFileImg = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
+          let fileType = this.fileList[0].name.split(".")
+          //是否为图片
+          if ( (typeImg.indexOf(fileType[1]) > -1 && typeFileImg.indexOf(file.type) > -1) || (typeImg.indexOf(fileType[1]) === -1 && typeFileImg.indexOf(file.type) === -1) ) {
+            this.$message.error('上传文件形式只能是图片+视频!');
+            return false
+          }
+        }
+
         const isLt2M = file.size / 1024 / 1024 < 500;
         const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4', 'video/avi', 'video/flv', 'video/3gpp']
 
