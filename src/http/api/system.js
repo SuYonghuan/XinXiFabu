@@ -137,3 +137,11 @@ export const GetConfig = (param) =>
 //更新密码配置
 export const UpdateConfig = (param) =>
 	post(`${store.state.config.url}/api/PwdConfig/UpdateConfig?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/PwdConfig/UpdateConfig"))}&time=${timeStamp()}`,param)
+
+//获取分辨率列表
+export const ResolutionList = (param) =>
+    post(`${store.state.config.url}/api/Screensaver/ResolutionList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Screensaver/ResolutionList"))}&time=${timeStamp()}`,param)
+
+//设置分辨率默认图片
+export const SetResolution = (param) =>
+    post(`${store.state.config.url}/api/Screensaver/SetResolution?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Screensaver/SetResolution"))}&time=${timeStamp()}`,param)

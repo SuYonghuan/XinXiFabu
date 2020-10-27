@@ -60,10 +60,10 @@
       </div>
 
       <!--  表格  -->
-      <p>默认屏保</p>
+      <p style="margin-top: 20px">默认屏保</p>
       <el-table :data="tableData" style="width: 100%;margin-bottom: 20px" height="320px">
         <el-table-column type="index" label="序号"></el-table-column>
-        <el-table-column prop="type" label="分辨率"></el-table-column>
+        <el-table-column prop="sName" label="分辨率"></el-table-column>
         <el-table-column label="默认图片">
           <template slot-scope="scope">
             <el-upload
@@ -74,8 +74,10 @@
                     :before-upload="beforeAvatarUpload"
                     multiple
                     :limit="1">
-              <img :src="scope.row.img" v-if="scope.row.img" alt="">
-              <el-button size="small" type="primary" v-else>点击上传</el-button>
+              <div @click="clickUpload(scope.row)">
+                <img :src="scope.row.filePath" width="40" height="40" v-if="scope.row.filePath" alt="">
+                <el-button size="small" type="primary" v-else>点击上传</el-button>
+              </div>
             </el-upload>
           </template>
         </el-table-column>
@@ -97,6 +99,8 @@
 		GetScreensaver,
 		SetScreensaver,
 		GetRolePermissions,
+    ResolutionList,
+    SetResolution,
 	} from 'http/api/system'
 	import {ERR_OK} from 'http/config'
 
@@ -136,12 +140,14 @@
 					[{label: '右下角显示', value: 0}, {label: '居中显示', value: 1}],
 					[{label: '左右移动', value: 0}, {label: '随机移动', value: 1}]
 				],
-        tableData: [{type:'1920'}],
+        tableData: [],
         maxImg: '',
+        newData: {},
 			}
 		},
 		created() {
 			this.GetRolePermissions()
+			this.ResolutionList()
 		},
 		methods: {
 			/**
@@ -182,6 +188,24 @@
 					}
 				})
 			},
+      SetResolution(param) {
+        SetResolution(param).then(res => {
+					if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+						this.ResolutionList()
+            return
+					}
+          this.$message.error(res.msg);
+				})
+			},
+      ResolutionList() {
+        ResolutionList({}).then(res => {
+					if (res.code === ERR_OK) {
+						this.tableData = res.data
+            console.log(this.tableData)
+					}
+				})
+			},
 			/**
 			 * End
 			 */
@@ -210,10 +234,10 @@
 			},
 			beforeAvatarUpload(file) {
 				const isLt2M = file.size / 1024 / 1024 < 10;
-				const type = ['image/jpg', 'image/png', 'image/jpeg']
+				const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
 
 				if (type.indexOf(file.type) === -1) {
-					this.$message.error('上传图片只能是 jpg、png格式!');
+					this.$message.error('上传图片只能是 jpg、png、gif格式!');
 					return false
 				}
 				if (!isLt2M) {
@@ -224,7 +248,11 @@
       //默认屏保
       handleScreenSuccess(res, file) {
         if (res.code === '200') {
-
+          const param = {
+            "Code":this.newData.code,
+            "FilePath":res.data.filePath
+          }
+          this.SetResolution(param);
         } else {
           this.$message.error('上传失败!');
         }
@@ -236,6 +264,10 @@
       //关闭大图
       maxDiv() {
         this.maxImg = '';
+      },
+      //上传按钮
+      clickUpload(item) {
+			  this.newData = item
       },
 		},
 		computed: {
