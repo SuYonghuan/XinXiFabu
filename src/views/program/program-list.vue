@@ -26,11 +26,6 @@
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
-        <!--<el-link type="primary" :underline="false" style="margin-left: 10px" @click="clickSearchOther()">-->
-        <!--高级查询-->
-        <!--<i class="el-icon-view el-icon-caret-top" v-show="otherSearch"></i>-->
-        <!--<i class="el-icon-view el-icon-caret-bottom" v-show="!otherSearch"></i>-->
-        <!--</el-link>-->
       </el-form-item>
 
       <el-form-item class="right-button">
@@ -38,54 +33,6 @@
         <el-button type="success" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delprog">删除</el-button>
       </el-form-item>
-
-      <div v-show="otherSearch">
-        <!--<el-form-item label="节目类型">-->
-        <!--<el-select v-model="search.progType" placeholder="节目类型">-->
-        <!--<el-option-->
-        <!--v-for="item in programType"-->
-        <!--:label="item.label"-->
-        <!--:value="item.label">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="屏幕属性">-->
-        <!--<el-select v-model="search.screenCode" placeholder="屏幕属性">-->
-        <!--<el-option-->
-        <!--v-for="item in searchDeviceList"-->
-        <!--:label="item.sName"-->
-        <!--:value="item.code">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="节目状态">-->
-        <!--<el-select v-model="search.progStatus" placeholder="节目状态">-->
-        <!--<el-option-->
-        <!--v-for="item in programStatus"-->
-        <!--:label="item.label"-->
-        <!--:value="item.label">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="屏幕适应">-->
-        <!--<el-select v-model="search.screenMatch" placeholder="屏幕适应">-->
-        <!--<el-option-->
-        <!--v-for="item in screenAdapt"-->
-        <!--:label="item.label"-->
-        <!--:value="item.label">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-        <!--<el-form-item label="切换效果">-->
-        <!--<el-select v-model="search.switchMode" placeholder="切换效果">-->
-        <!--<el-option-->
-        <!--v-for="item in programEffect"-->
-        <!--:label="item.label"-->
-        <!--:value="item.label">-->
-        <!--</el-option>-->
-        <!--</el-select>-->
-        <!--</el-form-item>-->
-      </div>
 
     </el-form>
 
@@ -99,7 +46,7 @@
             style="width: 100%">
       <el-table-column align="center" type="selection" width="60">
       </el-table-column>
-      <el-table-column prop="name" label="预览" width="50">
+      <el-table-column prop="name" label="预览" width="100">
         <template slot-scope="scope">
           <el-popover placement="top-start" trigger="hover">
             <div>
@@ -107,10 +54,11 @@
               <p>素材大小：{{ fileSize(scope.row.fileSize) }}</p>
             </div>
             <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" @click="clickImage(scope.row)">
+            <img :src="scope.row.vPreviewSrc" width="30" height="30" v-show="scope.row.vPreviewSrc" slot="reference" style="margin-left: 5px" @click="clickImage(scope.row,1)">
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column prop="programName" label="节目名称" min-width="180">
+      <el-table-column prop="programName" label="节目名称" min-width="130">
         <template slot-scope="scope">
           <el-popover placement="top-start" trigger="hover">
             <div>
@@ -267,7 +215,7 @@
                :close-on-click-modal="false" append-to-body>
       <el-form :label-width="formLabelWidth" :model="updateForm" ref="editForm">
         <el-form-item label="分辨率" prop="name">
-          <el-select v-model="updateForm.progScreenInfo" placeholder="分辨率">
+          <el-select v-model="updateForm.screenInfo" placeholder="分辨率" @change="changeScreen1">
             <el-option
                     v-for="item in searchDeviceList"
                     :label="item.sName"
@@ -301,12 +249,12 @@
                   :on-success="handleAvatarSuccess1">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             <el-card class="box-card file-list-card">
-              <div v-for="(item,index) of fileList" class="card-input">
+              <div v-for="(item,index) of updateForm.progFiles" class="card-input">
                 <div>
-                  <p>item.name</p>
+                  <p>{{item.name}}</p>
                 </div>
                 <p>
-                  <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
+                  <el-button type="danger" size="small" @click="handleDeleteFile1(index)">删除</el-button>
                 </p>
                 <el-progress v-if="item.uid == uid" :percentage="Math.round(item.percentage)"
                              class="el-progress"></el-progress>
@@ -314,28 +262,6 @@
             </el-card>
             <div slot="tip" class="el-upload__tip">支持最多5个素材文件;建议每个图片大小不超过5M，最大尺寸不超过5000x5000分辨率;视频大小不大于500M</div>
           </el-upload>
-          <!--<el-upload-->
-                  <!--class="upload-demo"-->
-                  <!--ref="upload"-->
-                  <!--:action="config.updateFile"-->
-                  <!--:before-upload="handleProgress"-->
-                  <!--:on-change="changeProgress"-->
-                  <!--:on-success="handleAvatarSuccess1"-->
-                  <!--:on-progress='uploaded1'-->
-                  <!--:show-file-list="false"-->
-                  <!--:auto-upload="true">-->
-            <!--<el-button slot="trigger" size="small" type="primary">选取文件</el-button>-->
-            <!--<el-card class="box-card file-list-card">-->
-              <!--<img :src="updateForm.progSrc" v-if="updateForm.progType == '图片'" style="max-height: 220px" alt="">-->
-              <!--<video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 220px"-->
-                     <!--v-else></video>-->
-              <!--<div style="position: relative">-->
-                <!--<el-progress v-if="fileList.length > 0 && fileList[0].uid == uid"-->
-                             <!--:percentage="Math.round(fileList[0].percentage)"-->
-                             <!--class="el-progress"></el-progress>-->
-              <!--</div>-->
-            <!--</el-card>-->
-          <!--</el-upload>-->
         </el-form-item>
         <el-form-item label="屏幕设置">
           <el-select v-model="updateForm.screenMatch" placeholder="屏幕适应">
@@ -532,6 +458,7 @@
         otherSearch: false,
         uid: 1,
         uploadNum: 1,
+        fileType: 0, //文件类型， 0图片  1视频
       }
     },
     created() {
@@ -580,7 +507,7 @@
           if (res.code === ERR_OK) {
             this.tableData = res.data.list
             this.total = res.data.allCount
-            // console.log(this.tableData)
+            console.log(this.tableData)
           }
         })
       },
@@ -793,8 +720,43 @@
       handleEdit(item) {
         let data = JSON.parse(JSON.stringify(item));
         data.time = [data.launchTime, data.expiryDate]
+        data.screenInfo = data.progScreenInfo
         this.updateForm = data
         this.dialogVisibleDetails = true
+        let newArray = data.progSrc.split("\\")
+        let newArray1 = data.vProgSrc ? data.vProgSrc.split("\\") : [];
+        this.fileList = []
+        const typeImg = ['jpg', 'png', 'jpeg', 'gif']
+        let fileType = data.progSrc.split(".")
+        let dataType = 'image/jpg'
+        if ( typeImg.indexOf(fileType[fileType.length-1]) < 0 ) {
+          dataType = 'video/mp4'
+        }
+        this.fileList.push(
+            {
+              name: newArray[newArray.length-1],
+              FileGUID: data.fileGuid,
+              PreviewFileGUID: data.previewFileGuid,
+              type: dataType,
+              uid: 102,
+            } )
+        if ( newArray1.length > 0 ) {
+          this.fileList.push( {
+            name: newArray1[newArray1.length-1],
+            FileGUID: data.vFileGuid,
+            PreviewFileGUID: data.vPreviewFileGuid,
+            type: 'video/mp4',
+            uid: 101,
+          } )
+        }
+
+        this.updateForm.progFiles = JSON.parse(JSON.stringify(this.fileList))
+
+        if ( data.sName.includes('横屏') ) {
+          this.uploadNum = 1;
+        } else {
+          this.uploadNum = 2;
+        }
         console.log(this.updateForm)
       },
       //已发布设备
@@ -838,7 +800,18 @@
               "SwitchMode": this.editForm.switchMode,
               "SwitchTime": this.editForm.switchTime,
               "ScreenMatch": this.editForm.screenMatch,
-              "ProgFiles": this.editForm.progFiles
+            }
+            param.ProgramName = this.editForm.progFiles[0].ProgramName
+
+            const typeFileImg = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
+            for ( let i=0;i<this.editForm.progFiles.length;i++ ) {
+              if ( typeFileImg.indexOf(this.editForm.progFiles[i].type) > -1 || this.uploadNum === 1 || this.editForm.progFiles.length === 1 ) {
+                param.FileGUID = this.editForm.progFiles[i].FileGUID
+                param.PreviewFileGUID = this.editForm.progFiles[i].PreviewFileGUID
+              } else {
+                param.VFileGUID = this.editForm.progFiles[i].FileGUID
+                param.VPreviewFileGUID = this.editForm.progFiles[i].PreviewFileGUID
+              }
             }
 
             //快速发布
@@ -854,19 +827,32 @@
       },
       //编辑提交
       submitEdForm(item) {
+        if ( this.updateForm.progFiles.length < 1 ) {
+          this.$message.error('请上传素材');
+          return
+        }
         this.$refs[item].validate(valid => {
           if (valid) {
             const param = {
               "Code": this.updateForm.code,
-              "ScreenInfo": this.updateForm.progScreenInfo,
+              "ScreenInfo": this.updateForm.screenInfo,
               "LaunchTime": this.updateForm.time[0],
               "ExpiryDate": this.updateForm.time[1],
               "SwitchMode": this.updateForm.switchMode,
               "SwitchTime": this.updateForm.switchTime,
               "ScreenMatch": this.updateForm.screenMatch,
               "ProgramName": this.updateForm.programName,
-              "FileGUID": this.updateForm.fileGuid,
-              "PreviewFileGUID": this.updateForm.previewFileGUID,
+            }
+
+            const typeFileImg = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
+            for ( let i=0;i<this.updateForm.progFiles.length;i++ ) {
+              if ( typeFileImg.indexOf(this.updateForm.progFiles[i].type) > -1 || this.uploadNum === 1 || this.updateForm.progFiles.length === 1 ) {
+                param.FileGUID = this.updateForm.progFiles[i].FileGUID
+                param.PreviewFileGUID = this.updateForm.progFiles[i].PreviewFileGUID
+              } else {
+                param.VFileGUID = this.updateForm.progFiles[i].FileGUID
+                param.VPreviewFileGUID = this.updateForm.progFiles[i].PreviewFileGUID
+              }
             }
 
             this.ProgEdit(param)
@@ -947,6 +933,19 @@
           }
         }
       },
+      //修改屏幕分辨率
+      changeScreen1() {
+        for ( let i=0;i<this.searchDeviceList.length;i++ ) {
+          if ( this.searchDeviceList[i].code === this.updateForm.screenInfo ) {
+            if ( this.searchDeviceList[i].sName.includes('横屏') ) {
+              this.uploadNum = 1;
+              this.handleDeleteFile1(1)
+            } else {
+              this.uploadNum = 2;
+            }
+          }
+        }
+      },
       /**
        * 上传素材
        */
@@ -1007,7 +1006,8 @@
             FileGUID: res.data.fileGuid,
             ProgramName: file.name,
             Size: file.size,
-            PreviewFileGUID: res.data.previewFileGuid
+            PreviewFileGUID: res.data.previewFileGuid,
+            type: file.raw.type
           });
           console.log(this.editForm.progFiles)
         } else {
@@ -1017,12 +1017,13 @@
       handleAvatarSuccess1(res, file) {
         if (res.code === '200') {
           this.uid = 1
-          this.updateForm.progSrc = URL.createObjectURL(file.raw)
-          let type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
-          this.updateForm.progType = type.indexOf(file.raw.type) === -1 ? '视频' : '图片'
-          this.updateForm.fileGuid = res.data.fileGuid
-          this.updateForm.previewFileGUID = res.data.previewFileGuid
-          this.updateForm.programName = file.raw.name
+          this.updateForm.progFiles.push({
+            name: file.name,
+            FileGUID: res.data.fileGuid,
+            Size: file.size,
+            PreviewFileGUID: res.data.previewFileGuid,
+            type: file.raw.type
+          });
         } else {
           this.$message.error('上传失败!');
         }
@@ -1037,6 +1038,11 @@
       //删除文件
       handleDeleteFile(index) {
         this.editForm.progFiles.splice(index, 1)
+        this.fileList.splice(index, 1)
+      },
+      //删除文件
+      handleDeleteFile1(index) {
+        this.updateForm.progFiles.splice(index, 1)
         this.fileList.splice(index, 1)
       },
       //关联店铺
@@ -1056,8 +1062,13 @@
         this.SetLabel(param)
       },
       //放大图片
-      clickImage(item) {
+      clickImage(item,type = 0) {
         this.bigFile = {}
+        if ( type === 1 ) {
+          this.bigFile.src = item.vProgSrc
+          this.bigFile.type = '视频'
+          return
+        }
         this.bigFile.src = item.progSrc
         this.bigFile.type = item.progType
       },
