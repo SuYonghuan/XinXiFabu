@@ -54,6 +54,12 @@
               <p>素材大小：{{ fileSize(scope.row.fileSize) }}</p>
             </div>
             <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" @click="clickImage(scope.row)">
+          </el-popover>
+          <el-popover placement="top-start" trigger="hover">
+            <div>
+              <p>实际分辨率大小：{{ scope.row.vWidth }}*{{ scope.row.vHeight }}</p>
+              <p>素材大小：{{ fileSize(scope.row.vFileSize) }}</p>
+            </div>
             <img :src="scope.row.vPreviewSrc" width="30" height="30" v-show="scope.row.vPreviewSrc" slot="reference" style="margin-left: 5px" @click="clickImage(scope.row,1)">
           </el-popover>
         </template>
@@ -212,7 +218,7 @@
 
     <!--  编辑单个素材  -->
     <el-dialog title="素材编辑" :visible.sync="dialogVisibleDetails" width="50%" :before-close="handleClose"
-               :close-on-click-modal="false" append-to-body>
+               :close-on-click-modal="false" class="dialog" append-to-body>
       <el-form :label-width="formLabelWidth" :model="updateForm" ref="editForm">
         <el-form-item label="分辨率" prop="name">
           <el-select v-model="updateForm.screenInfo" placeholder="分辨率" @change="changeScreen1">
@@ -1069,8 +1075,13 @@
           this.bigFile.type = '视频'
           return
         }
+        const typeImg = ['jpg', 'png', 'jpeg', 'gif']
+        let fileType = item.progSrc.split(".")
+        this.bigFile.type = '图片'
+        if ( typeImg.indexOf(fileType[fileType.length-1]) < 0 ) {
+          this.bigFile.type = '视频'
+        }
         this.bigFile.src = item.progSrc
-        this.bigFile.type = item.progType
       },
       //关闭放大
       closeImg() {
