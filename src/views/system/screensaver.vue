@@ -71,7 +71,7 @@
                     :action="config.updateFile"
                     :show-file-list="false"
                     :on-success="handleScreenSuccess"
-                    :before-upload="beforeAvatarUpload"
+                    :before-upload="beforeAvatarUpload1"
                     multiple
                     :limit="1">
               <div @click="clickUpload(scope.row)">
@@ -238,6 +238,19 @@
 
 				if (type.indexOf(file.type) === -1) {
 					this.$message.error('上传图片只能是 jpg、png、gif格式!');
+					return false
+				}
+				if (!isLt2M) {
+					this.$message.error('上传图片大小不能超过 10MB!');
+					return false
+				}
+			},
+			beforeAvatarUpload1(file) {
+				const isLt2M = file.size / 1024 / 1024 < 10;
+				const type = ['image/jpg', 'image/png', 'image/jpeg']
+
+				if (type.indexOf(file.type) === -1) {
+					this.$message.error('上传图片只能是 jpg、png格式!');
 					return false
 				}
 				if (!isLt2M) {
