@@ -799,6 +799,11 @@
       submitUpForm(item) {
         this.$refs[item].validate(valid => {
           if (valid) {
+            if ( this.uploadNum > this.editForm.progFiles.length ) {
+              this.$message.error('竖屏至少上传2个素材');
+              return
+            }
+
             const param = {
               "ScreenInfo": this.editForm.screenInfo,
               "LaunchTime": this.editForm.time[0],
@@ -839,6 +844,11 @@
         }
         this.$refs[item].validate(valid => {
           if (valid) {
+            if ( this.uploadNum > this.updateForm.progFiles.length ) {
+              this.$message.error('竖屏至少上传2个素材');
+              return
+            }
+
             const param = {
               "Code": this.updateForm.code,
               "ScreenInfo": this.updateForm.screenInfo,
