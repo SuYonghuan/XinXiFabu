@@ -65,7 +65,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -123,6 +123,7 @@
 				staffList: [],
 				selectedStaffList: [],
 				pageMenu: [],
+        loading: false,
 			}
 		},
 		created() {
@@ -164,6 +165,7 @@
 			},
 			addDept(param) {
 				addDept(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -175,6 +177,7 @@
 			},
 			editDept(param) {
 				editDept(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -267,11 +270,13 @@
 		    this.$refs["editForm"] && this.$refs["editForm"].resetFields()
 				this.editForm = {}
 				this.selectedStaffList = []
+        this.loading = false
 			},
 			//提交
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+            this.loading = true
 						if (this.editForm.code) {
 							this.editDept(this.editForm);
 							return
@@ -285,7 +290,7 @@
 				this.$confirm("此操作将永久删除, 是否继续?", "提示", {
 					confirmButtonText: "确定",
 					cancelButtonText: "取消",
-					type: "warning"
+					type: "warning",
 				}).then(() => {
 					const param = {
 						Code: [item.code]

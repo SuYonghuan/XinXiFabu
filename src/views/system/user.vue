@@ -99,7 +99,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('addForm')">取 消</el-button>
-        <el-button type="primary" @click="submitAdForm('addForm')">确 定</el-button>
+        <el-button type="primary" @click="submitAdForm('addForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -136,7 +136,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -156,7 +156,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('pwdForm')">取 消</el-button>
-        <el-button type="primary" @click="submitPwdForm('pwdForm')">确 定</el-button>
+        <el-button type="primary" @click="submitPwdForm('pwdForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -313,6 +313,7 @@
 				deptList: [],
 				roleList: [],
 				switchData: [],
+        loading: false,
 			}
 		},
 		created() {
@@ -379,6 +380,7 @@
 			},
 			addUser(param) {
 				addUser(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -390,6 +392,7 @@
 			},
 			editUser(param) {
 				editUser(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -432,6 +435,7 @@
 			},
 			ChangePassWord(param) {
 				ChangePassWord(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -483,11 +487,13 @@
 				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
 				this.$refs["addForm"] && this.$refs["addForm"].resetFields()
 				this.$refs["pwdForm"] && this.$refs["pwdForm"].resetFields()
+        this.loading = false
 			},
 			//新增
 			submitAdForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+            this.loading = true
 						const param = {
 							AccountName: this.addForm.accountName,
 							Password: this.addForm.password,
@@ -506,6 +512,7 @@
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+            this.loading = true
 						const param = {
 							Code: this.editForm.code,
 							AccountName: this.editForm.accountName,
@@ -523,6 +530,7 @@
 			submitPwdForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+            this.loading = true
 						const param = {
 							UserCode: this.editForm.code,
 							AccountName: this.editForm.accountName,

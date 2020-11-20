@@ -141,3 +141,15 @@ export const EditRegion = (param) =>
 //删除区域
 export const DelRegion = (param) =>
     post(`${store.state.config.mallYunUrl}/API/Area/Del?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Area/Del"))}&time=${timeStamp()}`,param)
+
+//导出店铺模板
+export const ExportTemplate = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Shop/ExportTemplate?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Shop/ExportTemplate"))}&time=${timeStamp()}`,param)
+
+//导入店铺模板
+export const ImportShopData = (param) =>
+    post(`${store.state.config.mallYunUrl}/API/Shop/ImportShopData?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Shop/ImportShopData"))}&time=${timeStamp()}`,param)
+
+//导入店铺模板
+export const UpLoadLogoFiles = (param) =>
+    post(`${store.state.config.mallYunUrl}/Api/MallFile/UpLoadLogoFiles?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/MallFile/UpLoadLogoFiles"))}&time=${timeStamp()}`,param)

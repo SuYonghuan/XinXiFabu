@@ -205,12 +205,13 @@
           <el-upload
                   class="upload-demo"
                   ref="upload"
-                  :action="config.updateFile"
+                  :action="config.url+config.uploadFile"
                   :before-upload="handleProgress"
                   :on-change="changeProgress"
                   :on-progress='uploaded'
                   :file-list="fileList"
                   :show-file-list="false"
+                  :multiple="true"
                   :limit="5"
                   :auto-upload="true"
                   :on-success="handleAvatarSuccess">
@@ -226,7 +227,7 @@
                 <p>
                   <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
                 </p>
-                <el-progress v-if="item.uid == uid" :percentage="Math.round(item.percentage)"
+                <el-progress v-if="item.percentage <= 100" :percentage="Math.round(item.percentage)"
                              class="el-progress"></el-progress>
               </div>
             </el-card>
@@ -258,7 +259,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -290,7 +291,7 @@
           <el-upload
                   class="upload-demo"
                   ref="upload"
-                  :action="config.updateFile"
+                  :action="config.url+config.uploadFile"
                   :before-upload="handleProgress"
                   :on-change="changeProgress"
                   :on-success="handleAvatarSuccess1"
@@ -303,7 +304,7 @@
               <video :src="updateForm.progSrc" controls="controls" ref="videoRef" style="max-height: 220px"
                      v-else></video>
               <div style="position: relative">
-                <el-progress v-if="fileList.length > 0 && fileList[0].uid == uid"
+                <el-progress v-if="fileList.length > 0 && fileList[0].percentage <= 100"
                              :percentage="Math.round(fileList[0].percentage)"
                              class="el-progress"></el-progress>
               </div>
@@ -335,7 +336,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitEdForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitEdForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -503,7 +504,7 @@
         labelActive: [],
         bigFile: null,
         otherSearch: false,
-        uid: 1,
+        loading: false,
       }
     },
     created() {
@@ -558,6 +559,7 @@
       },
       ProgAddFast(param) {
         ProgAddFast(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -569,6 +571,7 @@
       },
       ProgAdd(param) {
         ProgAdd(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -580,6 +583,7 @@
       },
       ProgEdit(param) {
         ProgEdit(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -803,6 +807,7 @@
       submitUpForm(item) {
         this.$refs[item].validate(valid => {
           if (valid) {
+            this.loading = true
             const param = {
               "ScreenInfo": this.editForm.screenInfo,
               "LaunchTime": this.editForm.time[0],
@@ -828,6 +833,7 @@
       submitEdForm(item) {
         this.$refs[item].validate(valid => {
           if (valid) {
+            this.loading = true
             const param = {
               "Code": this.updateForm.code,
               "ScreenInfo": this.updateForm.progScreenInfo,
@@ -911,13 +917,10 @@
         this.$refs.upload.submit();
       },
       uploaded(event, file, fileList) {
-        this.uid = file.uid
         this.fileList = fileList
       },
       uploaded1(event, file, fileList) {
-        this.uid = file.uid
         this.fileList = [fileList[fileList.length-1]]
-        console.log(file)
       },
       //修改文件名
       changeFileName(index, name) {
@@ -935,10 +938,6 @@
           this.$message.error('上传文件大小不能超过 500MB!');
           return false
         }
-        if ( this.uid > 1 ) {
-          this.$message.error('文件正在上传中，请稍后操作');
-          return false
-        }
       },
       changeProgress(file, fileList) {
         this.fileList = []
@@ -946,7 +945,11 @@
       },
       handleAvatarSuccess(res, file) {
         if (res.code === '200') {
-          this.uid = 1
+          for ( let i=0;i<this.fileList.length;i++ ) {
+            if ( this.fileList[i].uid === file.uid ) {
+              this.fileList[i].percentage = 101
+            }
+          }
           this.editForm.progFiles.push({
             FileGUID: res.data.fileGuid,
             ProgramName: file.name,
@@ -960,7 +963,9 @@
       },
       handleAvatarSuccess1(res, file) {
         if (res.code === '200') {
-          this.uid = 1
+          if ( this.fileList[0].uid === file.uid ) {
+            this.fileList[0].percentage = 101
+          }
           this.updateForm.progSrc = URL.createObjectURL(file.raw)
           let type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
           this.updateForm.progType = type.indexOf(file.raw.type) === -1 ? '视频' : '图片'
@@ -1046,18 +1051,18 @@
 
   .file-list-card {
     margin-top: 20px;
-    height: 300px;
+    height: 352px;
     position: relative;
 
     .card-input{
       width: 100%;
+      height: 60px;
       position: relative;
     }
 
     div {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin: 2px;
     }
   }
@@ -1085,6 +1090,6 @@
   .el-progress {
     position: absolute;
     width: 100%;
-    bottom: -20px;
+    bottom: -3px;
   }
 </style>

@@ -279,12 +279,13 @@
           <el-upload
                   class="upload-demo"
                   ref="upload"
-                  :action="config.updateFile"
+                  :action="config.url+config.uploadFile"
                   :before-upload="handleProgress"
                   :on-change="changeProgress"
                   :on-progress='uploaded'
                   :file-list="fileList"
                   :show-file-list="false"
+                  :multiple="true"
                   :limit="5"
                   :on-success="handleAvatarSuccess"
                   :auto-upload="true">
@@ -300,7 +301,7 @@
                 <p>
                   <el-button type="danger" size="small" @click="handleDeleteFile(index)">删除</el-button>
                 </p>
-                <el-progress v-if="item.uid == uid" :percentage="Math.round(item.percentage)"
+                <el-progress v-if="item.percentage <= 100" :percentage="Math.round(item.percentage)"
                              class="el-progress"></el-progress>
               </div>
             </el-card>
@@ -331,7 +332,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -424,7 +425,7 @@
     </el-dialog>
 
     <!--  新增字幕  -->
-    <el-dialog title="操作" :visible.sync="dialogVisibleSubtitle" width="50%" :before-close="handleClose"
+    <el-dialog title="新增字幕" :visible.sync="dialogVisibleSubtitle" width="50%" :before-close="handleClose"
                :close-on-click-modal="false" append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" :rules="rulesSub" ref="editForm">
         <el-form-item label="字幕名称" prop="name">
@@ -469,7 +470,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitSubForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitSubForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -609,7 +610,7 @@
           'left': '左侧', 'right': '右侧', 'top': '上方', 'foot': '下方'
         },
         otherSearch: false,
-        uid: 1,
+        loading: false,
       }
     },
     created() {
@@ -664,6 +665,7 @@
       },
       NewsAddFast(param) {
         NewsAddFast(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -675,6 +677,7 @@
       },
       UpdateGroupNews(param) {
         UpdateGroupNews(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -821,6 +824,7 @@
       },
       SetSubtitle(param) {
         SetSubtitle(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -832,6 +836,7 @@
       },
       UpdateSubtitle(param) {
         UpdateSubtitle(param).then(res => {
+          this.loading = false
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -1075,11 +1080,13 @@
         this.$refs["editForm"] && this.$refs["editForm"].resetFields()
         this.newsForm = {}
         this.fileList = []
+        this.loading = false
       },
       //提交插播
       submitUpForm(item) {
         this.$refs[item].validate(valid => {
           if (valid) {
+            this.loading = true
             const param = {
               "GroupName": this.newsForm.groupName,
               "ScreenInfo": this.newsForm.screenInfo,
@@ -1104,6 +1111,7 @@
       submitSubForm(item) {
         this.$refs[item].validate(valid => {
           if (valid) {
+            this.loading = true
             const param = {
               "Name": this.editForm.name,
               "Text": this.editForm.text,
@@ -1284,9 +1292,7 @@
         this.$refs.upload.submit();
       },
       uploaded(event, file, fileList) {
-        this.uid = file.uid
         this.fileList = fileList
-        console.log(file)
       },
       //修改文件名
       changeFileName(index, name) {
@@ -1315,7 +1321,11 @@
       },
       handleAvatarSuccess(res, file) {
         if (res.code === '200') {
-          this.uid = 1
+          for ( let i=0;i<this.fileList.length;i++ ) {
+            if ( this.fileList[i].uid === file.uid ) {
+              this.fileList[i].percentage = 101
+            }
+          }
           this.newsForm.progFiles.push({
             FileGUID: res.data.fileGuid,
             ProgramName: file.name,
@@ -1388,18 +1398,18 @@
 
   .file-list-card {
     margin-top: 20px;
-    height: 300px;
+    height: 352px;
     position: relative;
 
     .card-input{
       width: 100%;
+      height: 60px;
       position: relative;
     }
 
     div {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       margin: 2px;
     }
   }
@@ -1421,6 +1431,6 @@
   .el-progress {
     position: absolute;
     width: 100%;
-    bottom: -20px;
+    bottom: -3px;
   }
 </style>

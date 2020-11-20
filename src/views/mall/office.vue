@@ -28,7 +28,7 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <el-form-item class="right-button">
-        <el-button type="info" @click="handleEdit({})" v-if="pageMenu.addOffice">新增租户</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addOffice">新增租户</el-button>
         <el-button type="primary" @click="handleSysData()" :loading="loadingStatus">同步数据</el-button>
       </el-form-item>
     </el-form>
@@ -94,7 +94,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -129,7 +129,9 @@
 				pageSize: 10,
 				dialogVisible: false,
 				dialogTitle: '新增',
-				editForm: {},
+				editForm: {
+          floorCode: '',
+        },
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
@@ -146,6 +148,7 @@
 				buildingList: [],
 				floorList: [],
         loadingStatus: false,
+        loading: false,
 			}
 		},
 		created() {
@@ -211,6 +214,7 @@
 			},
 			OfficeAdd(param) {
 				OfficeAdd(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -222,6 +226,7 @@
 			},
 			OfficeEdit(param) {
 				OfficeEdit(param).then(res => {
+				  this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -305,11 +310,13 @@
 				this.$refs["editForm"].resetFields()
 				this.editForm = {}
 				this.floorList = []
+        this.loading = false
 			},
 			//提交
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+					  this.loading = true
 						this.editForm.mallCode = this.user.mallCode
 						if (this.editForm.code) {
 							this.OfficeEdit(this.editForm)

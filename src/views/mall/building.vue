@@ -39,7 +39,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -77,6 +77,7 @@
 					name: [{required: true, message: '请输入楼栋名称', trigger: 'blur'}]
 				},
 				pageMenu: {},
+        loading: false,
 			}
 		},
 		created() {
@@ -118,6 +119,7 @@
 			},
 			AddBuilding(param) {
 				AddBuilding(param).then(res => {
+				  this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -129,6 +131,7 @@
 			},
 			EditBuilding(param) {
 				EditBuilding(param).then(res => {
+				  this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -178,11 +181,13 @@
 				this.dialogVisibleDevice = false
 				this.$refs["editForm"].resetFields()
 				this.editForm = {}
+				this.loading = false
 			},
 			//提交
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+					  this.loading = true
 						const param = {
 							"BuildingName": this.editForm.name,
 							"MallCode": this.user.mallCode,

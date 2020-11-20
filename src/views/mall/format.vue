@@ -84,7 +84,7 @@
             <el-form-item label="业态图标" prop="iconFile">
               <el-upload
                       class="avatar-uploader"
-                      :action="config.yunUpdateFile"
+                      :action="config.fileUrl+config.yunUpdateFile"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload">
@@ -134,7 +134,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -180,6 +180,7 @@
 				childNum: 1,
 				pageMenu: {},
 				tabDefa: '父级业态',
+        loading: false,
 			}
 		},
 		created() {
@@ -242,6 +243,7 @@
 			},
 			ShopFormatAdd(param) {
 				ShopFormatAdd(param).then(res => {
+				  this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -253,6 +255,7 @@
 			},
 			EditFormat(param) {
 				EditFormat(param).then(res => {
+				  this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -313,11 +316,13 @@
 				this.imageUrl = ''
 				this.editForm = {}
 				this.childForm = [{Name: '', NameEn: ''}]
+        this.loading = false
 			},
 			//提交
 			submitUpForm(item) {
 				this.$refs[item].validate(valid => {
 					if (valid) {
+					  this.loading = true
 						//过滤空数据
 						let child = []
 						if (this.childForm.length > 0) {

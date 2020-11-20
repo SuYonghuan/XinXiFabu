@@ -64,7 +64,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -116,6 +116,7 @@
 				},
 				authority: [],
 				pageMenu: {},
+        loading: false,
 			}
 		},
 		created() {
@@ -184,6 +185,7 @@
 			},
 			addRoles(param) {
 				addRoles(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -195,6 +197,7 @@
 			},
 			editRoles(param) {
 				editRoles(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -254,6 +257,7 @@
 				this.$refs[item].validate(valid => {
 
 					if (valid) {
+            this.loading = true
 						const param = {
 							"Name": this.editForm.name,
 							"Description": this.editForm.description,

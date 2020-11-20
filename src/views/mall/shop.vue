@@ -35,7 +35,7 @@
       <el-form-item class="right-button">
         <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
         <el-button type="primary" @click="handleSysData()" v-if="pageMenu.syndata" :loading="loadingStatus">同步数据</el-button>
-        <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出</el-button>
+        <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出数据</el-button>
       </el-form-item>
     </el-form>
 
@@ -62,9 +62,33 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
-                @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
+    <div class="bottom-div">
+      <!--  分页  -->
+      <pagination class="page-div" :list="tableData" :total="total" :page="currentPage" :pageSize="pageSize"
+                  @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
+      <div class="bottom-button">
+        <el-button type="success" @click="handleExcelExport()" v-if="pageMenu.exporttemplate ">导出模板</el-button>
+        <el-upload
+                ref="upload"
+                :action="config.mallYunUrl+'/api/FileManage/UpLoadFilesSec'"
+                :show-file-list="false"
+                :auto-upload="true"
+                :accept="'.xls, .xlsx'"
+                :on-success="handleShopSuccess">
+          <el-button slot="trigger" type="success" v-if="pageMenu.importshopdata">导入店铺</el-button>
+        </el-upload>
+        <el-upload
+                ref="upload"
+                :action="config.fileUrl+'/Api/MallFileManage/UpLoadLogoFiles'"
+                :show-file-list="false"
+                :auto-upload="true"
+                :accept="'.zip'"
+                :data="logoData"
+                :on-success="handleLogoSuccess">
+          <el-button slot="trigger" type="success" v-if="pageMenu.upLoadLogoFiles">导入店铺LOGO</el-button>
+        </el-upload>
+      </div>
+    </div>
 
     <!--  新增  -->
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :close-on-click-modal="false"
@@ -93,7 +117,7 @@
         </el-form-item>
         <el-form-item label="所属区域" prop="areaCode">
           <el-select v-model="editForm.areaCode" placeholder="请选择区域">
-            <el-option label="暂无区域"></el-option>
+            <el-option label="暂无区域" value=""></el-option>
             <el-option v-for="item in regionList" :label="item.areaName" :value="item.code"></el-option>
           </el-select>
         </el-form-item>
@@ -109,7 +133,7 @@
         <el-form-item label="商铺LOGO" prop="logo">
           <el-upload
                   class="avatar-uploader"
-                  :action="config.yunUpdateFile"
+                  :action="config.fileUrl+config.yunUpdateFile"
                   :show-file-list="false"
                   :on-success="handleAvatarSuccess"
                   :before-upload="beforeAvatarUpload">
@@ -126,7 +150,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')" :loading="loading">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -135,18 +159,21 @@
                :close-on-click-modal="true" append-to-body>
 
       <el-form label-width="60">
-        <el-form-item label="选择标签">
+        <el-form-item>
           <div>
-            <el-checkbox class="checkbox-div" v-for="item of labelList" v-model="labelActive" :label="item.code" border>
-              {{item.name}}
-            </el-checkbox>
+            <div v-for="items of labelList">
+              <p>{{items.name}}</p>
+              <el-checkbox class="checkbox-div" v-for="item of items.child" v-model="labelActive" :disabled="item.type" :label="item.code" border>
+                {{item.name}}
+              </el-checkbox>
+            </div>
           </div>
         </el-form-item>
       </el-form>
 
       <span slot="footer" class="dialog-footer">
           <el-button @click="handleClose('editForm')">取 消</el-button>
-          <el-button type="primary" @click="submitLbForm('editForm')">确 定</el-button>
+          <el-button type="primary" @click="submitLbForm('editForm')" :loading="loading">确 定</el-button>
         </span>
     </el-dialog>
   </div>
@@ -172,6 +199,9 @@
 		GetShopLabelList,
 		SetLabel,
     GetRegionList,
+    ExportTemplate,
+    ImportShopData,
+    UpLoadLogoFiles,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -217,8 +247,11 @@
 				labelList: [],
 				shopInfo: {},
 				labelActive: [],
+				labelActiveBrand: [],
         loadingStatus: false,
         regionList: [],
+        logoData: {},
+        loading: false,
 			}
 		},
 		created() {
@@ -226,6 +259,7 @@
 			this.GetBuildingList()
 			this.GetShopFormatList()
 			this.GetRegionList()
+      this.logoData.MallCode = this.user.mallCode
 		},
 		methods: {
 			/**
@@ -304,6 +338,7 @@
 			},
 			ShopAdd(param) {
 				ShopAdd(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -315,6 +350,7 @@
 			},
 			ShopEdit(param) {
 				ShopEdit(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -390,17 +426,44 @@
 				}
 				GetShopLabelList(param).then(res => {
 					if (res.code === ERR_OK) {
-						this.labelList = res.data.alreadylist.concat(res.data.labels)
-						if (res.data.alreadylist.length > 0) {
-							for (let i = 0; i < res.data.alreadylist.length; i++) {
-								this.labelActive.push(res.data.alreadylist[i].code)
+					  console.log(res.data)
+            //合并各种状态标签
+            let allLabels = [];
+            allLabels = res.data.alreadylist.concat(res.data.labels)
+						if (res.data.brandLabels.length > 0) {
+							for (let i = 0; i < res.data.brandLabels.length; i++) {
+                res.data.brandLabels[i].type = true
+                allLabels.push(res.data.brandLabels[i])
+                this.labelActive.push(res.data.brandLabels[i].code)
+                this.labelActiveBrand.push(res.data.brandLabels[i].code)
 							}
 						}
+
+					  //标签分组
+            let labelList = res.data.alllabels
+            for ( let i=0;i<labelList.length;i++ ) {
+              labelList[i].child = []
+              for ( let j=0;j<allLabels.length;j++ ){
+                if ( labelList[i].code === allLabels[j].parentCode ) {
+                  labelList[i].child.push(allLabels[j])
+                }
+              }
+            }
+            this.labelList = labelList
+
+            //已选中标签
+            if (res.data.alreadylist.length > 0) {
+              for (let i = 0; i < res.data.alreadylist.length; i++) {
+                this.labelActive.push(res.data.alreadylist[i].code)
+              }
+            }
+            console.log(this.labelList)
 					}
 				})
 			},
 			SetLabel(param) {
 				SetLabel(param).then(res => {
+          this.loading = false
 					if (res.code === ERR_OK) {
 						this.handleClose()
 						this.$message.success(res.msg);
@@ -418,6 +481,33 @@
             this.regionList = res.data
             console.log(this.regionList)
           }
+        })
+      },
+      ExportTemplate() {
+        const param = {
+          "MallCode": this.user.mallCode,
+          "username": this.user.accountName,
+        }
+        ExportTemplate(param).then(res => {
+          if (res.code === ERR_OK) {
+            window.location.href = res.data;
+            console.log(res.data)
+          }
+        })
+      },
+      ImportShopData(FileGuid) {
+        const param = {
+          "MallCode": this.user.mallCode,
+          "username": this.user.accountName,
+          "FileGuid": FileGuid,
+        }
+        ImportShopData(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.getList(this.pageSize, this.currentPage)
+            this.$message.success(res.msg);
+            return
+          }
+          this.$message.error(res.msg);
         })
       },
 			/**
@@ -467,12 +557,13 @@
 				this.shopInfo = {}
 				this.labelList = []
 				this.labelActive = []
+        this.loading = false
 			},
 			//提交
 			submitUpForm(item) {
-				console.log(this.editForm)
 				this.$refs[item].validate(valid => {
 					if (valid) {
+            this.loading = true
 						const param = {
 							"Code": "",
 							"ShopFormat": this.editForm.shopFormat,
@@ -588,6 +679,7 @@
 			},
 			//设置标签
 			submitLbForm() {
+			  this.loading = true
 				const param = {
 					"LabelCodeList": this.labelActive,
 					"ObjectCode": this.shopInfo.code,
@@ -616,6 +708,24 @@
 			formatJson(filterVal, jsonData) {
 				return jsonData.map(v => filterVal.map(j => v[j]))
 			},
+      //导出excel模板
+      handleExcelExport() {
+        this.ExportTemplate()
+      },
+      handleShopSuccess(res, file) {
+        if (res.code === '200') {
+          this.ImportShopData(res.data.fileGuid)
+        } else {
+          this.$message.error('上传失败!');
+        }
+      },
+      handleLogoSuccess(res, file) {
+        if (res.code === '200') {
+          this.$message.success('上传成功!');
+        } else {
+          this.$message.error('上传失败!');
+        }
+      },
 		},
 		computed: {
 			...mapGetters(['presentMenu', 'user', 'config'])
@@ -669,8 +779,20 @@
     }
   }
 
+  .bottom-div{
+
+  }
+
   .page-div {
     margin-top: 20px;
+  }
+  .bottom-button{
+    float: right;
+    margin-top: -40px;
+    display: flex;
+    .el-button{
+      margin: 0 5px;
+    }
   }
 
   .time-tag {

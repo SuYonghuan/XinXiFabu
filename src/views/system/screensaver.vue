@@ -32,7 +32,7 @@
             <div @click.stop="">
               <el-upload
                       class="avatar-uploader"
-                      :action="config.updateFile"
+                      :action="config.url + config.uploadFile"
                       :show-file-list="false"
                       :on-success="handleAvatarSuccess"
                       :before-upload="beforeAvatarUpload">
@@ -68,7 +68,7 @@
           <template slot-scope="scope">
             <el-upload
                     class="upload-demo"
-                    :action="config.updateFile"
+                    :action="config.url + config.uploadFile"
                     :show-file-list="false"
                     :on-success="handleScreenSuccess"
                     :before-upload="beforeAvatarUpload1"
