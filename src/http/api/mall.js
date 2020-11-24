@@ -149,7 +149,3 @@ export const ExportTemplate = (param) =>
 //导入店铺模板
 export const ImportShopData = (param) =>
     post(`${store.state.config.mallYunUrl}/API/Shop/ImportShopData?token=${encodeURIComponent(mergeWordAndTimeStamp("/API/Shop/ImportShopData"))}&time=${timeStamp()}`,param)
-
-//导入店铺模板
-export const UpLoadLogoFiles = (param) =>
-    post(`${store.state.config.mallYunUrl}/Api/MallFile/UpLoadLogoFiles?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/MallFile/UpLoadLogoFiles"))}&time=${timeStamp()}`,param)

@@ -85,7 +85,7 @@
                 :accept="'.zip'"
                 :data="logoData"
                 :on-success="handleLogoSuccess">
-          <el-button slot="trigger" type="success" v-if="pageMenu.upLoadLogoFiles">导入店铺LOGO</el-button>
+          <el-button slot="trigger" type="success" v-if="pageMenu.UpLoadLogoFiles">导入店铺LOGO</el-button>
         </el-upload>
       </div>
     </div>
@@ -142,9 +142,9 @@
           </el-upload>
         </el-form-item>
         <el-form-item label="简介" prop="intro">
-          <el-input type="textarea" style="width: 40%;" rows="5" maxlength="2000" v-model="editForm.intro"
-                    placeholder="请输入中文简介"></el-input>
-          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5" maxlength="2000"
+          <el-input type="textarea" style="width: 40%;" rows="5" maxlength="2000" :show-word-limit="true"
+                    v-model="editForm.intro" placeholder="请输入中文简介"></el-input>
+          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5" maxlength="2000" :show-word-limit="true"
                     v-model="editForm.introEn" placeholder="请输入英文简介"></el-input>
         </el-form-item>
       </el-form>
@@ -712,6 +712,7 @@
       handleExcelExport() {
         this.ExportTemplate()
       },
+      //导入店铺
       handleShopSuccess(res, file) {
         if (res.code === '200') {
           this.ImportShopData(res.data.fileGuid)
@@ -719,6 +720,7 @@
           this.$message.error('上传失败!');
         }
       },
+      //导入店铺logo
       handleLogoSuccess(res, file) {
         if (res.code === '200') {
           this.$message.success('上传成功!');
@@ -804,5 +806,10 @@
     margin-top: 10px;
     margin-right: 0;
     margin-left: 10px;
+  }
+
+  /deep/.el-textarea .el-input__count{
+    height: 12px;
+    line-height: 12px;
   }
 </style>
