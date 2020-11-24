@@ -136,10 +136,9 @@
               </el-dropdown-item>
               <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除关机时间</p>
               </el-dropdown-item>
-              <!--              <el-dropdown-item>-->
-              <!--                <el-link :underline="false" href="https://element.eleme.io" target="_blank">远程协助</el-link>-->
-              <!--              </el-dropdown-item>-->
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
+              <el-dropdown-item v-if="pageMenu.devdel" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,2)">开启Explorer</p></el-dropdown-item>
+              <el-dropdown-item v-if="pageMenu.devdel" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,1)">关闭Explorer</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -212,6 +211,8 @@
     DevNumEdit,
     DeviceSetShutDownTime,
     DeviceScreenshot,
+    KillExplorer,
+    StartExplorer,
   } from 'http/api/device'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
@@ -428,6 +429,28 @@
       },
       DeviceSetShutDownTime(param) {
         DeviceSetShutDownTime(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      KillExplorer(param) {
+        KillExplorer(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      StartExplorer(param) {
+        StartExplorer(param).then(res => {
           if (res.code === ERR_OK) {
             this.handleClose()
             this.$message.success(res.msg);
@@ -787,7 +810,29 @@
       //关闭大图
       clickMaxImg() {
         this.shotImg = ''
-      }
+      },
+      //修改explorer
+      handleExplorer(item,type) {
+        this.$confirm("此操作将修改Explorer, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          let param = {
+            "Code": [item.code]
+          }
+          if ( type === 1 ) {
+            this.KillExplorer(param)
+            return
+          }
+          this.StartExplorer(param)
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      },
     },
     computed: {
       ...mapGetters(['presentMenu'])

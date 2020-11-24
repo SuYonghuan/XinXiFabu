@@ -114,3 +114,10 @@ export const GetDevCoordinate = (param) =>
 export const DevCoordinateEdit = (param) =>
 	post(`${store.state.config.url}/api/Dev/DevCoordinateEdit?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Dev/DevCoordinateEdit"))}&time=${timeStamp()}`,param)
 
+//关闭Explorer
+export const KillExplorer = (param) =>
+	post(`${store.state.config.url}/api/dev/KillExplorer?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/dev/KillExplorer"))}&time=${timeStamp()}`,param)
+
+//开启Explorer
+export const StartExplorer = (param) =>
+	post(`${store.state.config.url}/api/dev/StartExplorer?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/dev/StartExplorer"))}&time=${timeStamp()}`,param)
