@@ -103,8 +103,8 @@
             </template>
           </el-table-column>
           <el-table-column prop="launchTime" label="开始时间" min-width="100">
-            <template slot-scope="scope">{{ scope.row.launchTime == '0001-01-01T00:00:00' ? '----' :
-              timestampToTime(scope.row.launchTime) }}
+            <template slot-scope="scope">
+              {{ scope.row.launchTime == '0001-01-01T00:00:00' ? '----' : timestampToTime(scope.row.launchTime) }}
             </template>
           </el-table-column>
           <el-table-column prop="expiryDate" label="结束时间" min-width="100">
@@ -906,7 +906,7 @@
        */
       //时间转换
       timestampToTime(item) {
-        return this.dateFormat('y-m-d h:i:s', new Date(item))
+        return this.dateFormat('yyyy-mm-dd hh:ii', new Date(item))
       },
       //当前页码
       handleCurrentChange(val) {
@@ -996,7 +996,7 @@
           this.GetNewsGroupInfo(item.code)
         } else {
           this.newsForm = {
-            "groupName": this.dateFormat('y-m-d h:i:s') + ' 新建插播',
+            "groupName": this.dateFormat('yyyy-mm-dd hh:ii:ss') + ' 新建插播',
             "screenInfo": "",
             "launchTime": "",
             "expiryDate": "",
@@ -1013,7 +1013,7 @@
         this.GetDeviceByGroupCode(item.screenInfoCode)
         this.dialogVisibleDevice = true
         this.deviceForm = {
-          groupName: this.dateFormat('y-m-d h:i:s') + ' 新建设备',
+          groupName: this.dateFormat('yyyy-mm-dd hh:ii:ss') + ' 新建设备',
           screenInfo: item.screenInfoCode,
           sName: item.sName,
           newsGroupCode: item.code,
@@ -1330,7 +1330,7 @@
             FileGUID: res.data.fileGuid,
             ProgramName: file.name,
             Size: file.size,
-            PreviewFileGUID: res.data.previewFileGUID
+            PreviewFileGUID: res.data.previewFileGuid
           });
           this.$forceUpdate()
         } else {

@@ -56,7 +56,7 @@
           <div class="device-map">
             <p>
               设备点位：
-              <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999"></el-input-number>
+              <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999" :controls="false"></el-input-number>
             </p>
             <p>
               设备角度：
@@ -73,7 +73,7 @@
         <p>节目发布类型：</p>
         <div class="program-list">
           <el-card class="box-card program-item" v-for="item of programData">
-            <img :src="item.previewSrc" alt="" class="program-img">
+            <img :src="item.previewSrc" alt="" @click="clickImage(item)" class="program-img">
             <p>
               <i class="el-icon-date"></i>
               {{timestampToTime(item.launchTime,'y-m-d')}} 至 {{timestampToTime(item.expiryDate,'y-m-d')}}
@@ -111,6 +111,8 @@
         <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
       </span>
     </el-dialog>
+
+    <bigImage :src="bigFile.src" :type="bigFile.type" v-if="bigFile" @closeImg="closeImg"></bigImage>
   </div>
 </template>
 
@@ -127,6 +129,7 @@
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
 	import {timeFormatting} from 'common/js/mixins'
+  import bigImage from 'components/big-image/big-image'
 
 	export default {
 		name: "device-details",
@@ -141,13 +144,15 @@
 				programData: [],
 				departmentData: [],
 				code: this.$route.query.code,
+        bigFile: null,
 			}
 		},
 		created() {
 			this.GetDeviceInfo()
 			// this.GetLocalProgram()
 			this.GetDevCoordinate()
-      Config.getMapInfo("9d9ccf33-9ee6-49d7-8cc3-e1aaa75f896c","http://saas.1000my.com:8013","nbfbc",0);
+      // Config.setDeviceSite({floorOrder:0})
+      // Config.getMapInfo("9d9ccf33-9ee6-49d7-8cc3-e1aaa75f896c","http://saas.1000my.com:8013","nbfbc",0);
 		},
 		methods: {
 			/**
@@ -161,8 +166,10 @@
 				GetDeviceInfo(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.deviceInfo = res.data
-            //商场Code，云地址，名称，当前楼层，当前楼栋
-            // Config.getMapInfo(this.code,this.config.mallYunUrl,this.config.mapKey,this.deviceInfo.building);
+            console.log(this.deviceInfo)
+            Config.setDeviceSite({floorOrder:this.deviceInfo.floorOrder})
+            //商场Code，云地址，名称，当前楼栋
+            Config.getMapInfo(this.code,this.config.mallYunUrl,this.config.mapKey,this.deviceInfo.building);
 					}
 				})
 			},
@@ -236,7 +243,7 @@
 			 * End
 			 */
 			//时间转换
-			timestampToTime(item, type = 'y-m-d h:i:s') {
+			timestampToTime(item, type = 'yyyy-mm-dd hh:ii:ss') {
 				return this.dateFormat(type, new Date(item))
 			},
 			back() {
@@ -292,10 +299,23 @@
 				}
 				this.DevCoordinateEdit(param)
 			},
+      //放大图片
+      clickImage(item) {
+        this.bigFile = {}
+        this.bigFile.src = item.filePath
+        this.bigFile.type = item.progType
+      },
+      //关闭放大
+      closeImg() {
+        this.bigFile = null
+      },
 		},
 		computed: {
 			...mapGetters(['presentMenu','config'])
 		},
+    components: {
+      bigImage,
+    },
 	}
 </script>
 

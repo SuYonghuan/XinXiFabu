@@ -266,7 +266,7 @@
     <!--  编辑单个素材  -->
     <el-dialog title="素材编辑" :visible.sync="dialogVisibleDetails" width="50%" :before-close="handleClose"
                :close-on-click-modal="false" append-to-body>
-      <el-form :label-width="formLabelWidth" :model="updateForm" ref="editForm">
+      <el-form :label-width="formLabelWidth" :model="updateForm" :rules="rules1" ref="editForm">
         <el-form-item label="分辨率" prop="name">
           <el-select v-model="updateForm.progScreenInfo" placeholder="分辨率">
             <el-option
@@ -459,6 +459,11 @@
           screenInfo: [{required: true, message: '请选择分辨率', trigger: 'blur'}],
           time: [{required: true, message: '请选择时间范围', trigger: 'blur'}],
           progFiles: [{required: true, message: '请上传素材', trigger: 'blur'}],
+        },
+        rules1: {
+          progScreenInfo: [{required: true, message: '请选择分辨率', trigger: 'blur'}],
+          time: [{required: true, message: '请选择时间范围', trigger: 'blur'}],
+          fileGuid: [{required: true, message: '请上传素材', trigger: 'blur'}],
         },
         tableChecked: [],
         deviceForm: {},
@@ -742,7 +747,7 @@
           "groupName": "",
           "progFiles": []
         }
-        this.editForm.groupName = this.dateFormat("y-m-d h:i:s") + ' 新建节目组'
+        this.editForm.groupName = this.dateFormat("yyyy-mm-dd hh:ii:ss") + ' 新建节目组'
         this.dialogTitle = '快速发布'
         if (item == 2) {
           this.dialogTitle = '新增素材'
@@ -844,7 +849,7 @@
               "ScreenMatch": this.updateForm.screenMatch,
               "ProgramName": this.updateForm.programName,
               "FileGUID": this.updateForm.fileGuid,
-              "PreviewFileGUID": this.updateForm.previewFileGUID,
+              "PreviewFileGUID": this.updateForm.previewFileGuid,
             }
 
             this.ProgEdit(param)

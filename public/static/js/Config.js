@@ -12,7 +12,7 @@ let deviceSite={"floorOrder":1,"angle":0,"x":0,"y":0,"navPoint":1};
 ConfigFun = function () {
 	this.spriteMaterialArr = [];
 	this.shopHeight=10;
-	
+
 	this.pocHeight = 18;
 	this.Point = function (x = 0, y = 0) {
 		this.x = x;
@@ -71,11 +71,11 @@ ConfigFun = function () {
     });
   }
   this.setDeviceSite = function (obj){
-    deviceSite.x = obj.x;
-    deviceSite.y = obj.y;
-    deviceSite.navPoint = obj.navPoint;
-    deviceSite.angle = obj.angle;
-    deviceSite.floorOrder = obj.floorOrder;
+    deviceSite.x = obj.hasOwnProperty("x")?obj.x : deviceSite.x;
+    deviceSite.y = obj.hasOwnProperty("y")?obj.y : deviceSite.y;
+    deviceSite.navPoint = obj.hasOwnProperty("navPoint")?obj.navPoint : deviceSite.navPoint;
+    deviceSite.angle = obj.hasOwnProperty("angle")?obj.angle : deviceSite.angle;
+    deviceSite.floorOrder = obj.hasOwnProperty("floorOrder")?obj.floorOrder : deviceSite.floorOrder;
     console.log(deviceSite);
   }
   //mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
@@ -96,7 +96,7 @@ ConfigFun = function () {
     Map_QM = new MainMap_QM();
     Map_QM.initBuild();
   }
-	
+
 	/**
 	 * 检测点是否在多边形区域内
 	 */
@@ -107,20 +107,20 @@ ConfigFun = function () {
 		for (let i = 0; i < nCount; i++) {
 			let p1 = ptPolygon[i]; //当前节点
 			let p2 = ptPolygon[(i + 1) % nCount]; //下一个节点
-			// 求解 y=p.y 与 p1p2 的交点 
-			if (p1.y == p2.y) // p1p2 与 y=p0.y平行 
+			// 求解 y=p.y 与 p1p2 的交点
+			if (p1.y == p2.y) // p1p2 与 y=p0.y平行
 				continue;
-			if (p.y < Math.min(p1.y, p2.y)) // 交点在p1p2延长线上 
+			if (p.y < Math.min(p1.y, p2.y)) // 交点在p1p2延长线上
 				continue;
-			if (p.y >= Math.max(p1.y, p2.y)) // 交点在p1p2延长线上 
+			if (p.y >= Math.max(p1.y, p2.y)) // 交点在p1p2延长线上
 				continue;
-			// 从P发射一条水平射线 求交点的 X 坐标 ------原理: ((p2.y-p1.y)/(p2.x-p1.x))=((y-p1.y)/(x-p1.x)) 
+			// 从P发射一条水平射线 求交点的 X 坐标 ------原理: ((p2.y-p1.y)/(p2.x-p1.x))=((y-p1.y)/(x-p1.x))
 			//直线k值相等 交点y=p.y
 			let x = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
 			if (x > p.x)
-				nCross++; // 只统计单边交点 
+				nCross++; // 只统计单边交点
 		}
-		// 单边交点为偶数，点在多边形之外 --- 
+		// 单边交点为偶数，点在多边形之外 ---
 		return (nCross % 2 == 1);
 	}
 
@@ -264,7 +264,7 @@ ConfigFun = function () {
 		}
 		return true;
 	}
-	
+
 	//根据配置参数转换店铺圆角
 	this.changeShopLinesToString = function (area) {
 		let areaStr = [];
@@ -283,7 +283,7 @@ ConfigFun = function () {
 			let line = new QM_Line_Father(sPoint, ePoint, cPoint1, cPoint2, area.hasLines[m].isStrLine);
 			lines.push(line);
 		}
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			let line0 = lines[i];
 			let line1 = (i < lines.length - 1) ? lines[i + 1] : lines[0];
@@ -301,11 +301,11 @@ ConfigFun = function () {
 						areaStr.push(yArr);
 						continue;
 					}
-					
+
 					let result = Config.getIncircleByLines(x1, y1, x2, y2, x3, y3, Config.angleRadius);
 					let bezierResult = Config.getBezier(result.center.x, result.center.y, result.tangencyPoints[0].x, result.tangencyPoints[
 						0].y, result.tangencyPoints[1].x, result.tangencyPoints[1].y, x1, y1, Config.angleRadius);
-					
+
 					if (i > 0) {
 						let ctrlPoint1, ctrlPoint2, array=[];
 						ctrlPoint1 = ctrlPoint2 = new Config.Point(((bezierResult[0].x - line0.startPoint.x) / 2 + line0.startPoint.x) >> 0, ((
@@ -671,7 +671,7 @@ ConfigFun = function () {
 		let typeObj = { ft: 0, mys: 3, xsj: 4, dt: 5, fwt: 7, tcc: 8, cjr: 10, xys: 11, dit: 21, czc: 22, atm: 23, jcfw: 24, sjcd: 25, bc: 26, cjc: 27, jtn: 28, jtv: 29, ksgj: 30, sjxsn: 31, sjxsv: 32, tcjf: 33, vip: 34, xsjn: 35, xsjv: 36, yszj: 37, xxt: 38, door: 39, pq: 40, upft:0, downft:0, ysp: 50, lt: 88 };
 		return typeObj[str];
 	}
-	
+
 	this.isToFloor = function (hasFloor, floor) {
 		if (hasFloor.search(floor) != -1) {
 			return true;
@@ -682,31 +682,31 @@ ConfigFun = function () {
 		return a.id - b.id
 	}
 
-	/**该方法用来绘制一个圆角矩形 
-*@param cxt:canvas的上下文环境 
-*@param x:左上角x轴坐标 
-*@param y:左上角y轴坐标 
-*@param width:矩形的宽度 
-*@param height:矩形的高度 
-*@param radius:圆的半径 
+	/**该方法用来绘制一个圆角矩形
+*@param cxt:canvas的上下文环境
+*@param x:左上角x轴坐标
+*@param y:左上角y轴坐标
+*@param width:矩形的宽度
+*@param height:矩形的高度
+*@param radius:圆的半径
 **/
 	this.drawRoundRectPath = function (cxt, width, height, radius) {
 		cxt.beginPath(0);
-		//从右下角顺时针绘制，弧度从0到1/2PI  
+		//从右下角顺时针绘制，弧度从0到1/2PI
 		cxt.arc(width - radius, height - radius, radius, 0, Math.PI / 2);
-		//矩形下边线  
+		//矩形下边线
 		cxt.lineTo(radius, height);
-		//左下角圆弧，弧度从1/2PI到PI  
+		//左下角圆弧，弧度从1/2PI到PI
 		cxt.arc(radius, height - radius, radius, Math.PI / 2, Math.PI);
-		//矩形左边线  
+		//矩形左边线
 		cxt.lineTo(0, radius);
-		//左上角圆弧，弧度从PI到3/2PI  
+		//左上角圆弧，弧度从PI到3/2PI
 		cxt.arc(radius, radius, radius, Math.PI, Math.PI * 3 / 2);
-		//上边线  
+		//上边线
 		cxt.lineTo(width - radius, 0);
-		//右上角圆弧  
+		//右上角圆弧
 		cxt.arc(width - radius, radius, radius, Math.PI * 3 / 2, Math.PI * 2);
-		//右边线  
+		//右边线
 		cxt.lineTo(width, height - radius);
 		cxt.closePath();
 	}
@@ -721,7 +721,7 @@ ConfigFun = function () {
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////
 	this.getWallPoints = function (points, wallWidth) {
-		
+
 		if (points.length < 2) {
 			console.log("getWallPoints", "points size is letter than 2");
 			return new Array();
@@ -809,7 +809,7 @@ ConfigFun = function () {
 			x = point.x + 5;
 			y = parseInt(gradient * (x - point.x) + point.y);
 		}
-		
+
 		return Config.pointXY(point, new Config.Point(x, y), wallWidth / 2);
 	}
 
@@ -1057,7 +1057,7 @@ ConfigFun = function () {
 		}else{
 			mapData.path = fromData.path;
 		}
-		
+
 		return mapData;
 	}
 	//更新全局所有区域点de 数组

@@ -394,7 +394,7 @@
 			 */
 			//时间转换
 			timestampToTime(item) {
-				return this.dateFormat('y-m-d h:i:s', new Date(item))
+				return this.dateFormat('yyyy-mm-dd hh:ii:ss', new Date(item))
 			},
 			//当前页码
 			handleCurrentChange(val) {
@@ -446,7 +446,7 @@
 					this.dialogTitle = '编辑'
 					this.dialogType = true
 				} else {
-					this.deviceForm.gName = this.dateFormat("y-m-d h:i:s") + ' 新建节目组'
+					this.deviceForm.gName = this.dateFormat("yyyy-mm-dd hh:ii:ss") + ' 新建节目组'
 					this.deviceForm.screenInfoCode = this.searchDeviceList[0].code
 					this.deviceForm.isSync = false
 					this.GetDeviceByGroupCode('', this.deviceForm.screenInfoCode, this.deviceForm.isSync)

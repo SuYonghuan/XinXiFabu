@@ -419,7 +419,7 @@
        */
       //时间转换
       timestampToTime(item) {
-        return this.dateFormat('y-m-d h:i:s', new Date(item))
+        return this.dateFormat('yyyy-mm-dd hh:ii:ss', new Date(item))
       },
       //当前页码
       handleCurrentChange(val) {
@@ -469,9 +469,10 @@
           this.editForm = JSON.parse(JSON.stringify(item));
           this.GetProgByGroupCode(this.editForm.screenInfoCode, this.editForm.code)
         } else {
+          this.dialogTitle = '新增'
           this.GetProgByGroupCode(this.searchDeviceList[0].code)
           this.editForm = {
-            groupName: this.dateFormat('y-m-d h:i:s') + ' 新建节目组',
+            groupName: this.dateFormat('yyyy-mm-dd hh:ii:ss') + ' 新建节目组',
             screenInfoCode: this.searchDeviceList[0].code
           }
         }
@@ -490,7 +491,7 @@
         this.dialogVisibleDevice = true
         this.GetDeviceByGroupCode(item.screenInfoCode, false)
         this.deviceForm = {
-          groupName: this.dateFormat('y-m-d h:i:s') + ' 新建设备',
+          groupName: this.dateFormat('yyyy-mm-dd hh:ii:ss') + ' 新建设备',
           screenInfo: item.screenInfo,
           screenInfoCode: item.screenInfoCode,
           ProgramGroupCode: item.code,

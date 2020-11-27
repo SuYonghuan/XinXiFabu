@@ -228,7 +228,7 @@
 			 */
 			//时间转换
 			timestampToTime(item) {
-				return this.dateFormat('y-m-d h:i:s', new Date(item))
+				return this.dateFormat('yyyy-mm-dd hh:ii:ss', new Date(item))
 			},
 			//当前页码
 			handleCurrentChange(val) {
