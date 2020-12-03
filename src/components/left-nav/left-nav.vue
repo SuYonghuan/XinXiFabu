@@ -300,6 +300,7 @@
     position: fixed;
     left: 0;
     top: 0;
+    overflow: hidden auto;
     /*min-height: 400px;*/
   }
   .el-menu-vertical-demo:not(.el-menu--collapse) {

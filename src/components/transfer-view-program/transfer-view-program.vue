@@ -125,7 +125,7 @@
 		methods: {
 			//时间转换
 			timestampToTime(item) {
-				return this.dateFormat('y-m-d h:i:s', new Date(item))
+				return this.dateFormat('yyyy-mm-dd hh:ii', new Date(item))
 			},
 			//排序
 			sort(index, type) {
