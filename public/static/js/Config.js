@@ -19,7 +19,8 @@ ConfigFun = function () {
 		this.y = y;
 	}
 
-  this.getMapInfo = function (mallCode,url,mallName="",buildOrder=0){
+  this.getMapInfo = function (mallCode,mallName="",buildOrder=0){
+    let url = "http://saas.1000my.com:8013";
     let tim = Config.timeStamp();
     let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
     Config.requestNoJM({
@@ -71,12 +72,22 @@ ConfigFun = function () {
     });
   }
   this.setDeviceSite = function (obj){
-    deviceSite.x = obj.hasOwnProperty("x")?obj.x : deviceSite.x;
-    deviceSite.y = obj.hasOwnProperty("y")?obj.y : deviceSite.y;
     deviceSite.navPoint = obj.hasOwnProperty("navPoint")?obj.navPoint : deviceSite.navPoint;
     deviceSite.angle = obj.hasOwnProperty("angle")?obj.angle : deviceSite.angle;
     deviceSite.floorOrder = obj.hasOwnProperty("floorOrder")?obj.floorOrder : deviceSite.floorOrder;
     console.log(deviceSite);
+    if(mapObj){
+      let pathArr = mapObj.mapData.path.nodes;
+      try{
+        deviceSite.x = pathArr[parseInt(deviceSite.navPoint)].x;
+        deviceSite.y = -1*pathArr[parseInt(deviceSite.navPoint)].y;
+      }catch(error){
+        console.error("未找到点");
+        deviceSite.x = 0;
+        deviceSite.y = 0;
+      }
+      Map_QM.floor.setStartSite();
+    }
   }
   //mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
   this.initData = function (mapJSON,shopJSON){

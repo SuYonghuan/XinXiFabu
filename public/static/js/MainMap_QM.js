@@ -10,20 +10,20 @@ let siteIcon;
  * @param angle(-180~180)  设备角度
  */
 MainMap_QM = function(callBackFun) {
-	
+
 	this.callBackLoadOver = callBackFun;
 	let ele = document.getElementById("threeDiv");
 	this.w = parseInt(ele.clientWidth);
 	this.h = parseInt(ele.clientHeight);
-	
+
 	this.scene = new THREE.Scene();
-	
+
 	this.scene.name="scene";
 	aspect = this.w / this.h;
 	this.camera = new THREE.OrthographicCamera( ortNum * aspect / - 2, ortNum * aspect / 2, ortNum / 2, ortNum / - 2, 1, 10000 );
 	this.camera.position.set(0,500, 500);
 	this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-	
+
 	this.renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});   //
 	this.renderer.antialias = true;
 	//this.renderer.sortObjects = false;
@@ -41,14 +41,14 @@ MainMap_QM = function(callBackFun) {
 	this.labelRenderer.domElement.style.position = 'absolute';
 	this.labelRenderer.domElement.style.top = 0;
 	ele.appendChild(this.labelRenderer.domElement);
-	
+
 	this.controls = new THREE.OrbitControls(this.camera, this.labelRenderer.domElement);
 	//禁用旋转
 	this.controls.enableRotate = false;
 	//设置相机距离原点的最远距离
 	this.controls.minPolarAngle = 0;  // radians
 	this.controls.maxPolarAngle = 0.001;   // radians
-	this.floor;  
+	this.floor;
 	window.addEventListener('resize', this.onWindowResize, false);           //窗口变化
 	document.getElementById('threeDiv').addEventListener('click', this.onMouseClick, false);
 }
@@ -83,7 +83,7 @@ MainMap_QM.prototype = {
 			let selected = intersects[0].object;//取第一个物体
 			let site = {"x":parseInt(selected.position.x), "y":parseInt(selected.position.y), "navPoint":selected.name, "angle":parseInt(deviceSite.angle), "floorOrder":deviceSite.floorOrder};
       Config.setDeviceSite(site);
-			Map_QM.floor.setStartSite();
+			// Map_QM.floor.setStartSite();
 		}
 
 	},

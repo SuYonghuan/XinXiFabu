@@ -56,7 +56,7 @@
           <div class="device-map">
             <p>
               设备点位：
-              <el-input-number v-model="devCoordinate.yaxis" :min="1" :max="99999" :controls="false"></el-input-number>
+              <el-input-number v-model="devCoordinate.yaxis" :min="0" :max="99999" @change="changeNavPoint" :controls="false"></el-input-number>
             </p>
             <p>
               设备角度：
@@ -168,8 +168,10 @@
 						this.deviceInfo = res.data
             console.log(this.deviceInfo)
             Config.setDeviceSite({floorOrder:this.deviceInfo.floorOrder})
+            // Config.setDeviceSite({floorOrder:1})
             //商场Code，云地址，名称，当前楼栋
-            Config.getMapInfo(this.user.mallCode,this.config.mallYunUrl,this.config.mapKey,0);
+            Config.getMapInfo(this.user.mallCode,this.config.mapKey,0);
+            // Config.getMapInfo('398424aa-e79c-4033-977b-c8eba2b4e6b9',this.config.mapKey,0);
 					}
 				})
 			},
@@ -280,16 +282,26 @@
       //点击地图
       clickThree() {
 			  setTimeout(()=>{
-			    if ( deviceSite.x > 0 ) {
+			    if ( deviceSite.navPoint >= 0 ) {
             this.devCoordinate.yaxis = deviceSite.navPoint
             this.devCoordinate.angle = deviceSite.angle
           }
         },10)
       },
+      //修改设备点位
+      changeNavPoint() {
+        Config.setDeviceSite({navPoint:this.devCoordinate.yaxis})
+      },
+      //修改设备角度
       changeAngle() {
         Map_QM.rotateSite(this.devCoordinate.angle)
       },
+      //保存
 			clickMap() {
+			  if ( typeof (this.devCoordinate.yaxis) == 'undefined' ) {
+          this.$message.error('设备点位不能为空');
+          return
+        }
 				const param = {
 					"Code": this.code,
 					"Xaxis": this.devCoordinate.yaxis,
