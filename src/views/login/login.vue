@@ -181,9 +181,10 @@
 						let cookieData = {
 							"userCode": res.data.userCode,
 							"mallCode": res.data.mallCode,
+              "jwtToken": res.data.jwtToken
 						}
-						//保存帐号到cookie，有效期1天
-						setCookie(JSON.stringify(cookieData), 'userInfo', 1)
+						//保存帐号到cookie，有效期30天
+						setCookie(JSON.stringify(cookieData), 'userInfo', 30)
 						this.$message({
 							message: '登录成功',
 							type: 'success'

@@ -7,3 +7,7 @@ export const delUser = ({ commit }) => {
 export const setConfig = function({ commit }, data) {
   commit(types.SET_CONFIG, data)
 }
+
+export const setUser = function({ commit }, data) {
+  commit(types.SET_USER, data)
+}

@@ -4,7 +4,7 @@ import store from 'store'
 import { ERR_OK, ERR_LOGIN, ERR_AUTH } from './config'
 import { encrypt, decrypt } from 'common/js/utils'
 import { Message } from 'element-ui'
-import { delCookie } from 'common/js/cookie'
+import { delCookie, getCookie, setCookie } from 'common/js/cookie'
 
 axios.defaults.timeout = 10000
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
@@ -31,6 +31,15 @@ axios.interceptors.response.use(response => {
   if ( typeof(response.data) == "object") {
     return response
   }
+
+  //更新后台token
+  if ( response.headers.refreshtoken ) {
+    let user = JSON.parse(getCookie("userInfo"))
+    user.jwtToken = response.headers.refreshtoken
+    setCookie(JSON.stringify(user), 'userInfo', 30)
+    store.dispatch('setUser', user);
+  }
+
   const data = JSON.parse(decrypt(response.data))
 
   //401 重新登录
@@ -49,9 +58,15 @@ axios.interceptors.response.use(response => {
 
 //封装post方法
 export function post(url, params, flag=true) {
+  let jwtToken = getCookie("userInfo") ? JSON.parse(getCookie("userInfo")).jwtToken : ''
   return new Promise((resolve, reject) => {
     axios
-      .post(url, encrypt(JSON.stringify(params)), {withCredentials: flag})
+      .post(url, encrypt(JSON.stringify(params)), {
+        withCredentials: flag,
+        headers: {
+          Authorization: "Bearer " + jwtToken
+        }
+      })
       .then(res => {
         resolve(res)
       })
@@ -63,10 +78,14 @@ export function post(url, params, flag=true) {
 
 //封装get方法
 export function get(url, params) {
+  let jwtToken = getCookie("userInfo") ? JSON.parse(getCookie("userInfo")).jwtToken : ''
   return new Promise((resolve, reject) => {
     axios
       .get(url, {
-        params
+        params,
+        headers: {
+          Authorization: "Bearer " + jwtToken
+        }
       })
       .then(res => {
         resolve(res.data)
