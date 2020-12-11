@@ -20,7 +20,7 @@
       </div>
       <el-collapse class="collapse-div">
         <el-collapse-item title="时间段" name="1">
-          <div class="grid-content" v-for="item of timeList.timeRelateList">
+          <div class="grid-content" v-if="timeList" v-for="item of timeList.timeRelateList">
             <span>{{item.beginTimeSlot}}-{{item.endTimeSlot}}</span>
             <span>
               开放给商家时间:
@@ -140,8 +140,10 @@
         ],
         moduleList: [],
         localModuleList: [],
-        timeList: [],
-        timeRange: [],
+        timeList: {},
+        timeRange: [
+          '00:00','00:00'
+        ],
         programMonitorList: {days: '', clockTime: '', repeatExecution: 'false'},
         pageMenu: {},
       }
@@ -218,12 +220,15 @@
         }
         getTimeAxis(param).then(res => {
           if (res.code === ERR_OK) {
-            this.timeList = res.data
-            if (this.timeList.timeRelateList.length > 0) {
-              this.timeRange[0] = this.timeList.timeRelateList[0].beginTimeSlot
-              this.timeRange[1] = this.timeList.timeRelateList[this.timeList.timeRelateList.length - 1].beginTimeSlot
-              this.$forceUpdate()
+            if ( res.data ) {
+              this.timeList = res.data
+              if (this.timeList.timeRelateList.length > 0) {
+                this.timeRange[0] = this.timeList.timeRelateList[0].beginTimeSlot
+                this.timeRange[1] = this.timeList.timeRelateList[this.timeList.timeRelateList.length - 1].beginTimeSlot
+                this.$forceUpdate()
+              }
             }
+
             const param = {"MallCode": this.user.mallCode}
             this.GetMallModuleList(param)
           }
@@ -277,16 +282,20 @@
        */
       handleEdit() {
         this.editForm.time = []
-        if (this.timeRange[0].slice(0, 1) == 0) {
-          this.editForm.time[0] = this.timeRange[0].slice(1, 2)
-        } else {
-          this.editForm.time[0] = this.timeRange[0].slice(0, 2)
+
+        if ( this.timeRange.length > 0 ) {
+          if (this.timeRange[0].slice(0, 1) == 0) {
+            this.editForm.time[0] = this.timeRange[0].slice(1, 2)
+          } else {
+            this.editForm.time[0] = this.timeRange[0].slice(0, 2)
+          }
+          if (this.timeRange[1].slice(0, 1) == 0) {
+            this.editForm.time[1] = this.timeRange[1].slice(1, 2)
+          } else {
+            this.editForm.time[1] = this.timeRange[1].slice(0, 2)
+          }
         }
-        if (this.timeRange[1].slice(0, 1) == 0) {
-          this.editForm.time[1] = this.timeRange[1].slice(1, 2)
-        } else {
-          this.editForm.time[1] = this.timeRange[1].slice(0, 2)
-        }
+
         this.dialogVisible = true
       },
       //关闭弹窗
@@ -302,7 +311,7 @@
           "MallCode": this.user.mallCode,
           "BeginAxis": this.editForm.time[0],
           "EndAxis": this.editForm.time[1],
-          "TimeAxisCode": this.timeList.timeAxis.code
+          "TimeAxisCode": this.timeList.timeAxis ? this.timeList.timeAxis.code : ''
         }
         this.SetTimeAxis(param)
       },
@@ -320,7 +329,7 @@
       },
       //素材到期提醒
       submitPgForm() {
-        this.programMonitorList.mallCode = this.timeList.timeAxis.mallCode
+        this.programMonitorList.mallCode = this.user.mallCode
         this.SettingProgramMonitor(this.programMonitorList);
       },
     },

@@ -169,7 +169,7 @@
             console.log(this.deviceInfo)
             Config.setDeviceSite({floorOrder:this.deviceInfo.floorOrder})
             //商场Code，云地址，名称，当前楼栋
-            Config.getMapInfo(this.code,this.config.mallYunUrl,this.config.mapKey,this.deviceInfo.building);
+            Config.getMapInfo(this.user.mallCode,this.config.mallYunUrl,this.config.mapKey,0);
 					}
 				})
 			},
@@ -311,7 +311,7 @@
       },
 		},
 		computed: {
-			...mapGetters(['presentMenu','config'])
+			...mapGetters(['presentMenu','config', 'user'])
 		},
     components: {
       bigImage,
