@@ -266,7 +266,7 @@
 					if (valid) {
 					  this.loading = true
 						const param = {
-							"Map": this.editForm.map,
+							"Map": this.editForm.mapFile,
 							"BuildingCode": this.buildingCode,
 							"Name": this.editForm.name,
 							"MallCode": this.user.mallCode,
@@ -275,7 +275,7 @@
 
 						if (this.editForm.floorCode) {
 							param.code = this.editForm.floorCode
-							param.FileGUID = this.editForm.map
+							param.FileGUID = this.editForm.mapFile
 							this.FloorEdit(param)
 							return
 						}
@@ -319,7 +319,7 @@
 			handleAvatarSuccess(res, file) {
 				if (res.code === '200') {
 					this.imageUrl = URL.createObjectURL(file.raw);
-					this.editForm.map = res.data.fileGuid;
+					this.editForm.mapFile = res.data.fileGuid;
 				} else {
 					this.$message.error('上传失败!');
 				}
