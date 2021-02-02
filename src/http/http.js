@@ -6,7 +6,7 @@ import { encrypt, decrypt } from 'common/js/utils'
 import { Message } from 'element-ui'
 import { delCookie, getCookie, setCookie } from 'common/js/cookie'
 
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 40000
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
 
 // if (process.env.NODE_ENV === 'development') {
