@@ -12,7 +12,7 @@
         <el-badge :value="noticeData.count" :hidden="noticeData.count < 1" class="item">
           <i class="el-icon-message-solid" style="font-size: 30px;" @click="clickNoticeIcon"></i>
         </el-badge>
-        <el-dropdown-menu slot="dropdown" :hidden="dropdownStatus">
+        <el-dropdown-menu slot="dropdown" v-show="dropdownStatus">
           <div class="notice-div">
             <div class="notice-list">
               <div class="notice-item" v-for="item of noticeData.list">
@@ -30,14 +30,18 @@
         </el-dropdown-menu>
       </el-dropdown>
 
-      <div class="el-dropdown-link" style="display: inline-block;" @click="clickName" v-show="!autoAuth">
-        <!--<img src="../../common/images/default-photo.gif"/>-->
-        <p>
-          {{ user.nickName }}
-        </p>
-      </div>
-
-      <a @click="exit()">退出</a>
+      <el-dropdown trigger="click" v-show="!autoAuth">
+        <el-badge class="item">
+          <i class="el-icon-user" style="font-size: 30px;"></i>
+        </el-badge>
+        <el-dropdown-menu slot="dropdown">
+          <div class="user-div">
+            <p class="user-name">您好! {{ user.nickName }}</p>
+            <p class="user-menu" @click="clickName"><el-link type="primary">个人中心</el-link></p>
+            <p class="user-menu" @click="exit()"><el-link type="primary">退出登录</el-link></p>
+          </div>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </el-menu>
 </template>
@@ -224,8 +228,7 @@
   }
 
   .item {
-    margin-top: 10px;
-    margin-right: 40px;
+    margin: 8px 20px 0;
   }
 
   .notice-div {
@@ -283,6 +286,23 @@
     p {
       font-size: 20px;
       color: #505050;
+    }
+  }
+
+  .user-div {
+    width: 140px;
+    height: 150px;
+    padding: 10px 20px;
+    .user-name{
+      width: 100%;
+      height: 50px;
+      overflow: hidden;
+    }
+    .user-menu{
+      width: 100%;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
     }
   }
 </style>

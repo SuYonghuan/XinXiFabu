@@ -67,10 +67,12 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <p class="version-p">Copyright © 南京千目信息科技有限公司V{{ config.version }}</p>
   </div>
 </template>
 <script type="text/ecmascript-6">
-	import {mapMutations} from 'vuex'
+	import {mapMutations,mapGetters} from 'vuex'
 	import {setCookie, getCookie} from 'common/js/cookie'
 	import {login, getMenu, ChangeSelfWord} from 'http/api/login'
 	import {ERR_OK} from 'http/config'
@@ -260,6 +262,9 @@
 				setRolePermissions: 'SET_ROLE_PERMISSIONS',
 			})
 		},
+    computed: {
+      ...mapGetters(['presentMenu', 'user', 'config'])
+    },
 
 	}
 </script>
@@ -388,7 +393,7 @@
     margin: 0px 0px 46px 0;
     text-align: center;
     color: #505458;
-    background: url("../../common/images/login.png") no-repeat;
+    /*background: url("../../common/images/login.png") no-repeat;*/
     width: 177px;
     height: 18px;
   }
@@ -403,5 +408,14 @@
 
   .codeimg {
     height: 40px;
+  }
+
+  .version-p{
+    position: fixed;
+    bottom: 30px;
+    color: rgba(255, 255, 255, 1);
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
   }
 </style>

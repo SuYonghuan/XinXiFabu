@@ -6,5 +6,5 @@
   "uploadFile": "/api/FileManage/UpLoadFilesSec",
   "yunUpdateFile": "/api/MallFileManage/UpLoadFilesSec",
   "mapKey": "A",
-  "version": "千目智能应用发布系统V1.0"
+  "version": "1.0"
 }

@@ -36,6 +36,34 @@
           <el-button type="primary" size="small" @click="handleOther()">修改信息</el-button>
         </p>
       </div>
+      <el-divider></el-divider>
+      <div class="content-p">
+        <div>
+          <p class="content-t" style="position: absolute">网站logo</p>
+          <el-upload
+                  class="avatar-uploader"
+                  :action="config.fileUrl+config.uploadFile"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload">
+            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </div>
+        <p>
+          <el-button type="primary" size="small" @click="handlePsd()">保存</el-button>
+        </p>
+      </div>
+      <el-divider></el-divider>
+      <div class="content-p">
+        <div>
+          <p class="content-t">网站标题</p>
+          <el-input v-model="input" size="small" style="width: auto" placeholder="请输入标题" maxlength="20"></el-input>
+        </div>
+        <p>
+          <el-button type="primary" size="small" @click="handlePsd()">保存</el-button>
+        </p>
+      </div>
     </el-card>
 
     <!--  修改密码  -->
@@ -265,6 +293,39 @@
 	}
 </script>
 
+<style>
+  .avatar-uploader {
+    margin-left: 100px;
+    height: 43px;
+  }
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 20px;
+    color: #8c939d;
+    width: 80px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 80px;
+    height: 40px;
+    display: block;
+  }
+</style>
 <style scoped lang="scss">
   .box-card {
     margin-top: 40px;

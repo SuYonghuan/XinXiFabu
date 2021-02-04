@@ -145,3 +145,19 @@ export const ResolutionList = (param) =>
 //设置分辨率默认图片
 export const SetResolution = (param) =>
     post(`${store.state.config.url}/api/Screensaver/SetResolution?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Screensaver/SetResolution"))}&time=${timeStamp()}`,param)
+
+//项目Appkey列表
+export const AppKeyList = (param) =>
+    post(`${store.state.config.url}/APi/OpenApi/AppKeyList?token=${encodeURIComponent(mergeWordAndTimeStamp("/APi/OpenApi/AppKeyList"))}&time=${timeStamp()}`,param)
+
+//添加Appkey
+export const AddAppkey = (param) =>
+    post(`${store.state.config.url}/APi/OpenApi/AddAppkey?token=${encodeURIComponent(mergeWordAndTimeStamp("/APi/OpenApi/AddAppkey"))}&time=${timeStamp()}`,param)
+
+//锁定项目
+export const LockAppkey = (param) =>
+    post(`${store.state.config.url}/APi/OpenApi/LockAppkey?token=${encodeURIComponent(mergeWordAndTimeStamp("/APi/OpenApi/LockAppkey"))}&time=${timeStamp()}`,param)
+
+//删除项目
+export const DelAppkey = (param) =>
+    post(`${store.state.config.url}/APi/OpenApi/DelAppkey?token=${encodeURIComponent(mergeWordAndTimeStamp("/APi/OpenApi/DelAppkey"))}&time=${timeStamp()}`,param)

@@ -74,6 +74,11 @@ const routes = [
         component: () => import('views/system/password'),
       },
       {
+        path: '/system/deptConfig',
+        name: '开放秘钥',
+        component: () => import('views/system/deptConfig'),
+      },
+      {
         path: '/system/notice',
         name: '通知中心',
         component: () => import('views/system/notice'),
