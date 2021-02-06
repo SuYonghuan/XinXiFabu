@@ -14,7 +14,7 @@
     <div class="logobox">
       <img
               class="logoimg"
-              src="../../common/images/logo.png"
+              :src="website.logo ? website.logo : '../../common/images/logo.png'"
               alt=""
       />
     </div>
@@ -64,7 +64,7 @@
 		  })
 	  },
 	  computed: {
-		  ...mapGetters(['menus'])
+		  ...mapGetters(['menus','website'])
 	  },
 	}
 </script>
@@ -115,7 +115,7 @@
   .logobox {
     color: #9d9d9d;
     height: 60px;
-    background: #001529 !important;
+    background: #ffffff !important;
     display: flex;
     justify-content: center;
     align-items: center;

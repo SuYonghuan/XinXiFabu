@@ -6,3 +6,5 @@ export const SET_MENUS = 'SET_MENUS'
 
 export const SET_PRESENT_MENUS = 'SET_PRESENT_MENUS'
 
+export const SET_WEBSITE = 'SET_WEBSITE'
+

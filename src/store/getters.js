@@ -5,3 +5,5 @@ export const config = state => state.config
 export const menus = state => state.menus
 
 export const presentMenu = state => state.presentMenu
+
+export const website = state => state.website

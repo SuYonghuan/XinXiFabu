@@ -1,7 +1,8 @@
 ﻿const state = {
-  user: { name: 'kelson' },
+  user: { name: '' },
   config: {},
   menus: [],
   presentMenu: {},
+  website: {},
 }
 export default state

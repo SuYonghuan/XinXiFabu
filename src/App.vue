@@ -5,8 +5,8 @@
 </template>
 <script>
 	import {setCookie, getCookie} from 'common/js/cookie'
-	import {mapMutations} from 'vuex'
-	import {getMenu, GetUserInfo} from 'http/api/login'
+	import {mapMutations, mapGetters} from 'vuex'
+	import {getMenu, GetUserInfo, GetSiteInfo} from 'http/api/login'
 	import {ERR_OK} from 'http/config'
 
 	export default {
@@ -24,6 +24,7 @@
 			if (this.$route != '/login') {
 				this._getLogin()
 			}
+			this.GetSiteInfo()
 		},
 		methods: {
 			reload() {
@@ -65,12 +66,32 @@
 					}
 				})
 			},
+      GetSiteInfo() {
+        GetSiteInfo({}).then(res => {
+          if (res.code === ERR_OK) {
+            if ( res.data.siteLogo ) {
+              const website = {
+                logo: this.config.url + res.data.siteLogo
+              }
+              this.setWebsite(website)
+            }
+
+            if ( res.data.siteTitle ) {
+              document.title = res.data.siteTitle
+            }
+          }
+        })
+      },
 			...mapMutations({
 				setUser: 'SET_USER',
 				setMenu: 'SET_MENUS',
 				setPresentMenu: 'SET_PRESENT_MENUS',
+        setWebsite: "SET_WEBSITE",
 			})
 		},
+    computed: {
+      ...mapGetters(['presentMenu', 'user', 'config', 'website'])
+    },
 	}
 </script>
 <style lang="scss">

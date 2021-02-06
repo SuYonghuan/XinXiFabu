@@ -12,6 +12,9 @@ const mutations = {
   },
   [types.SET_PRESENT_MENUS](state, presentMenu) {
     state.presentMenu = presentMenu
+  },
+  [types.SET_WEBSITE](state, website) {
+    state.website = website
   }
 }
 

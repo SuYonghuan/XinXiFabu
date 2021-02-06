@@ -53,3 +53,15 @@ export const MallRegister = (param) =>
 //已读消息删除
 export const DelMessage = (param) =>
     post(`${store.state.config.url}/api/Detection/DelMessage?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Detection/DelMessage"))}&time=${timeStamp()}`,param)
+
+//设置网站logo
+export const EditSiteLogo = (param) =>
+    post(`${store.state.config.url}/api/Project/EditSiteLogo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Project/EditSiteLogo"))}&time=${timeStamp()}`,param)
+
+//设置网站标题
+export const EditSiteTitle = (param) =>
+    post(`${store.state.config.url}/api/Project/EditSiteTitle?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Project/EditSiteTitle"))}&time=${timeStamp()}`,param)
+
+//获取网站信息
+export const GetSiteInfo = (param) =>
+    post(`${store.state.config.url}/api/Project/GetSiteInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Project/GetSiteInfo"))}&time=${timeStamp()}`,param)
