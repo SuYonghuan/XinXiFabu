@@ -5,6 +5,7 @@ import { ERR_OK, ERR_LOGIN, ERR_AUTH } from './config'
 import { encrypt, decrypt } from 'common/js/utils'
 import { Message } from 'element-ui'
 import { delCookie, getCookie, setCookie } from 'common/js/cookie'
+import { timeStamp } from '../common/js/utils'
 
 axios.defaults.timeout = 40000
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8'
@@ -28,12 +29,12 @@ axios.interceptors.request.use(
 // 响应拦截器
 axios.interceptors.response.use(response => {
   //兼容config文件
-  if ( typeof(response.data) == "object") {
+  if (typeof (response.data) == "object") {
     return response
   }
 
   //更新后台token
-  if ( response.headers.refreshtoken ) {
+  if (response.headers.refreshtoken) {
     let user = JSON.parse(getCookie("userInfo"))
     user.jwtToken = response.headers.refreshtoken
     setCookie(JSON.stringify(user), 'userInfo', 30)
@@ -57,7 +58,7 @@ axios.interceptors.response.use(response => {
 })
 
 //封装post方法
-export function post(url, params, flag=true) {
+export function post(url, params, flag = true) {
   let jwtToken = getCookie("userInfo") ? JSON.parse(getCookie("userInfo")).jwtToken : ''
   return new Promise((resolve, reject) => {
     axios
@@ -75,6 +76,16 @@ export function post(url, params, flag=true) {
       })
   })
 }
+
+export const cPost = url => params => {
+  const timestamp = timeStamp();
+  return post(
+    `${url}?token=${encodeURIComponent(
+      encrypt(url + timestamp)
+    )}&time=${timestamp}`,
+    params
+  );
+};
 
 //封装get方法
 export function get(url, params) {

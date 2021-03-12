@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import { getCookie,setCookie } from '../common/js/cookie'
+import { getCookie, setCookie } from '../common/js/cookie'
 
 Vue.use(VueRouter)
 
@@ -104,6 +104,11 @@ const routes = [
         component: () => import('views/device/device-group'),
       },
       {
+        path: '/program/material',
+        name: '素材管理',
+        component: () => import('views/program/material'),
+      },
+      {
         path: '/program/program-list',
         name: '节目管理列表',
         component: () => import('views/program/program-list'),
@@ -182,7 +187,7 @@ router.beforeEach((to, from, next) => {
   if ((to.path === '/login' && !getCookie('autoauth')) || to.path === '/mallregister') {
     next()
   } else {
-    if ( getCookie('autoauth') ) {
+    if (getCookie('autoauth')) {
       let userInfo = decodeURIComponent(getCookie('userInfo'))
       setCookie(userInfo, 'userInfo', 1)
       next()
