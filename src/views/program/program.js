@@ -4,6 +4,7 @@ import store from '../../store'
 const base = store.state.config.url
 export class MaterialApi {
     static async get() {
+        return { code: '200', data: [], }
         return cPost(`${base}`)
     }
     static async post() {
