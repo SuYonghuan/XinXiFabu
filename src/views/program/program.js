@@ -1,19 +1,21 @@
 import { cPost } from '../../http/http'
-import store from '../../store'
 
-const base = store.state.config.url
 export class MaterialApi {
-    static async get() {
-        return { code: '200', data: [], }
-        return cPost(`${base}`)
-    }
-    static async post() {
-        return cPost(`${base}`)
-    }
-    static async put() {
-        return cPost(`${base}`)
-    }
-    static async delete() {
-        return cPost(`${base}`)
-    }
+    static get = cPost(`/Api/Material/MaterialList`);
+    static post = cPost(`/Api/Material/AddLocalMaterial`);
+    static put = cPost(`/Api/Material/EditMaterial`);
+    static delete = cPost('/Api/Material/Del');
+    static async getMaterialTypes() {
+        if (MaterialApi.materialTypes) return MaterialApi.materialTypes
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "MaterialType" })
+        MaterialApi.materialTypes = data
+        return data;
+    };
+    static async getAuditTypes() {
+        if (MaterialApi.auditType) return MaterialApi.auditType
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "MaterialAuditType" })
+        MaterialApi.auditType = data
+        return data;
+    };
+
 }

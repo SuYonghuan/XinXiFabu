@@ -39,10 +39,10 @@
             :clearable="true"
           >
             <el-option
-              v-for="item in statusOptions"
-              :key="item.code"
-              :label="item.name"
-              :value="item.code"
+              v-for="(name, code) in statusTypes"
+              :key="code"
+              :label="name"
+              :value="Number(code)"
             >
             </el-option>
           </el-select>
@@ -91,31 +91,31 @@
         width="55"
       ></el-table-column>
       <el-table-column prop="name" key="name" label="素材名"></el-table-column>
-      <el-table-column
-        prop="typeName"
-        key="typeName"
-        label="素材类型"
-      ></el-table-column>
-      <el-table-column key="size" label="大小">
+      <el-table-column prop="typeName" key="typeName" label="素材类型">
+        <template slot-scope="scope">
+          {{ materialTypes[scope.row.typeCode] }}
+        </template>
+      </el-table-column>
+      <el-table-column key="fileSize" label="大小">
         <template slot-scope="scope">
           {{
-            !scope.row.size
+            !scope.row.fileSize
               ? ""
-              : scope.row.size > 1073741824
-              ? (scope.row.size / 1073741824).toFixed(1) + "G"
-              : scope.row.size > 1048576
-              ? (scope.row.size / 1048576).toFixed(1) + "M"
-              : scope.row.size > 1024
-              ? (scope.row.size / 1024).toFixed(1) + "kb"
-              : scope.row.size + "b"
+              : scope.row.fileSize > 1073741824
+              ? (scope.row.fileSize / 1073741824).toFixed(1) + "G"
+              : scope.row.fileSize > 1048576
+              ? (scope.row.fileSize / 1048576).toFixed(1) + "M"
+              : scope.row.fileSize > 1024
+              ? (scope.row.fileSize / 1024).toFixed(1) + "kb"
+              : scope.row.fileSize + "b"
           }}
         </template>
       </el-table-column>
-      <el-table-column
-        prop="statusName"
-        key="statusName"
-        label="审核状态"
-      ></el-table-column>
+      <el-table-column prop="statusCode" key="statusCode" label="审核状态">
+        <template slot-scope="scope">
+          {{ statusTypes[scope.row.statusCode] }}
+        </template>
+      </el-table-column>
       <el-table-column
         prop="creator"
         key="creator"
@@ -127,12 +127,18 @@
         label="审核人"
       ></el-table-column>
       <el-table-column
-        prop="createTime"
-        key="createTime"
+        prop="addTime"
+        key="addTime"
         label="上传时间"
+        :formatter="dateFormatter"
       ></el-table-column>
       <el-table-column prop="desc" key="desc" label="描述"></el-table-column>
-      <el-table-column prop="operating" key="operating" label="操作">
+      <el-table-column
+        prop="operating"
+        width="220px;"
+        key="operating"
+        label="操作"
+      >
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -140,17 +146,22 @@
             @click="handleEdit(scope.row)"
             >编辑</el-button
           >
-          <el-button size="mini" type="success" @click="preview(scope.row)"
+          <el-button
+            size="mini"
+            type="success"
+            @click="preview(scope.row)"
+            :disabled="!scope.row.fileUrl"
             >查看</el-button
           >
           <el-popconfirm
             v-if="canI.deletematerial"
+            style="margin-left: 10px;"
             confirm-button-text="好的"
             cancel-button-text="不用了"
             icon="el-icon-info"
             icon-color="red"
             title="确定删除该素材吗？"
-            @confirm="handleDelete(scope.row)"
+            @confirm="handleDelete([scope.row.code])"
           >
             <el-button slot="reference" size="mini" type="danger"
               >删除</el-button
@@ -187,7 +198,7 @@
           <el-form-item label="素材名称" prop="name">
             <el-input
               v-model="form.name"
-              maxlength="250"
+              :maxlength="50"
               placeholder="请输入素材名称"
               autocomplete="off"
             ></el-input>
@@ -205,18 +216,23 @@
               @remove="form.file = []"
               :on-progress="handleProgress"
             >
-              <img
+              <object
                 v-if="form.file && form.file.length"
-                :src="form.file[0].url"
                 class="avatar"
-              />
+                :data="form.file[0].url"
+              >
+              </object>
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
-          <el-form-item label="审核方式" prop="auditTypeCode">
-            <el-radio-group v-model="form.auditTypeCode">
-              <el-radio :label="3">AI审核</el-radio>
-              <el-radio :label="6">人工审核</el-radio>
+          <el-form-item label="审核方式" prop="auditType">
+            <el-radio-group v-model="form.auditType">
+              <el-radio
+                v-for="(name, code) in auditTypes"
+                :key="code"
+                :label="code"
+                >{{ name }}</el-radio
+              >
             </el-radio-group>
           </el-form-item>
           <el-form-item label="素材描述" prop="desc">
@@ -224,9 +240,13 @@
               type="textarea"
               :rows="4"
               placeholder="请输入素材描述"
+              :maxlength="200"
               v-model="form.desc"
             >
             </el-input>
+          </el-form-item>
+          <el-form-item label="同名素材替换">
+            <el-switch v-model="form.sameReplace"> </el-switch>
           </el-form-item>
           <el-form-item label="上传进度">
             <el-progress
@@ -262,7 +282,7 @@
           <el-form-item label="素材名称" prop="name">
             <el-input
               v-model="form.name"
-              maxlength="250"
+              :maxlength="50"
               placeholder="请输入素材名称"
               autocomplete="off"
             ></el-input>
@@ -280,16 +300,29 @@
               type="textarea"
               :rows="4"
               placeholder="请输入素材描述"
+              :maxlength="200"
               v-model="form.desc"
             >
             </el-input>
           </el-form-item>
         </template>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div class="dialog-footer">
         <el-button @click="showForm = false">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
+    </el-dialog>
+    <el-dialog
+      :title="modalMat && modalMat.name"
+      append-to-body
+      :visible.sync="showModal"
+    >
+      <template v-if="modalMat">
+        <object
+          style="width:100%;min-height:500px;"
+          :data="modalMat.fileUrl"
+        ></object>
+      </template>
     </el-dialog>
   </table-page>
 </template>
@@ -310,17 +343,21 @@ export default {
       list: [],
       pageIndex: 0,
       total: 0,
-      statusCode: "",
-      statusOptions: [
-        { code: "0", name: "审核通过" },
-        { code: "1", name: "待审核" },
-        { code: "2", name: "运行中" },
-      ],
+      statusCode: null,
       canI: {},
       showForm: false,
       isStaticForm: false,
       form: {},
       progress: 0,
+      materialTypes: {},
+      auditTypes: {},
+      statusTypes: {
+        0: "待审核",
+        1: "审核通过",
+        2: "不通过",
+      },
+      showModal: false,
+      modalMat: null,
     };
   },
   computed: {
@@ -406,16 +443,33 @@ export default {
                 trigger: "blur",
               },
             ],
-            auditTypeCode: [
+            auditType: [
               { required: true, message: "请选择审核方式", trigger: "blur" },
             ],
             desc: [
               { required: true, message: "请输入素材描述", trigger: "blur" },
             ],
+            sameReplace: [
+              {
+                type: "boolean",
+                required: true,
+                message: "请选择是否同名替换",
+                trigger: "blur",
+              },
+            ],
           };
+    },
+    isEdit() {
+      return !!this.form.code;
     },
   },
   async mounted() {
+    const [materialTypes, auditTypes] = await Promise.all([
+      MaterialApi.getMaterialTypes(),
+      MaterialApi.getAuditTypes(),
+    ]);
+    this.materialTypes = materialTypes;
+    this.auditTypes = auditTypes;
     let { code, data, msg } = await GetRolePermissions({
       MenuCode: this.presentMenu.code,
     });
@@ -430,15 +484,51 @@ export default {
   },
 
   methods: {
+    async handleDelete(codes) {
+      const { code, msg } = await MaterialApi.delete({ codes });
+      this.$message({
+        type: code === "200" ? "success" : "error",
+        message: code === "200" ? "删除成功" : msg,
+      });
+      if (code === "200") this.getList();
+    },
+    dateFormatter(row) {
+      let [date, time] = row.addTime.split("T");
+      [time] = time.split(".");
+      return `${date} ${time}`;
+    },
     handleProgress({ percent }) {
       this.progress = percent;
+    },
+    handleEdit(row) {
+      const { code, name, fileCode, fileUrl, auditType, desc } = row;
+      this.form = {
+        code,
+        name,
+        file: [
+          {
+            name: fileCode,
+            url: fileUrl,
+          },
+        ],
+        auditType,
+        desc,
+        sameReplace: true,
+      };
+      this.isStaticForm = true;
+      this.progress = 0;
+      this.$nextTick(() => {
+        if (this.$refs.form) this.$refs.form.clearValidate();
+        this.showForm = true;
+      });
     },
     addStatic() {
       this.form = {
         name: "",
         file: [],
-        auditTypeCode: "",
+        auditType: "",
         desc: "",
+        sameReplace: true,
       };
       this.isStaticForm = true;
       this.progress = 0;
@@ -460,14 +550,44 @@ export default {
         this.showForm = true;
       });
     },
-    submit() {},
+    async submit() {
+      const isValid = await new Promise((resolve) =>
+        this.$refs.form.validate(resolve)
+      );
+      if (!isValid) return;
+      if (this.isStatic) {
+        const { name, file, auditType, desc, sameReplace, code } = this.form;
+        const res = await (this.isEdit ? MaterialApi.put : MaterialApi.post)({
+          name,
+          fileCode: file[0].name,
+          auditType,
+          desc,
+          sameReplace,
+          code,
+        });
+        if (res.code !== "200") return this.$message.error(res.msg);
+        this.$message.success(res.msg);
+        if (!this.isEdit) {
+          this.reset();
+        }
+        this.getList();
+        this.showForm = false;
+      }
+    },
+    reset() {
+      this.name = "";
+      this.creator = "";
+      this.pageIndex = 0;
+      this.list = [];
+      this.total = 0;
+    },
     onUpload(change) {
       if (change.response) {
         const { data, msg, code } = change.response;
         if (code === ERR_OK) {
           this.form.file = [
             {
-              name: data.code,
+              name: data.fileGuid,
               url: change.url,
             },
           ];
@@ -476,9 +596,15 @@ export default {
         } else this.$message({ message: msg, type: "error" });
       }
     },
-    preview() {},
-    handleDelete() {},
-    handleEdit() {},
+    preview(row) {
+      this.modalMat = row;
+      this.$nextTick(() => {
+        this.showModal = true;
+      });
+
+      // window.open(row.fileUrl);
+    },
+
     handleSelectionChange() {},
     handleSizeChange(val) {
       this.pageSize = val;
@@ -500,6 +626,7 @@ export default {
       });
       if (code == "200") {
         const { list, allCount } = data;
+        console.log(list);
         this.list = list;
         this.total = allCount;
       } else {
@@ -523,5 +650,8 @@ export default {
   width: 178px;
   height: 178px;
   display: block;
+}
+.dialog-footer {
+  text-align: center;
 }
 </style>

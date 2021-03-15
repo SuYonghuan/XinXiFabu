@@ -80,7 +80,7 @@ export function post(url, params, flag = true) {
 export const cPost = url => params => {
   const timestamp = timeStamp();
   return post(
-    `${url}?token=${encodeURIComponent(
+    `${store.state.config.url}${url}?token=${encodeURIComponent(
       encrypt(url + timestamp)
     )}&time=${timestamp}`,
     params
