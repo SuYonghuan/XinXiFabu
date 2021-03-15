@@ -109,6 +109,11 @@ const routes = [
         component: () => import('views/program/material'),
       },
       {
+        path: '/audit/material',
+        name: '素材审核',
+        component: () => import('views/audit/material'),
+      },
+      {
         path: '/program/program-list',
         name: '节目管理列表',
         component: () => import('views/program/program-list'),

@@ -486,6 +486,7 @@ export default {
       creator: "",
       list: [],
       pageIndex: 0,
+      pageSize: 10,
       total: 0,
       statusCode: null,
       canI: {},
@@ -918,7 +919,6 @@ export default {
       });
       if (code == "200") {
         const { list, allCount } = data;
-        console.log(list);
         this.list = list;
         this.total = allCount;
       } else {

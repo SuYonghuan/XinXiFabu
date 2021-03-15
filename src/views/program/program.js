@@ -6,6 +6,8 @@ export class MaterialApi {
     static postDynamic = cPost(`/Api/Material/AddDynamicMaterial`);
     static put = cPost(`/Api/Material/EditMaterial`);
     static delete = cPost('/Api/Material/Del');
+    static getAuditList = cPost('/Api/Material/AuditMaterialList');
+    static audit = cPost('/Api/Material/AuditMaterials');
     static async getMaterialTypes() {
         if (MaterialApi.materialTypes) return MaterialApi.materialTypes
         const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "MaterialType" })
