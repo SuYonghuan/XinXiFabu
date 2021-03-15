@@ -69,7 +69,12 @@
             @click="addDynamic"
             >创建动态素材</el-button
           >
-          <el-button size="small" type="danger" v-if="canI.deletematerial"
+          <el-button
+            size="small"
+            :disabled="!toDelCodes.length"
+            type="danger"
+            v-if="canI.deletematerial"
+            @click="bulkDelete"
             >批量删除</el-button
           >
         </div>
@@ -256,20 +261,159 @@
             ></el-progress>
           </el-form-item>
         </template>
-        <template v-else-if="isIPC"></template>
-        <template v-else>
-          <el-form-item label="素材类型" prop="name">
+        <template v-else-if="isIpc">
+          <el-form-item label="素材类型" prop="typeCode">
             <el-select
               class="prefix"
               v-model="form.typeCode"
               placeholder="请选择"
               size="small"
               style="width: 250px"
+              :disabled="isEdit"
+              @change="handleTypeCodeChange"
             >
               <el-option
                 v-for="item in [
                   { code: '在线网页', name: '在线网页' },
-                  { code: 'IPC', name: '网络摄像机' },
+                  { code: 'ipc', name: '网络摄像机' },
+                  { code: '流媒体', name: '流媒体服务器' },
+                ]"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="素材名称" prop="name">
+            <el-input
+              v-model="form.name"
+              :maxlength="50"
+              placeholder="请输入素材名称"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="IP类型" prop="ipType">
+            <el-select
+              class="prefix"
+              v-model="form.ipType"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="item in [
+                  { code: 'IPV4', name: 'IPV4' },
+                  { code: 'IPV6', name: 'IPV6' },
+                ]"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="IP地址" prop="ipAddress">
+            <el-input
+              v-model="form.ipAddress"
+              maxlength="250"
+              placeholder="请输入IP地址"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="端口号" prop="port">
+            <el-input
+              type="number"
+              v-model="form.port"
+              :maxlength="5"
+              placeholder="请输入端口号"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="通道号" prop="channel">
+            <el-input
+              v-model="form.channel"
+              :maxlength="3"
+              placeholder="请输入通道号"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="用户名" prop="userName">
+            <el-input
+              v-model="form.userName"
+              :maxlength="50"
+              placeholder="请输入用户名"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input
+              v-model="form.password"
+              :maxlength="50"
+              placeholder="请输入密码"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="传输协议" prop="protocol">
+            <el-select
+              class="prefix"
+              v-model="form.protocol"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="(name, code) in protocols"
+                :key="code"
+                :label="name + '(' + code + ')'"
+                :value="code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="码率类型" prop="bitRateType">
+            <el-select
+              class="prefix"
+              v-model="form.bitRateType"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="(name, code) in bitRateTypes"
+                :key="code"
+                :label="name"
+                :value="code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="素材描述" prop="desc">
+            <el-input
+              type="textarea"
+              :rows="4"
+              placeholder="请输入素材描述"
+              :maxlength="200"
+              v-model="form.desc"
+            >
+            </el-input>
+          </el-form-item>
+        </template>
+        <template v-else>
+          <el-form-item label="素材类型" prop="typeCode">
+            <el-select
+              class="prefix"
+              v-model="form.typeCode"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+              @change="handleTypeCodeChange"
+              :disabled="isEdit"
+            >
+              <el-option
+                v-for="item in [
+                  { code: '在线网页', name: '在线网页' },
+                  { code: 'ipc', name: '网络摄像机' },
                   { code: '流媒体', name: '流媒体服务器' },
                 ]"
                 :key="item.code"
@@ -356,8 +500,19 @@ export default {
         1: "审核通过",
         2: "不通过",
       },
+      protocols: {
+        RTMP: "实时流协议",
+        UDP: "数据报协议",
+        HTTP: "超文本传输协议",
+        RTP: "实时传输协议",
+      },
+      bitRateTypes: {
+        main: "主码流",
+        sub: "副码流",
+      },
       showModal: false,
       modalMat: null,
+      toDelCodes: [],
     };
   },
   computed: {
@@ -373,11 +528,11 @@ export default {
       return (
         this.form.typeCode !== "在线网页" &&
         this.form.typeCode !== "流媒体" &&
-        this.form.typeCode !== "IPC"
+        this.form.typeCode !== "ipc"
       );
     },
-    isIPC() {
-      return this.form.typeCode === "IPC";
+    isIpc() {
+      return this.form.typeCode === "ipc";
     },
     rules() {
       return this.form.typeCode === "在线网页" ||
@@ -398,7 +553,7 @@ export default {
               { required: true, message: "请输入素材描述", trigger: "blur" },
             ],
           }
-        : this.form.typeCode === "IPC"
+        : this.form.typeCode === "ipc"
         ? {
             name: [
               { required: true, message: "请输入素材名称", trigger: "blur" },
@@ -468,6 +623,8 @@ export default {
       MaterialApi.getMaterialTypes(),
       MaterialApi.getAuditTypes(),
     ]);
+    console.log("materialTypes", materialTypes);
+    console.log("auditTypes", auditTypes);
     this.materialTypes = materialTypes;
     this.auditTypes = auditTypes;
     let { code, data, msg } = await GetRolePermissions({
@@ -484,6 +641,33 @@ export default {
   },
 
   methods: {
+    handleTypeCodeChange(val) {
+      if (val === "ipc") {
+        this.form = {
+          typeCode: val,
+          ipType: "IPV4",
+          ipAddress: "",
+          port: 554,
+          channel: "ch1",
+          userName: "",
+          password: "",
+          protocol: "TCP",
+          bitRateType: "main",
+          desc: "",
+        };
+      } else {
+        this.form = {
+          typeCode: val,
+          name: "",
+          url: "",
+          desc: "",
+        };
+      }
+
+      this.$nextTick(() => {
+        if (this.$refs.form) this.$refs.form.clearValidate();
+      });
+    },
     async handleDelete(codes) {
       const { code, msg } = await MaterialApi.delete({ codes });
       this.$message({
@@ -491,6 +675,10 @@ export default {
         message: code === "200" ? "删除成功" : msg,
       });
       if (code === "200") this.getList();
+    },
+    async bulkDelete() {
+      await this.handleDelete(this.toDelCodes);
+      this.toDelCodes = [];
     },
     dateFormatter(row) {
       let [date, time] = row.addTime.split("T");
@@ -501,22 +689,68 @@ export default {
       this.progress = percent;
     },
     handleEdit(row) {
-      const { code, name, fileCode, fileUrl, auditType, desc } = row;
-      this.form = {
+      const {
         code,
         name,
-        file: [
-          {
-            name: fileCode,
-            url: fileUrl,
-          },
-        ],
+        fileCode,
+        fileUrl,
         auditType,
         desc,
-        sameReplace: true,
-      };
-      this.isStaticForm = true;
-      this.progress = 0;
+        typeCode,
+        url,
+        ipType,
+        ipAddress,
+        port,
+        channel,
+        userName,
+        password,
+        protocol,
+        bitRateType,
+      } = row;
+      if (["流媒体", "在线网页"].includes(typeCode)) {
+        this.isStaticForm = false;
+        this.form = {
+          code,
+          typeCode,
+          name,
+          url,
+          desc,
+        };
+      } else if (typeCode === "ipc") {
+        this.isStaticForm = false;
+        this.form = {
+          code,
+          typeCode,
+          name,
+          ipType,
+          ipAddress,
+          port,
+          channel,
+          userName,
+          password,
+          protocol,
+          bitRateType,
+          desc,
+        };
+      } else {
+        this.form = {
+          code,
+          typeCode,
+          name,
+          file: [
+            {
+              name: fileCode,
+              url: fileUrl,
+            },
+          ],
+          auditType,
+          desc,
+          sameReplace: true,
+        };
+        this.isStaticForm = true;
+        this.progress = 0;
+      }
+
       this.$nextTick(() => {
         if (this.$refs.form) this.$refs.form.clearValidate();
         this.showForm = true;
@@ -572,6 +806,62 @@ export default {
         }
         this.getList();
         this.showForm = false;
+      } else if (this.isIpc) {
+        const {
+          code,
+          typeCode,
+          name,
+          ipType,
+          ipAddress,
+          port,
+          channel,
+          userName,
+          password,
+          protocol,
+          bitRateType,
+          desc,
+        } = this.form;
+        const res = await (this.isEdit
+          ? MaterialApi.put
+          : MaterialApi.postDynamic)({
+          code,
+          typeCode,
+          name,
+          ipType,
+          ipAddress,
+          port,
+          channel,
+          userName,
+          password,
+          protocol,
+          bitRateType,
+          desc,
+        });
+        if (res.code !== "200") return this.$message.error(res.msg);
+        this.$message.success(res.msg);
+        if (!this.isEdit) {
+          this.reset();
+        }
+        this.getList();
+        this.showForm = false;
+      } else {
+        const { code, typeCode, name, url, desc } = this.form;
+        const res = await (this.isEdit
+          ? MaterialApi.put
+          : MaterialApi.postDynamic)({
+          code,
+          typeCode,
+          name,
+          url,
+          desc,
+        });
+        if (res.code !== "200") return this.$message.error(res.msg);
+        this.$message.success(res.msg);
+        if (!this.isEdit) {
+          this.reset();
+        }
+        this.getList();
+        this.showForm = false;
       }
     },
     reset() {
@@ -605,7 +895,9 @@ export default {
       // window.open(row.fileUrl);
     },
 
-    handleSelectionChange() {},
+    handleSelectionChange(data) {
+      this.toDelCodes = data.map(({ code }) => code);
+    },
     handleSizeChange(val) {
       this.pageSize = val;
       this.getList();

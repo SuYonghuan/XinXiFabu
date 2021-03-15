@@ -3,6 +3,7 @@ import { cPost } from '../../http/http'
 export class MaterialApi {
     static get = cPost(`/Api/Material/MaterialList`);
     static post = cPost(`/Api/Material/AddLocalMaterial`);
+    static postDynamic = cPost(`/Api/Material/AddDynamicMaterial`);
     static put = cPost(`/Api/Material/EditMaterial`);
     static delete = cPost('/Api/Material/Del');
     static async getMaterialTypes() {
