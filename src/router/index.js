@@ -104,16 +104,6 @@ const routes = [
         component: () => import('views/device/device-group'),
       },
       {
-        path: '/program/material',
-        name: '素材管理',
-        component: () => import('views/program/material'),
-      },
-      {
-        path: '/audit/material',
-        name: '素材审核',
-        component: () => import('views/audit/material'),
-      },
-      {
         path: '/program/program-list',
         name: '节目管理列表',
         component: () => import('views/program/program-list'),
@@ -177,6 +167,21 @@ const routes = [
         path: '/statistics/program-statistics',
         name: '节目播放',
         component: () => import('views/statistics/program-statistics'),
+      },
+      {
+        path: '/program/material',
+        name: '素材管理',
+        component: () => import('views/program/material'),
+      },
+      {
+        path: '/audit/material',
+        name: '素材审核',
+        component: () => import('views/audit/material'),
+      },
+      {
+        path: '/program/programs',
+        name: '节目制作',
+        component: () => import('views/program/programs'),
       },
     ]
   },

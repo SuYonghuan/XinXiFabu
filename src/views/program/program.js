@@ -20,5 +20,11 @@ export class MaterialApi {
         MaterialApi.auditType = data
         return data;
     };
+}
 
+export class ProgramApi {
+    static get = cPost(`/Api/Programme/ProgrammeList`);
+    static post = cPost(`/Api/Programme/AddProgramme`);
+    static delete = cPost('/Api/Programme/Del');
+    static getResolutions = cPost('/Api/Programme/ResolutionList');
 }
