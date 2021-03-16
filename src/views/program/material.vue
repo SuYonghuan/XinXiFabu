@@ -127,8 +127,8 @@
         label="上传者"
       ></el-table-column>
       <el-table-column
-        prop="auditorName"
-        key="auditorName"
+        prop="auditor"
+        key="auditor"
         label="审核人"
       ></el-table-column>
       <el-table-column
@@ -137,7 +137,20 @@
         label="上传时间"
         :formatter="dateFormatter"
       ></el-table-column>
-      <el-table-column prop="desc" key="desc" label="描述"></el-table-column>
+      <el-table-column prop="desc" key="desc" label="描述">
+        <template slot-scope="scope">
+          <el-tooltip placement="top">
+            <div slot="content" style="max-width:300px;">
+              {{ scope.row.desc }}
+            </div>
+            <div
+              style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;"
+            >
+              {{ scope.row.desc }}
+            </div>
+          </el-tooltip>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="operating"
         width="220px;"
@@ -920,6 +933,7 @@ export default {
       if (code == "200") {
         const { list, allCount } = data;
         this.list = list;
+        console.log(list);
         this.total = allCount;
       } else {
         this.$message({ message: msg, type: "error" });
