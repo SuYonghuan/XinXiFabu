@@ -86,8 +86,8 @@ export const cPost = url => async params => {
     params
   );
   console.group('%curl:' + url, 'background:#282c34;color:#7cc370;');
-  console.debug('params:', params,)
-  console.debug('response:', res)
+  console.info('params:', params,)
+  console.info('response:', res)
   console.groupEnd();
   return res;
 };

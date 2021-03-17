@@ -204,7 +204,63 @@
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="14" class="canvas-wrapper">2</el-col>
+        <el-col :span="14" class="canvas-wrapper">
+          <v-stage
+            class="stage"
+            :style="`transform: scale(${stageScale})`"
+            v-if="editForm"
+            :config="{
+              width: editForm.width,
+              height: editForm.height,
+            }"
+            @mousedown="handleStageMouseDown"
+            @touchstart="handleStageMouseDown"
+          >
+            <v-layer>
+              <v-rect
+                v-for="(component, i) in editForm.components"
+                :key="i"
+                :name="'name_' + i"
+                :config="{
+                  x: component.offsetX,
+                  y: component.offsetY,
+                  width: component.width,
+                  height: component.height,
+                  draggable: true,
+                  fill: component.color,
+                  shadowBlur: 10,
+                  strokeEnabled: false,
+                  zIndex: i,
+                  dragBoundFunc: (pos) => {
+                    return {
+                      x:
+                        pos.x < 0
+                          ? 0
+                          : pos.x > editForm.width - component.width
+                          ? editForm.width - component.width
+                          : pos.x,
+                      y:
+                        pos.y < 0
+                          ? 0
+                          : pos.y > editForm.height - component.height
+                          ? editForm.height - component.height
+                          : pos.y,
+                    };
+                  },
+                }"
+                @dragend="handleDragend"
+                @transformend="handleTransformEnd"
+              ></v-rect>
+              <v-transformer
+                ref="transformer"
+                :config="{
+                  rotateEnabled: false,
+                  boundBoxFunc: transformBoundBoxFunc,
+                }"
+              />
+            </v-layer>
+          </v-stage>
+        </el-col>
         <el-col :span="5">
           <el-form
             v-if="editForm"
@@ -237,8 +293,12 @@
                 (activeComponent === component ? 'selected' : '') +
                   ' component-item'
               "
-              @click="activeComponent = component"
+              @click="setActiveComponent(i)"
             >
+              <span
+                class="cube"
+                :style="'background: ' + component.color"
+              ></span>
               <span>{{ componentTypes[component.typeCode] }}组件</span>
               <template v-if="editForm.components.length === 1"></template>
               <el-button-group v-else-if="i === 0">
@@ -419,10 +479,35 @@ export default {
         "stream",
       ],
       logos,
+      colors: [
+        "#cf8592",
+        "#b285be",
+        "#93a1c6",
+        "#6aa18a",
+        "#78adb5",
+        "#aec889",
+        "#bc9c63",
+        "#ee9962",
+        "#c9c272",
+        "#949494",
+        "#b2b2b2",
+        "#d6d6d6",
+        "#93867d",
+        "#b3aaa3",
+        "#dad5d2",
+      ],
+      colorIndex: 0,
     };
   },
   computed: {
     ...mapGetters(["presentMenu", "config"]),
+    stageScale() {
+      if (!this.editForm) return 0;
+      return Math.min(
+        ((window.innerWidth - 40) * 0.5833333) / this.editForm.width,
+        (window.innerHeight - 200) / this.editForm.height
+      );
+    },
   },
   async mounted() {
     await this.getResolutions();
@@ -441,6 +526,103 @@ export default {
     } else this.$message({ message: msg, type: "error" });
   },
   methods: {
+    dragBoundFunc() {},
+    setActiveComponent(i) {
+      this.activeComponent = this.editForm.components[i];
+      this.selectedShapeName = "name_" + i;
+      this.updateTransformer();
+    },
+    transformBoundBoxFunc(oldBox, newBox) {
+      if (
+        newBox.x < 0 ||
+        newBox.y < 0 ||
+        newBox.x + newBox.width > this.editForm.width ||
+        newBox.y + newBox.height > this.editForm.height
+      )
+        return oldBox;
+      return newBox;
+    },
+    updateTransformer() {
+      // here we need to manually attach or detach Transformer node
+      const transformerNode = this.$refs.transformer.getNode();
+      const stage = transformerNode.getStage();
+      const { selectedShapeName } = this;
+
+      const selectedNode = stage.findOne("." + selectedShapeName);
+      // do nothing if selected node is already attached
+      if (selectedNode === transformerNode.node()) {
+        return;
+      }
+
+      if (selectedNode) {
+        // attach to another node
+        transformerNode.nodes([selectedNode]);
+      } else {
+        // remove transformer
+        transformerNode.nodes([]);
+      }
+      transformerNode.getLayer().batchDraw();
+    },
+    handleStageMouseDown(e) {
+      // clicked on stage - clear selection
+      if (e.target === e.target.getStage()) {
+        this.selectedShapeName = "";
+        this.updateTransformer();
+        return;
+      }
+
+      // clicked on transformer - do nothing
+      const clickedOnTransformer =
+        e.target.getParent().className === "Transformer";
+      if (clickedOnTransformer) {
+        return;
+      }
+
+      // find clicked rect by its name
+      const name = e.target.name();
+
+      const component = this.editForm.components[name.replace("name_", "")];
+      if (component) {
+        this.activeComponent = component;
+        this.selectedShapeName = name;
+      } else {
+        this.selectedShapeName = "";
+      }
+      this.updateTransformer();
+    },
+    handleTransformEnd({ target }) {
+      const {
+        index,
+        attrs: { x, y, scaleX, scaleY },
+      } = target;
+      const component = this.editForm.components[index];
+      let newWidth = component.width * scaleX;
+
+      let newHeight = component.height * scaleY;
+
+      Object.assign(component, {
+        width: Math.floor(newWidth),
+        height: Math.floor(newHeight),
+        offsetX: Math.floor(x),
+        offsetY: Math.floor(y),
+      });
+      target.scaleX(1);
+      target.scaleY(1);
+      this.setComponents();
+    },
+    handleDragend({
+      target: {
+        index,
+        attrs: { x, y },
+      },
+    }) {
+      const component = this.editForm.components[index];
+      Object.assign(component, {
+        offsetX: Math.floor(x),
+        offsetY: Math.floor(y),
+      });
+      this.setComponents();
+    },
     setComponents() {
       this.editForm.components.forEach(
         (component, i) => (component.zIndex = i + 1)
@@ -459,7 +641,10 @@ export default {
         offsetX: 0,
         offsetY: 0,
         materials: [],
+        color: this.colors[this.colorIndex],
       };
+      this.colorIndex++;
+      if (this.colorIndex === this.colors.length) this.colorIndex = 0;
       this.activeComponent = component;
       this.editForm.components.push(component);
       this.editForm = {
@@ -587,8 +772,8 @@ export default {
   height: 100%;
 }
 .canvas-wrapper {
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
   height: calc(100vh - 200px);
+  position: relative;
 }
 .form {
   margin-left: 36px;
@@ -605,6 +790,7 @@ h5 {
   border-top: 1px solid #999;
 }
 .component-item {
+  position: relative;
   display: flex;
   padding-left: 25px;
   font-size: 14px;
@@ -617,5 +803,31 @@ h5 {
 }
 .updown {
   width: 30px;
+}
+.stage {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  transform-origin: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cube {
+  position: absolute;
+  display: block;
+  width: 14px;
+  height: 14px;
+  left: 5px;
+  top: 7px;
+}
+</style>
+<style>
+.konvajs-content {
+  flex-shrink: 0;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
 }
 </style>
