@@ -37,80 +37,13 @@
         </div>
       </el-row>
     </template>
-    <el-table
-      v-if="canI.getprogrammelist"
-      :data="list"
-      border
-      stripe
-      ref="table"
-    >
-      <el-table-column type="index" key="index"></el-table-column>
-      <el-table-column
-        prop="name"
-        key="name"
-        label="节目名称"
-      ></el-table-column>
-      <el-table-column prop="resolution" key="resolution" label="分辨率">
-      </el-table-column>
-      <el-table-column prop="duration" key="duration" label="时长">
-      </el-table-column>
-      <el-table-column key="fileSize" label="素材大小">
-        <template slot-scope="scope">
-          {{
-            !scope.row.fileSize
-              ? ""
-              : scope.row.fileSize > 1073741824
-              ? (scope.row.fileSize / 1073741824).toFixed(1) + "G"
-              : scope.row.fileSize > 1048576
-              ? (scope.row.fileSize / 1048576).toFixed(1) + "M"
-              : scope.row.fileSize > 1024
-              ? (scope.row.fileSize / 1024).toFixed(1) + "kb"
-              : scope.row.fileSize + "b"
-          }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="updateTime"
-        key="updateTime"
-        label="更新时间"
-        :formatter="dateFormatter"
-      ></el-table-column>
-      <el-table-column
-        prop="editor"
-        key="editor"
-        label="修改人"
-      ></el-table-column>
-      <el-table-column
-        prop="operating"
-        width="220px;"
-        key="operating"
-        label="操作"
-      >
-        <template slot-scope="scope">
-          <el-button
-            v-if="canI.editprogramme"
-            size="mini"
-            type="primary"
-            @click="editProgram(scope.row.code)"
-            >编辑</el-button
-          >
-          <el-popconfirm
-            v-if="canI.deleteprogramme"
-            style="margin-left: 10px;"
-            confirm-button-text="好的"
-            cancel-button-text="不用了"
-            icon="el-icon-info"
-            icon-color="red"
-            title="确定删除该节目吗？"
-            @confirm="deleteProgram([scope.row.code])"
-          >
-            <el-button slot="reference" size="mini" type="danger"
-              >删除</el-button
-            >
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
+    <program-table
+      :list="list"
+      :canI="canI"
+      :dateFormatter="dateFormatter"
+      @editProgram="editProgram"
+      @deleteProgram="deleteProgram"
+    ></program-table>
     <template v-slot:footer>
       <pagination
         :list="list"
@@ -121,43 +54,12 @@
       />
     </template>
     <el-dialog title="新增节目" append-to-body :visible.sync="showAddForm">
-      <el-form
-        label-width="120px"
-        ref="addForm"
-        :model="addForm"
-        :rules="addRules"
-      >
-        <el-form-item label="节目名称" prop="name">
-          <el-input
-            placeholder="请输入节目名称"
-            :maxlength="200"
-            v-model="addForm.name"
-          >
-          </el-input>
-        </el-form-item>
-        <el-form-item label="分辨率" prop="resolution">
-          <el-select
-            class="prefix"
-            v-model="addForm.resolution"
-            placeholder="请选择"
-            size="small"
-            style="width: 250px"
-            :clearable="true"
-          >
-            <el-option
-              v-for="data in resolutions"
-              :key="data.code"
-              :label="data.sName"
-              :value="data.sName"
-            >
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div style="text-align: right;">
-        <el-button @click="showAddForm = false">取 消</el-button>
-        <el-button type="primary" @click="submitAddForm">确 定</el-button>
-      </div>
+      <add-form
+        :resolutions="resolutions"
+        :showAddForm="showAddForm"
+        @closeAddForm="showAddForm = false"
+        @submitAddForm="submitAddForm"
+      ></add-form>
     </el-dialog>
     <el-dialog
       title="节目制作"
@@ -286,6 +188,7 @@
             >
               背景
             </div>
+
             <div
               v-for="(component, i) in editForm.components"
               :key="i"
@@ -379,38 +282,131 @@
             <template v-else>
               <el-form
                 style="padding-left:20px;"
-                label-width="20px"
+                label-width="70px"
+                label-position="left"
                 :model="activeComponent"
               >
-                <el-form-item label="X" prop="offsetX">
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.offsetX"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="Y" prop="offsetY">
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.offsetY"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="宽" prop="width">
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.width"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="高" prop="height">
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.height"
-                  ></el-input>
-                </el-form-item>
+                <div class="pos-items">
+                  <el-form-item
+                    label-width="20px"
+                    class="short-item"
+                    label="X"
+                    prop="offsetX"
+                  >
+                    <el-input
+                      type="number"
+                      v-model="activeComponent.offsetX"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item
+                    label-width="20px"
+                    class="short-item"
+                    label="Y"
+                    prop="offsetY"
+                  >
+                    <el-input
+                      type="number"
+                      v-model="activeComponent.offsetY"
+                    ></el-input>
+                  </el-form-item>
+                  <br />
+                  <el-form-item
+                    label-width="20px"
+                    class="short-item"
+                    label="宽"
+                    prop="width"
+                  >
+                    <el-input
+                      type="number"
+                      v-model="activeComponent.width"
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item
+                    label-width="20px"
+                    class="short-item"
+                    label="高"
+                    prop="height"
+                  >
+                    <el-input
+                      type="number"
+                      v-model="activeComponent.height"
+                    ></el-input>
+                  </el-form-item>
+                </div>
+                <template v-if="activeComponent.typeCode === 'image'">
+                  <el-form-item label="显示效果">
+                    <el-select v-model="activeComponent.transition">
+                      <el-option
+                        :key="op"
+                        :value="op"
+                        :label="op"
+                        v-for="op in [
+                          '随机',
+                          '马赛克',
+                          '上下滚动',
+                          '左右滚动',
+                          '渐入',
+                        ]"
+                      ></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="切换时间">
+                    <el-input-number
+                      v-model="activeComponent.transitionPeriod"
+                      :step="1"
+                      step-strictly
+                      :min="1"
+                      :max="86400"
+                    ></el-input-number
+                    >秒
+                  </el-form-item>
+                  <el-form-item label="素材">
+                    <el-button @click="showSelectMaterial = true"
+                      >添加素材</el-button
+                    >
+                    <el-table :data="activeComponent.materials">
+                      <el-table-column
+                        prop="name"
+                        key="name"
+                        label="名称"
+                        :formatter="dateFormatter"
+                      ></el-table-column>
+                      <el-table-column prop="op" key="op" label="操作">
+                        <template>
+                          <el-button
+                            size="mini"
+                            type="text"
+                            class="updown"
+                            icon="el-icon-top"
+                          ></el-button>
+                          <el-button
+                            size="mini"
+                            type="text"
+                            class="updown"
+                            icon="el-icon-top"
+                          ></el-button>
+                          <el-button
+                            size="mini"
+                            type="text"
+                            class="updown"
+                            icon="el-icon-top"
+                          ></el-button> </template
+                      ></el-table-column>
+                    </el-table>
+                  </el-form-item>
+                </template>
               </el-form>
             </template>
           </el-form>
         </el-col>
       </el-row>
+      <el-dialog
+        width="30%"
+        title="内层 Dialog"
+        :visible.sync="showSelectMaterial"
+        append-to-body
+      >
+      </el-dialog>
     </el-dialog>
   </table-page>
 </template>
@@ -422,6 +418,8 @@ import { ProgramApi } from "./program.js";
 import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
+import ProgramTable from "./program/ProgramTable";
+import AddForm from "./program/AddForm";
 function importAll(r) {
   let obj = {};
   r.keys().forEach((key) => {
@@ -441,19 +439,9 @@ export default {
       canI: {},
       showAddForm: false,
       showEditForm: false,
+      showSelectMaterial: false,
       resolutions: [],
       componentTypes: {},
-      addForm: {
-        name: "",
-        resolution: null,
-      },
-
-      addRules: {
-        name: [{ required: true, message: "请填写节目名称", trigger: "blur" }],
-        resolution: [
-          { required: true, message: "请选择分辨率", trigger: "change" },
-        ],
-      },
       editForm: null,
       editRules: {
         duration: [
@@ -643,6 +631,16 @@ export default {
         materials: [],
         color: this.colors[this.colorIndex],
       };
+      switch (typeCode) {
+        case "image":
+          component.transition = "随机";
+          component.transitionPeriod = 15;
+          component.materials = [];
+          break;
+
+        default:
+          break;
+      }
       this.colorIndex++;
       if (this.colorIndex === this.colors.length) this.colorIndex = 0;
       this.activeComponent = component;
@@ -680,12 +678,7 @@ export default {
       if (code === "200") this.resolutions = data;
       else this.$message({ message: msg, type: "error" });
     },
-    async submitAddForm() {
-      const isValid = await new Promise((resolve) =>
-        this.$refs.addForm.validate(resolve)
-      );
-      if (!isValid) return;
-      const { name, resolution } = this.addForm;
+    async submitAddForm({ name, resolution }) {
       const res = await ProgramApi.post({
         name,
         resolution,
@@ -704,14 +697,7 @@ export default {
       if (code === "200") this.getList();
     },
     addProgram() {
-      this.addForm = {
-        name: "",
-        resolution: null,
-      };
-      this.$nextTick(() => {
-        if (this.$refs.addForm) this.$refs.addForm.clearValidate();
-        this.showAddForm = true;
-      });
+      this.showAddForm = true;
     },
     async editProgram(code) {
       const res = await ProgramApi.getDetail({ code });
@@ -752,7 +738,7 @@ export default {
       }
     },
   },
-  components: { TablePage, pagination },
+  components: { TablePage, pagination, ProgramTable, AddForm },
 };
 </script>
 
@@ -823,6 +809,23 @@ h5 {
   height: 14px;
   left: 5px;
   top: 7px;
+}
+.pos-items {
+  position: relative;
+  padding-left: 40px;
+}
+.pos-items::before {
+  content: "位置";
+  position: absolute;
+  top: 14px;
+  left: 0;
+}
+.short-item {
+  display: inline-block;
+  width: 100px;
+}
+.short-item + .short-item {
+  margin-left: 10px;
 }
 </style>
 <style>
