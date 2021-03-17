@@ -77,14 +77,19 @@ export function post(url, params, flag = true) {
   })
 }
 
-export const cPost = url => params => {
+export const cPost = url => async params => {
   const timestamp = timeStamp();
-  return post(
+  const res = await post(
     `${store.state.config.url}${url}?token=${encodeURIComponent(
       encrypt(url + timestamp)
     )}&time=${timestamp}`,
     params
   );
+  console.group('%curl:' + url, 'background:#282c34;color:#7cc370;');
+  console.debug('params:', params,)
+  console.debug('response:', res)
+  console.groupEnd();
+  return res;
 };
 
 //封装get方法

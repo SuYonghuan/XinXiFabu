@@ -3,12 +3,14 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import ElementUI from 'element-ui'
-import {get} from 'http/http'
+import { get } from 'http/http'
+import VueKonva from 'vue-konva'
 
 import 'common/scss/index.scss'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.use(ElementUI)
+Vue.use(VueKonva)
 Vue.config.productionTip = false
 
 //引入Excel
@@ -21,14 +23,14 @@ Vue.prototype.$echarts = echarts;
 
 
 get('/static/config/config.json')
-    .then((res) => {
-      store.dispatch('setConfig', res)
-      new Vue({
-        router,
-        store,
-        render: h => h(App)
-      }).$mount('#app')
-    })
-    .catch((err) => {
-      console.log('Check if config.json exists')
-    })
+  .then((res) => {
+    store.dispatch('setConfig', res)
+    new Vue({
+      router,
+      store,
+      render: h => h(App)
+    }).$mount('#app')
+  })
+  .catch((err) => {
+    console.log('Check if config.json exists')
+  })

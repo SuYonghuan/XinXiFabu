@@ -637,8 +637,6 @@ export default {
       MaterialApi.getMaterialTypes(),
       MaterialApi.getAuditTypes(),
     ]);
-    console.log("materialTypes", materialTypes);
-    console.log("auditTypes", auditTypes);
     this.materialTypes = materialTypes;
     this.auditTypes = auditTypes;
     let { code, data, msg } = await GetRolePermissions({

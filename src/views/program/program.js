@@ -24,7 +24,14 @@ export class MaterialApi {
 
 export class ProgramApi {
     static get = cPost(`/Api/Programme/ProgrammeList`);
+    static getDetail = cPost(`/Api/Programme/ProgrammeInfo`);
     static post = cPost(`/Api/Programme/AddProgramme`);
     static delete = cPost('/Api/Programme/Del');
     static getResolutions = cPost('/Api/Programme/ResolutionList');
+    static async getComponentTypes() {
+        if (ProgramApi.componentTypes) return ProgramApi.componentTypes
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "ComponentType" })
+        ProgramApi.componentTypes = data
+        return data;
+    };
 }
