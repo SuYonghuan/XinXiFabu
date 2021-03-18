@@ -360,6 +360,133 @@
                   ></el-table-column>
                 </el-table>
               </template>
+              <template v-else-if="activeComponent.typeCode === 'video'">
+                <el-form-item label="素材">
+                  <el-button type="primary" @click="openMaterialModal"
+                    >添加素材</el-button
+                  >
+                </el-form-item>
+                <el-table
+                  v-if="activeComponent.materials.length"
+                  :data="activeComponent.materials"
+                >
+                  <el-table-column prop="name" key="name" label="名称">
+                    <template slot-scope="scope">
+                      <div class="ellipsis">{{ scope.row.name }}</div>
+                    </template></el-table-column
+                  >
+                  <el-table-column
+                    prop="op"
+                    key="op"
+                    label="操作"
+                    width="180px"
+                  >
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-view"
+                        @click="preview(scope.row)"
+                      ></el-button>
+                      <el-button
+                        v-if="scope.$index !== 0"
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-up"
+                        @click="swap(scope.$index, scope.$index - 1)"
+                      ></el-button>
+                      <el-button
+                        v-if="
+                          scope.$index !== activeComponent.materials.length - 1
+                        "
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-down"
+                        @click="swap(scope.$index, scope.$index + 1)"
+                      ></el-button>
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-delete-solid"
+                        @click="removeMaterial(scope.$index)"
+                      ></el-button> </template
+                  ></el-table-column>
+                </el-table>
+              </template>
+              <template v-else-if="activeComponent.typeCode === 'url'">
+                <el-form-item label="刷新时间" prop="refreshPeriod">
+                  <el-time-picker
+                    v-model="activeComponent.refreshPeriod"
+                    value-format="HH:mm:ss"
+                    placeholder="选择刷新时间"
+                  >
+                  </el-time-picker>
+                </el-form-item>
+                <el-form-item label="素材" prop="materials">
+                  <el-button
+                    type="primary"
+                    v-if="!activeComponent.materials.length"
+                    @click="openMaterialModal"
+                    >选择素材</el-button
+                  >
+                  <div v-else>
+                    {{ activeComponent.materials[0].name }}
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-view"
+                      @click="preview(activeComponent.materials[0])"
+                    ></el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="activeComponent.materials = []"
+                    ></el-button>
+                  </div>
+                </el-form-item>
+              </template>
+              <template v-else-if="activeComponent.typeCode === 'html'">
+                <el-form-item label="刷新时间" prop="refreshPeriod">
+                  <el-time-picker
+                    v-model="activeComponent.refreshPeriod"
+                    value-format="HH:mm:ss"
+                    placeholder="选择刷新时间"
+                  >
+                  </el-time-picker>
+                </el-form-item>
+                <el-form-item required label="素材" prop="materials">
+                  <el-button
+                    type="primary"
+                    v-if="!activeComponent.materials.length"
+                    @click="openMaterialModal"
+                    >选择素材</el-button
+                  >
+                  <div v-else>
+                    {{ activeComponent.materials[0].name }}
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-view"
+                      @click="preview(activeComponent.materials[0])"
+                    ></el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="activeComponent.materials = []"
+                    ></el-button>
+                  </div>
+                </el-form-item>
+              </template>
             </el-form>
           </template>
         </el-form>
@@ -417,7 +544,11 @@
       <template v-if="previewMaterial">
         <object
           style="width:100%;min-height:500px;"
-          :data="previewMaterial.fileUrl"
+          :data="
+            previewMaterial.fileUrl
+              ? previewMaterial.fileUrl
+              : previewMaterial.url
+          "
         ></object>
       </template>
     </el-dialog>
@@ -639,7 +770,21 @@ export default {
           component.transitionPeriod = 15;
           component.materials = [];
           break;
-
+        case "url":
+          component.refreshPeriod = "00:00:00";
+          component.materials = [];
+        case "html":
+          component.refreshPeriod = "00:00:00";
+          component.materials = [];
+        case "text":
+          component.backgroundColor = "#FFFFFF";
+          component.backgroundOpacity = 1;
+          component.color = "#000000";
+          component.fontSize = 16;
+          component.fontStyle = "正常";
+          conponent.animationSpeed = "中等";
+          conponent.animation = "从左往右";
+          component.materials = [];
         default:
           break;
       }
