@@ -650,6 +650,32 @@
                   </el-color-picker>
                 </el-form-item>
               </template>
+              <template v-else-if="activeComponent.typeCode === 'clock'">
+                <el-form-item label="字体颜色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.fontColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+                <el-form-item label="字体大小">
+                  <el-input-number
+                    v-model="activeComponent.fontSize"
+                    :step="1"
+                    step-strictly
+                    :min="1"
+                    :max="1000"
+                  ></el-input-number
+                  >px
+                </el-form-item>
+                <el-form-item label="背景色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.backgroundColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+              </template>
             </el-form>
           </template>
         </el-form>
@@ -962,6 +988,11 @@ export default {
         case "weather":
           component.cityName = "";
           component.components = this.weatherComponents;
+          component.fontColor = "#000000";
+          component.fontSize = 16;
+          component.backgroundColor = "#FFFFFF";
+          break;
+        case "clock":
           component.fontColor = "#000000";
           component.fontSize = 16;
           component.backgroundColor = "#FFFFFF";
