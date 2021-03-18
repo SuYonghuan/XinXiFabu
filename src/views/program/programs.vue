@@ -63,350 +63,15 @@
     </el-dialog>
     <el-dialog
       title="节目制作"
-      class="edit"
       append-to-body
       :visible.sync="showEditForm"
       fullscreen
     >
-      <el-row
-        v-if="editForm"
-        type="flex"
-        justify="space-between"
-        style="margin-bottom:30px;"
-      >
-        <el-col>
-          <span class="prefix">节目名称：{{ editForm.name }}</span>
-          <span class="prefix">分辨率：{{ editForm.resolution }}</span>
-        </el-col>
-        <el-col style="text-align: right;">
-          <el-button @click="showEditForm = false">预 览</el-button>
-          <el-button type="primary" @click="submitAddForm">保 存</el-button>
-          <el-button @click="showEditForm = false">关 闭</el-button>
-        </el-col>
-      </el-row>
-
-      <el-row>
-        <el-col :span="5">
-          <el-row>
-            <el-col
-              style="text-align: center;height: 140px;"
-              :span="8"
-              :key="code"
-              v-for="code in componentTypeOrder"
-            >
-              <img
-                @click="appendComponent(code)"
-                class="logo"
-                :src="logos[code]"
-                :alt="componentTypes[code]"
-              />
-              <div @click="appendComponent(code)">
-                {{ componentTypes[code] }}
-              </div>
-            </el-col>
-          </el-row>
-        </el-col>
-        <el-col :span="14" class="canvas-wrapper">
-          <v-stage
-            class="stage"
-            :style="`transform: scale(${stageScale})`"
-            v-if="editForm"
-            :config="{
-              width: editForm.width,
-              height: editForm.height,
-            }"
-            @mousedown="handleStageMouseDown"
-            @touchstart="handleStageMouseDown"
-          >
-            <v-layer>
-              <v-rect
-                v-for="(component, i) in editForm.components"
-                :key="i"
-                :name="'name_' + i"
-                :config="{
-                  x: component.offsetX,
-                  y: component.offsetY,
-                  width: component.width,
-                  height: component.height,
-                  draggable: true,
-                  fill: component.color,
-                  shadowBlur: 10,
-                  strokeEnabled: false,
-                  zIndex: i,
-                  dragBoundFunc: (pos) => {
-                    return {
-                      x:
-                        pos.x < 0
-                          ? 0
-                          : pos.x > editForm.width - component.width
-                          ? editForm.width - component.width
-                          : pos.x,
-                      y:
-                        pos.y < 0
-                          ? 0
-                          : pos.y > editForm.height - component.height
-                          ? editForm.height - component.height
-                          : pos.y,
-                    };
-                  },
-                }"
-                @dragend="handleDragend"
-                @transformend="handleTransformEnd"
-              ></v-rect>
-              <v-transformer
-                ref="transformer"
-                :config="{
-                  rotateEnabled: false,
-                  boundBoxFunc: transformBoundBoxFunc,
-                }"
-              />
-            </v-layer>
-          </v-stage>
-        </el-col>
-        <el-col :span="5">
-          <el-form
-            v-if="editForm"
-            class="form"
-            label-width="100px"
-            ref="editForm"
-            :model="editForm"
-            :rules="editRules"
-          >
-            <h5>节目设置</h5>
-            <el-form-item label="节目时长" prop="duration">
-              <el-time-picker
-                v-model="editForm.duration"
-                value-format="HH:mm:ss"
-                placeholder="选择时长"
-              >
-              </el-time-picker>
-            </el-form-item>
-            <h5>页面控件</h5>
-            <div
-              :class="(activeComponent ? '' : 'selected') + ' component-item'"
-              @click="activeComponent = null"
-            >
-              背景
-            </div>
-
-            <div
-              v-for="(component, i) in editForm.components"
-              :key="i"
-              :class="
-                (activeComponent === component ? 'selected' : '') +
-                  ' component-item'
-              "
-              @click="setActiveComponent(i)"
-            >
-              <span
-                class="cube"
-                :style="'background: ' + component.color"
-              ></span>
-              <span>{{ componentTypes[component.typeCode] }}组件</span>
-              <template v-if="editForm.components.length === 1"></template>
-              <el-button-group v-else-if="i === 0">
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-bottom"
-                  @click="down(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-download"
-                  @click="bottom(i)"
-                ></el-button>
-              </el-button-group>
-              <el-button-group v-else-if="i === editForm.components.length - 1">
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-top"
-                  @click="up(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  style="transform: rotate(180deg)"
-                  icon="el-icon-download"
-                  @click="top(i)"
-                ></el-button>
-              </el-button-group>
-              <el-button-group v-else>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  style="transform: rotate(180deg)"
-                  icon="el-icon-download"
-                  @click="top(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-top"
-                  @click="up(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-bottom"
-                  @click="down(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-download"
-                  @click="bottom(i)"
-                ></el-button>
-              </el-button-group>
-            </div>
-            <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
-            <template v-if="!activeComponent">
-              <el-form-item label="背景颜色" prop="backgroundColor">
-                <el-color-picker v-model="editForm.backgroundColor" show-alpha>
-                </el-color-picker>
-              </el-form-item>
-              <el-form-item label="背景图片" prop="backgroundMaterial">
-                <div style="width: 20px;height: 20px;">12</div>
-              </el-form-item>
-            </template>
-            <template v-else>
-              <el-form
-                style="padding-left:20px;"
-                label-width="70px"
-                label-position="left"
-                :model="activeComponent"
-              >
-                <div class="pos-items">
-                  <el-form-item
-                    label-width="20px"
-                    class="short-item"
-                    label="X"
-                    prop="offsetX"
-                  >
-                    <el-input
-                      type="number"
-                      v-model="activeComponent.offsetX"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item
-                    label-width="20px"
-                    class="short-item"
-                    label="Y"
-                    prop="offsetY"
-                  >
-                    <el-input
-                      type="number"
-                      v-model="activeComponent.offsetY"
-                    ></el-input>
-                  </el-form-item>
-                  <br />
-                  <el-form-item
-                    label-width="20px"
-                    class="short-item"
-                    label="宽"
-                    prop="width"
-                  >
-                    <el-input
-                      type="number"
-                      v-model="activeComponent.width"
-                    ></el-input>
-                  </el-form-item>
-                  <el-form-item
-                    label-width="20px"
-                    class="short-item"
-                    label="高"
-                    prop="height"
-                  >
-                    <el-input
-                      type="number"
-                      v-model="activeComponent.height"
-                    ></el-input>
-                  </el-form-item>
-                </div>
-                <template v-if="activeComponent.typeCode === 'image'">
-                  <el-form-item label="显示效果">
-                    <el-select v-model="activeComponent.transition">
-                      <el-option
-                        :key="op"
-                        :value="op"
-                        :label="op"
-                        v-for="op in [
-                          '随机',
-                          '马赛克',
-                          '上下滚动',
-                          '左右滚动',
-                          '渐入',
-                        ]"
-                      ></el-option>
-                    </el-select>
-                  </el-form-item>
-                  <el-form-item label="切换时间">
-                    <el-input-number
-                      v-model="activeComponent.transitionPeriod"
-                      :step="1"
-                      step-strictly
-                      :min="1"
-                      :max="86400"
-                    ></el-input-number
-                    >秒
-                  </el-form-item>
-                  <el-form-item label="素材">
-                    <el-button @click="showSelectMaterial = true"
-                      >添加素材</el-button
-                    >
-                    <el-table :data="activeComponent.materials">
-                      <el-table-column
-                        prop="name"
-                        key="name"
-                        label="名称"
-                        :formatter="dateFormatter"
-                      ></el-table-column>
-                      <el-table-column prop="op" key="op" label="操作">
-                        <template>
-                          <el-button
-                            size="mini"
-                            type="text"
-                            class="updown"
-                            icon="el-icon-top"
-                          ></el-button>
-                          <el-button
-                            size="mini"
-                            type="text"
-                            class="updown"
-                            icon="el-icon-top"
-                          ></el-button>
-                          <el-button
-                            size="mini"
-                            type="text"
-                            class="updown"
-                            icon="el-icon-top"
-                          ></el-button> </template
-                      ></el-table-column>
-                    </el-table>
-                  </el-form-item>
-                </template>
-              </el-form>
-            </template>
-          </el-form>
-        </el-col>
-      </el-row>
-      <el-dialog
-        width="30%"
-        title="内层 Dialog"
-        :visible.sync="showSelectMaterial"
-        append-to-body
-      >
-      </el-dialog>
+      <edit-form
+        :showEditForm="showEditForm"
+        :code="editCode"
+        @close="showEditForm = false"
+      ></edit-form>
     </el-dialog>
   </table-page>
 </template>
@@ -420,14 +85,8 @@ import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import ProgramTable from "./program/ProgramTable";
 import AddForm from "./program/AddForm";
-function importAll(r) {
-  let obj = {};
-  r.keys().forEach((key) => {
-    obj[key.replace("./", "").replace(".svg", "")] = r(key);
-  });
-  return obj;
-}
-const logos = importAll(require.context("./logo", false, /\.(png|jpe?g|svg)$/));
+import EditForm from "./program/EditForm";
+
 export default {
   data() {
     return {
@@ -441,66 +100,15 @@ export default {
       showEditForm: false,
       showSelectMaterial: false,
       resolutions: [],
-      componentTypes: {},
-      editForm: null,
-      editRules: {
-        duration: [
-          { required: true, message: "请选择节目时长", trigger: "blur" },
-          {
-            validator: (rule, value, callback) => {
-              if (value === "00:00:00") callback(new Error("节目时长不能为0"));
-            },
-            trigger: "blur",
-          },
-        ],
-      },
-      activeComponent: null,
-      componentTypeOrder: [
-        "video",
-        "image",
-        "text",
-        "html",
-        "weather",
-        "clock",
-        "url",
-        "audio",
-        "stream",
-      ],
-      logos,
-      colors: [
-        "#cf8592",
-        "#b285be",
-        "#93a1c6",
-        "#6aa18a",
-        "#78adb5",
-        "#aec889",
-        "#bc9c63",
-        "#ee9962",
-        "#c9c272",
-        "#949494",
-        "#b2b2b2",
-        "#d6d6d6",
-        "#93867d",
-        "#b3aaa3",
-        "#dad5d2",
-      ],
-      colorIndex: 0,
+
+      editCode: null,
     };
   },
   computed: {
     ...mapGetters(["presentMenu", "config"]),
-    stageScale() {
-      if (!this.editForm) return 0;
-      return Math.min(
-        ((window.innerWidth - 40) * 0.5833333) / this.editForm.width,
-        (window.innerHeight - 200) / this.editForm.height
-      );
-    },
   },
   async mounted() {
     await this.getResolutions();
-    const componentTypes = await ProgramApi.getComponentTypes();
-    this.componentTypes = componentTypes;
     let { code, data, msg } = await GetRolePermissions({
       MenuCode: this.presentMenu.code,
     });
@@ -514,165 +122,6 @@ export default {
     } else this.$message({ message: msg, type: "error" });
   },
   methods: {
-    dragBoundFunc() {},
-    setActiveComponent(i) {
-      this.activeComponent = this.editForm.components[i];
-      this.selectedShapeName = "name_" + i;
-      this.updateTransformer();
-    },
-    transformBoundBoxFunc(oldBox, newBox) {
-      if (
-        newBox.x < 0 ||
-        newBox.y < 0 ||
-        newBox.x + newBox.width > this.editForm.width ||
-        newBox.y + newBox.height > this.editForm.height
-      )
-        return oldBox;
-      return newBox;
-    },
-    updateTransformer() {
-      // here we need to manually attach or detach Transformer node
-      const transformerNode = this.$refs.transformer.getNode();
-      const stage = transformerNode.getStage();
-      const { selectedShapeName } = this;
-
-      const selectedNode = stage.findOne("." + selectedShapeName);
-      // do nothing if selected node is already attached
-      if (selectedNode === transformerNode.node()) {
-        return;
-      }
-
-      if (selectedNode) {
-        // attach to another node
-        transformerNode.nodes([selectedNode]);
-      } else {
-        // remove transformer
-        transformerNode.nodes([]);
-      }
-      transformerNode.getLayer().batchDraw();
-    },
-    handleStageMouseDown(e) {
-      // clicked on stage - clear selection
-      if (e.target === e.target.getStage()) {
-        this.selectedShapeName = "";
-        this.updateTransformer();
-        return;
-      }
-
-      // clicked on transformer - do nothing
-      const clickedOnTransformer =
-        e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-
-      // find clicked rect by its name
-      const name = e.target.name();
-
-      const component = this.editForm.components[name.replace("name_", "")];
-      if (component) {
-        this.activeComponent = component;
-        this.selectedShapeName = name;
-      } else {
-        this.selectedShapeName = "";
-      }
-      this.updateTransformer();
-    },
-    handleTransformEnd({ target }) {
-      const {
-        index,
-        attrs: { x, y, scaleX, scaleY },
-      } = target;
-      const component = this.editForm.components[index];
-      let newWidth = component.width * scaleX;
-
-      let newHeight = component.height * scaleY;
-
-      Object.assign(component, {
-        width: Math.floor(newWidth),
-        height: Math.floor(newHeight),
-        offsetX: Math.floor(x),
-        offsetY: Math.floor(y),
-      });
-      target.scaleX(1);
-      target.scaleY(1);
-      this.setComponents();
-    },
-    handleDragend({
-      target: {
-        index,
-        attrs: { x, y },
-      },
-    }) {
-      const component = this.editForm.components[index];
-      Object.assign(component, {
-        offsetX: Math.floor(x),
-        offsetY: Math.floor(y),
-      });
-      this.setComponents();
-    },
-    setComponents() {
-      this.editForm.components.forEach(
-        (component, i) => (component.zIndex = i + 1)
-      );
-      this.editForm = {
-        ...this.editForm,
-      };
-    },
-    appendComponent(typeCode) {
-      if (!this.editForm.components) this.editForm.components = [];
-      const component = {
-        typeCode,
-        zIndex: this.editForm.components.length,
-        width: 200,
-        height: 200,
-        offsetX: 0,
-        offsetY: 0,
-        materials: [],
-        color: this.colors[this.colorIndex],
-      };
-      switch (typeCode) {
-        case "image":
-          component.transition = "随机";
-          component.transitionPeriod = 15;
-          component.materials = [];
-          break;
-
-        default:
-          break;
-      }
-      this.colorIndex++;
-      if (this.colorIndex === this.colors.length) this.colorIndex = 0;
-      this.activeComponent = component;
-      this.editForm.components.push(component);
-      this.editForm = {
-        ...this.editForm,
-      };
-    },
-    down(i) {
-      const tmp = this.editForm.components[i + 1];
-      this.editForm.components[i + 1] = this.editForm.components[i];
-      this.editForm.components[i] = tmp;
-      this.setComponents();
-    },
-    up(i) {
-      const tmp = this.editForm.components[i - 1];
-      this.editForm.components[i - 1] = this.editForm.components[i];
-      this.editForm.components[i] = tmp;
-      this.setComponents();
-    },
-    top(i) {
-      const component = this.editForm.components[i];
-      this.editForm.components.splice(i, 1);
-      this.editForm.components.unshift(component);
-      this.setComponents();
-    },
-    bottom(i) {
-      const component = this.editForm.components[i];
-      this.editForm.components.splice(i, 1);
-      this.editForm.components.push(component);
-      this.setComponents();
-    },
     async getResolutions() {
       const { code, data, msg } = await ProgramApi.getResolutions();
       if (code === "200") this.resolutions = data;
@@ -699,14 +148,9 @@ export default {
     addProgram() {
       this.showAddForm = true;
     },
-    async editProgram(code) {
-      const res = await ProgramApi.getDetail({ code });
-      if (res.code === "200") {
-        this.editForm = res.data;
-        this.showEditForm = true;
-      } else {
-        this.$message({ type: "error", message: res.msg });
-      }
+    editProgram(code) {
+      this.editCode = code;
+      this.showEditForm = true;
     },
     dateFormatter(row) {
       let [date, time] = row.updateTime.split("T");
@@ -738,7 +182,7 @@ export default {
       }
     },
   },
-  components: { TablePage, pagination, ProgramTable, AddForm },
+  components: { TablePage, pagination, ProgramTable, AddForm, EditForm },
 };
 </script>
 
@@ -746,91 +190,8 @@ export default {
 .gap {
   margin: 20px auto;
 }
-.logo {
-  width: 57px;
-  height: 57px;
-}
+
 .prefix {
   margin-right: 10px;
-}
-.edit .el-dialog {
-  width: 100%;
-  height: 100%;
-}
-.canvas-wrapper {
-  height: calc(100vh - 200px);
-  position: relative;
-}
-.form {
-  margin-left: 36px;
-  border-left: 1px solid #999;
-  height: calc(100vh - 200px);
-  overflow-y: scroll;
-}
-h5 {
-  padding-left: 19px;
-  color: rgba(80, 80, 80, 1);
-  font-size: 19px;
-  line-height: 50px;
-  font-weight: bold;
-  border-top: 1px solid #999;
-}
-.component-item {
-  position: relative;
-  display: flex;
-  padding-left: 25px;
-  font-size: 14px;
-  line-height: 28px;
-  margin-bottom: 12px;
-  justify-content: space-between;
-}
-.selected {
-  background: #eff9ff;
-}
-.updown {
-  width: 30px;
-}
-.stage {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  transform-origin: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.cube {
-  position: absolute;
-  display: block;
-  width: 14px;
-  height: 14px;
-  left: 5px;
-  top: 7px;
-}
-.pos-items {
-  position: relative;
-  padding-left: 40px;
-}
-.pos-items::before {
-  content: "位置";
-  position: absolute;
-  top: 14px;
-  left: 0;
-}
-.short-item {
-  display: inline-block;
-  width: 100px;
-}
-.short-item + .short-item {
-  margin-left: 10px;
-}
-</style>
-<style>
-.konvajs-content {
-  flex-shrink: 0;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
 }
 </style>

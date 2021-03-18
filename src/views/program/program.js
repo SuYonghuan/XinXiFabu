@@ -34,4 +34,5 @@ export class ProgramApi {
         ProgramApi.componentTypes = data
         return data;
     };
+    static getMaterials = cPost('/Api/Programme/ComponentMaterials');
 }
