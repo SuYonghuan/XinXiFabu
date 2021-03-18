@@ -608,6 +608,48 @@
                   ></el-table-column>
                 </el-table>
               </template>
+              <template v-else-if="activeComponent.typeCode === 'weather'">
+                <el-form-item label="城市名称">
+                  <el-input
+                    :maxlength="20"
+                    v-model="activeComponent.cityName"
+                  ></el-input>
+                </el-form-item>
+                <el-form-item label="数据选择">
+                  <el-select v-model="activeComponent.components" multiple>
+                    <el-option
+                      :key="key"
+                      :value="key"
+                      :label="key"
+                      v-for="key in weatherComponents"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="字体颜色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.fontColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+                <el-form-item label="字体大小">
+                  <el-input-number
+                    v-model="activeComponent.fontSize"
+                    :step="1"
+                    step-strictly
+                    :min="1"
+                    :max="1000"
+                  ></el-input-number
+                  >px
+                </el-form-item>
+                <el-form-item label="背景色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.backgroundColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+              </template>
             </el-form>
           </template>
         </el-form>
@@ -731,6 +773,14 @@ export default {
         "url",
         "audio",
         "stream",
+      ],
+      weatherComponents: [
+        "城市",
+        "天气图标",
+        "温度",
+        "风力",
+        "空气质量",
+        "湿度",
       ],
       colorIndex: 0,
       logos,
@@ -894,9 +944,11 @@ export default {
         case "url":
           component.refreshPeriod = "00:00:00";
           component.materials = [];
+          break;
         case "html":
           component.refreshPeriod = "00:00:00";
           component.materials = [];
+          break;
         case "text":
           component.backgroundColor = "#FFFFFF";
           component.backgroundOpacity = 100;
@@ -906,6 +958,14 @@ export default {
           component.animationSpeed = "中等";
           component.animation = "从左往右";
           component.materials = [];
+          break;
+        case "weather":
+          component.cityName = "";
+          component.components = this.weatherComponents;
+          component.fontColor = "#000000";
+          component.fontSize = 16;
+          component.backgroundColor = "#FFFFFF";
+          break;
         default:
           break;
       }
