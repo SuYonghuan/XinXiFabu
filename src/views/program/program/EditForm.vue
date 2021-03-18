@@ -461,7 +461,7 @@
                   >
                   </el-time-picker>
                 </el-form-item>
-                <el-form-item required label="素材" prop="materials">
+                <el-form-item label="素材" prop="materials">
                   <el-button
                     type="primary"
                     v-if="!activeComponent.materials.length"
@@ -486,6 +486,127 @@
                     ></el-button>
                   </div>
                 </el-form-item>
+              </template>
+              <template v-else-if="activeComponent.typeCode === 'text'">
+                <el-form-item label="背景色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.backgroundColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+                <el-form-item label="背景透明度" prop="backgroundOpacity">
+                  <el-slider
+                    v-model="activeComponent.backgroundOpacity"
+                  ></el-slider>
+                </el-form-item>
+                <el-form-item label="字体颜色" prop="backgroundColor">
+                  <el-color-picker
+                    v-model="activeComponent.fontColor"
+                    show-alpha
+                  >
+                  </el-color-picker>
+                </el-form-item>
+                <el-form-item label="字体大小">
+                  <el-input-number
+                    v-model="activeComponent.fontSize"
+                    :step="1"
+                    step-strictly
+                    :min="1"
+                    :max="1000"
+                  ></el-input-number
+                  >px
+                </el-form-item>
+                <el-form-item label="样式">
+                  <el-select v-model="activeComponent.fontStyle">
+                    <el-option
+                      :key="key"
+                      :value="key"
+                      :label="key"
+                      v-for="key in ['正常', '加粗', '斜体', '加粗、斜体']"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="滚动速度">
+                  <el-select v-model="activeComponent.animationSpeed">
+                    <el-option
+                      :key="key"
+                      :value="key"
+                      :label="key"
+                      v-for="key in ['慢', '中等', '快', '很快']"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="字幕滚动">
+                  <el-select v-model="activeComponent.animation">
+                    <el-option
+                      :key="key"
+                      :value="key"
+                      :label="key"
+                      v-for="key in [
+                        '从左往右',
+                        '从右往左',
+                        '从上往下',
+                        '从下往上',
+                      ]"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="素材">
+                  <el-button type="primary" @click="openMaterialModal"
+                    >添加素材</el-button
+                  >
+                </el-form-item>
+                <el-table
+                  v-if="activeComponent.materials.length"
+                  :data="activeComponent.materials"
+                >
+                  <el-table-column prop="name" key="name" label="名称">
+                    <template slot-scope="scope">
+                      <div class="ellipsis">{{ scope.row.name }}</div>
+                    </template></el-table-column
+                  >
+                  <el-table-column
+                    prop="op"
+                    key="op"
+                    label="操作"
+                    width="180px"
+                  >
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-view"
+                        @click="preview(scope.row)"
+                      ></el-button>
+                      <el-button
+                        v-if="scope.$index !== 0"
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-up"
+                        @click="swap(scope.$index, scope.$index - 1)"
+                      ></el-button>
+                      <el-button
+                        v-if="
+                          scope.$index !== activeComponent.materials.length - 1
+                        "
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-down"
+                        @click="swap(scope.$index, scope.$index + 1)"
+                      ></el-button>
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-delete-solid"
+                        @click="removeMaterial(scope.$index)"
+                      ></el-button> </template
+                  ></el-table-column>
+                </el-table>
               </template>
             </el-form>
           </template>
@@ -778,12 +899,12 @@ export default {
           component.materials = [];
         case "text":
           component.backgroundColor = "#FFFFFF";
-          component.backgroundOpacity = 1;
-          component.color = "#000000";
+          component.backgroundOpacity = 100;
+          component.fontColor = "#000000";
           component.fontSize = 16;
           component.fontStyle = "正常";
-          conponent.animationSpeed = "中等";
-          conponent.animation = "从左往右";
+          component.animationSpeed = "中等";
+          component.animation = "从左往右";
           component.materials = [];
         default:
           break;
@@ -828,6 +949,11 @@ export default {
       });
       if (code === "200") {
         this.form = data;
+        this.form.components &&
+          this.form.components.forEach((component) => {
+            component.color = this.colors[this.colorIndex];
+            this.colorIndex++;
+          });
       } else {
         this.$message({ type: "error", message: msg });
       }
