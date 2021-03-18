@@ -6,7 +6,7 @@
         <span class="prefix">分辨率：{{ form.resolution }}</span>
       </el-col>
       <el-col style="text-align: right;">
-        <el-button @click="showEditForm = false">预 览</el-button>
+        <el-button disabled>预 览</el-button>
         <el-button type="primary" @click="submit">保 存</el-button>
         <el-button @click="$emit('close')">关 闭</el-button>
       </el-col>
@@ -733,6 +733,56 @@
                   ></el-table-column>
                 </el-table>
               </template>
+              <template v-else-if="activeComponent.typeCode === 'stream'">
+                <el-form-item label="素材">
+                  <el-button type="primary" @click="openMaterialModal"
+                    >添加素材</el-button
+                  >
+                </el-form-item>
+                <el-table
+                  v-if="activeComponent.materials.length"
+                  :data="activeComponent.materials"
+                >
+                  <el-table-column prop="name" key="name" label="名称">
+                    <template slot-scope="scope">
+                      <div class="ellipsis">{{ scope.row.name }}</div>
+                    </template></el-table-column
+                  >
+                  <el-table-column
+                    prop="op"
+                    key="op"
+                    label="操作"
+                    width="180px"
+                  >
+                    <template slot-scope="scope">
+                      <el-button
+                        v-if="scope.$index !== 0"
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-up"
+                        @click="swap(scope.$index, scope.$index - 1)"
+                      ></el-button>
+                      <el-button
+                        v-if="
+                          scope.$index !== activeComponent.materials.length - 1
+                        "
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-down"
+                        @click="swap(scope.$index, scope.$index + 1)"
+                      ></el-button>
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-delete-solid"
+                        @click="removeMaterial(scope.$index)"
+                      ></el-button> </template
+                  ></el-table-column>
+                </el-table>
+              </template>
             </el-form>
           </template>
         </el-form>
@@ -1056,6 +1106,8 @@ export default {
           break;
         case "audio":
           component.materials = [];
+        case "stream":
+          component.materials = [];
           break;
         default:
           break;
@@ -1092,7 +1144,12 @@ export default {
       this.form.components.push(component);
       this.setComponents();
     },
-    submit() {},
+    async submit() {
+      const isValid = await new Promise((resolve) =>
+        this.$refs.form.validate(resolve)
+      );
+      console.log(isValid, this.form);
+    },
     async init() {
       this.form = null;
       const { data, code, msg } = await ProgramApi.getDetail({
