@@ -85,8 +85,7 @@
       v-if="canI.getmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      border
-      stripe
+      height="620px"
       ref="table"
     >
       <el-table-column type="index" key="index"></el-table-column>
@@ -188,15 +187,13 @@
         </template>
       </el-table-column>
     </el-table>
-    <template v-slot:footer>
-      <pagination
-        :list="list"
-        :page="pageIndex"
-        :total="total"
-        @handleSizeChange="handleSizeChange"
-        @handleCurrentChange="handleCurrentChange"
-      />
-    </template>
+    <pagination
+      :list="list"
+      :page="pageIndex"
+      :total="total"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"
+    />
 
     <el-dialog
       :title="dialogTitle"

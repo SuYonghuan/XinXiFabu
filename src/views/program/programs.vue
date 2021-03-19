@@ -44,15 +44,13 @@
       @editProgram="editProgram"
       @deleteProgram="deleteProgram"
     ></program-table>
-    <template v-slot:footer>
-      <pagination
-        :list="list"
-        :page="pageIndex"
-        :total="total"
-        @handleSizeChange="handleSizeChange"
-        @handleCurrentChange="handleCurrentChange"
-      />
-    </template>
+    <pagination
+      :list="list"
+      :page="pageIndex"
+      :total="total"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"
+    />
     <el-dialog title="新增节目" append-to-body :visible.sync="showAddForm">
       <add-form
         :resolutions="resolutions"

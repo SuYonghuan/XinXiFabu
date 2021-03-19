@@ -1,5 +1,10 @@
 <template>
-  <el-table v-if="canI.getprogrammelist" :data="list" border stripe ref="table">
+  <el-table
+    v-if="canI.getprogrammelist"
+    :data="list"
+    height="620px"
+    ref="table"
+  >
     <el-table-column type="index" key="index"></el-table-column>
     <el-table-column prop="name" key="name" label="节目名称"></el-table-column>
     <el-table-column prop="resolution" key="resolution" label="分辨率">

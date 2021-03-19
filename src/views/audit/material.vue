@@ -53,8 +53,7 @@
       v-if="canI.auditmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      border
-      stripe
+      height="620px"
       ref="table"
     >
       <el-table-column type="index" key="index"></el-table-column>
@@ -138,6 +137,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <pagination
+      :list="list"
+      :page="pageIndex"
+      :total="total"
+      @handleSizeChange="handleSizeChange"
+      @handleCurrentChange="handleCurrentChange"
+    />
     <el-dialog title="审核" append-to-body :visible.sync="showForm">
       <el-form ref="form" :model="form" :rules="rules">
         <el-form-item label="审核结果" prop="audit">
@@ -178,15 +184,6 @@
         ></object>
       </template>
     </el-dialog>
-    <template v-slot:footer>
-      <pagination
-        :list="list"
-        :page="pageIndex"
-        :total="total"
-        @handleSizeChange="handleSizeChange"
-        @handleCurrentChange="handleCurrentChange"
-      />
-    </template>
   </table-page>
 </template>
 
