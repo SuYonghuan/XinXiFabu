@@ -26,6 +26,7 @@ export class ProgramApi {
     static get = cPost(`/Api/Programme/ProgrammeList`);
     static getDetail = cPost(`/Api/Programme/ProgrammeInfo`);
     static post = cPost(`/Api/Programme/AddProgramme`);
+    static put = cPost('/Api/Programme/EditProgramme')
     static delete = cPost('/Api/Programme/Del');
     static getResolutions = cPost('/Api/Programme/ResolutionList');
     static async getComponentTypes() {

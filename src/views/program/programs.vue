@@ -71,6 +71,10 @@
         :showEditForm="showEditForm"
         :code="editCode"
         @close="showEditForm = false"
+        @saved="
+          getList();
+          showEditForm = false;
+        "
       ></edit-form>
     </el-dialog>
   </table-page>

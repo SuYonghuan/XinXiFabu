@@ -126,67 +126,84 @@
           >
             <span class="cube" :style="'background: ' + component.color"></span>
             <span>{{ componentTypes[component.typeCode] }}组件</span>
-            <template v-if="form.components.length === 1"></template>
-            <el-button-group v-else-if="i === 0">
+            <template v-if="form.components.length === 1">
               <el-button
                 size="mini"
                 type="text"
                 class="updown"
-                icon="el-icon-arrow-down"
-                @click="down(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-bottom"
-                @click="bottom(i)"
-              ></el-button>
-            </el-button-group>
-            <el-button-group v-else-if="i === form.components.length - 1">
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-up"
-                @click="up(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-top"
-                @click="top(i)"
-              ></el-button>
-            </el-button-group>
+                icon="el-icon-delete-solid"
+                @click="removeComponent(i)"
+              ></el-button
+            ></template>
             <el-button-group v-else>
+              <template v-if="i === 0">
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-arrow-down"
+                  @click="down(i)"
+                ></el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-bottom"
+                  @click="bottom(i)"
+                ></el-button>
+              </template>
+              <template v-else-if="i === form.components.length - 1">
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-arrow-up"
+                  @click="up(i)"
+                ></el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-top"
+                  @click="top(i)"
+                ></el-button>
+              </template>
+              <template v-else>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-top"
+                  @click="top(i)"
+                ></el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-arrow-up"
+                  @click="up(i)"
+                ></el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-arrow-down"
+                  @click="down(i)"
+                ></el-button>
+                <el-button
+                  size="mini"
+                  type="text"
+                  class="updown"
+                  icon="el-icon-bottom"
+                  @click="bottom(i)"
+                ></el-button>
+              </template>
               <el-button
                 size="mini"
                 type="text"
                 class="updown"
-                icon="el-icon-top"
-                @click="top(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-up"
-                @click="up(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-down"
-                @click="down(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-bottom"
-                @click="bottom(i)"
+                icon="el-icon-delete-solid"
+                @click="removeComponent(i)"
               ></el-button>
             </el-button-group>
           </div>
@@ -204,7 +221,7 @@
                 >选择素材</el-button
               >
               <div v-else>
-                {{ form.backgroundMaterial.name }}
+                {{ form.backgroundMaterial.name || "默认名称" }}
                 <el-button
                   size="mini"
                   type="text"
@@ -814,7 +831,11 @@
         >
           <div class="item">
             <object v-if="material.fileUrl" :data="material.fileUrl"></object>
-            <img v-else :src="logos[activeComponent.typeCode]" alt="" />
+            <img
+              v-else-if="activeComponent"
+              :src="logos[activeComponent.typeCode]"
+              alt=""
+            />
             <p v-if="material.resolution" class="meta">
               {{ material.resolution }}
             </p>
@@ -861,6 +882,21 @@ function importAll(r) {
   return obj;
 }
 const logos = importAll(require.context("./logo", false, /\.(png|jpe?g|svg)$/));
+const componentKeys = [
+  "code",
+  "addTime",
+  "typeCode",
+  "zIndex",
+  "width",
+  "height",
+  "offsetX",
+  "offsetY",
+  "materials",
+];
+const flatenComponent = ({ config, ...component }) => {
+  if (!config) return { ...component };
+  return { ...component, ...config };
+};
 export default {
   props: ["showEditForm", "code"],
   data() {
@@ -873,8 +909,8 @@ export default {
           {
             validator: (rule, value, callback) => {
               if (value === "00:00:00") callback(new Error("节目时长不能为0"));
+              return;
             },
-            trigger: "blur",
           },
         ],
       },
@@ -925,6 +961,7 @@ export default {
       total: 0,
       showPreview: false,
       previewMaterial: null,
+      selectedShapeName: "",
     };
   },
   computed: {
@@ -1119,6 +1156,10 @@ export default {
       this.form = {
         ...this.form,
       };
+      this.$nextTick(() => {
+        this.selectedShapeName = "name_" + (this.form.components.length - 1);
+        this.updateTransformer();
+      });
     },
     down(i) {
       const tmp = this.form.components[i + 1];
@@ -1144,24 +1185,81 @@ export default {
       this.form.components.push(component);
       this.setComponents();
     },
+    removeComponent(i) {
+      this.$confirm("您确认要删除该组件?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        this.form.components.splice(i, 1);
+        this.activeComponent = null;
+        this.selectedShapeName = "";
+        this.updateTransformer();
+        this.setComponents();
+      });
+    },
     async submit() {
-      const isValid = await new Promise((resolve) =>
-        this.$refs.form.validate(resolve)
-      );
-      console.log(isValid, this.form);
+      if (this.form.duration === "00:00:00")
+        return this.$message({ type: "error", message: "节目时长不能为0" });
+      const {
+        duration,
+        backgroundColor,
+        backgroundMaterial,
+        components,
+      } = this.form;
+      const { code, msg } = await ProgramApi.put({
+        programCode: this.form.code,
+        duration,
+        backgroundColor,
+        backgroundMaterial: backgroundMaterial ? backgroundMaterial.code : null,
+        components: components
+          ? components
+              .map(({ color, ...component }) => component)
+              .map((component) =>
+                Object.entries(component).reduce(
+                  (acc, [k, v]) =>
+                    componentKeys.includes(k)
+                      ? { ...acc, [k]: v }
+                      : { ...acc, config: { ...acc.config, [k]: v } },
+                  { config: {} }
+                )
+              )
+              .map((component, i) => ({
+                ...component,
+                zIndex: i,
+              }))
+          : [],
+      });
+      if (code === "200") {
+        this.$message({ type: "success", message: msg });
+        this.$emit("saved");
+      } else this.$message({ type: "error", message: msg });
+    },
+    reset() {
+      this.form = null;
+      this.activeComponent = null;
+      this.selectedShapeName = "";
+      this.colorIndex = 0;
     },
     async init() {
-      this.form = null;
+      this.reset();
       const { data, code, msg } = await ProgramApi.getDetail({
         code: this.code,
       });
       if (code === "200") {
         this.form = data;
-        this.form.components &&
-          this.form.components.forEach((component) => {
-            component.color = this.colors[this.colorIndex];
-            this.colorIndex++;
-          });
+        if (this.form.backgroundMaterial) {
+          this.form.backgroundMaterial = {
+            code: this.form.backgroundMaterial,
+            fileUrl: this.form.backgroundMaterialUrl,
+          };
+        }
+        if (!this.form.components) this.form.components = [];
+        this.form.components = this.form.components.map(flatenComponent);
+        this.form.components.forEach((component) => {
+          component.color = this.colors[this.colorIndex];
+          this.colorIndex++;
+        });
       } else {
         this.$message({ type: "error", message: msg });
       }
