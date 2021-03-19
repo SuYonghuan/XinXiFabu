@@ -1095,6 +1095,8 @@ export default {
     },
     appendComponent(typeCode) {
       if (!this.form.components) this.form.components = [];
+      if (this.form.components.length >= 8)
+        return this.$message({ type: "warning", message: "最多添加8个组件。" });
       const component = {
         typeCode,
         zIndex: this.form.components.length,
