@@ -29,23 +29,6 @@
             @keyup.enter.native="getList"
           >
           </el-input>
-          <span class="prefix">审核状态</span>
-          <el-select
-            class="prefix"
-            v-model="statusCode"
-            placeholder="请选择"
-            size="small"
-            style="width: 250px"
-            :clearable="true"
-          >
-            <el-option
-              v-for="(name, code) in statusTypes"
-              :key="code"
-              :label="name"
-              :value="Number(code)"
-            >
-            </el-option>
-          </el-select>
           <el-button
             @click="getList"
             size="small"
@@ -87,6 +70,7 @@
       @selection-change="handleSelectionChange"
       height="620px"
       ref="table"
+      @filter-change="handleFilterChange"
     >
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
@@ -95,7 +79,14 @@
         width="55"
       ></el-table-column>
       <el-table-column prop="name" key="name" label="素材名"></el-table-column>
-      <el-table-column prop="typeName" key="typeName" label="素材类型">
+      <el-table-column
+        prop="typeCode"
+        key="typeCode"
+        column-key="typeCode"
+        label="素材类型"
+        :filters="materialTypeFilters"
+        :filter-multiple="false"
+      >
         <template slot-scope="scope">
           {{ materialTypes[scope.row.typeCode] }}
         </template>
@@ -115,7 +106,14 @@
           }}
         </template>
       </el-table-column>
-      <el-table-column prop="statusCode" key="statusCode" label="审核状态">
+      <el-table-column
+        prop="statusCode"
+        key="statusCode"
+        column-key="statusCode"
+        label="审核状态"
+        :filters="statusTypeFilters"
+        :filter-multiple="false"
+      >
         <template slot-scope="scope">
           {{ statusTypes[scope.row.statusCode] }}
         </template>
@@ -505,6 +503,7 @@ export default {
       form: {},
       progress: 0,
       materialTypes: {},
+      typeCode: null,
       auditTypes: {},
       statusTypes: {
         0: "待审核",
@@ -628,6 +627,18 @@ export default {
     isEdit() {
       return !!this.form.code;
     },
+    materialTypeFilters() {
+      return Object.entries(this.materialTypes).map(([v, k]) => ({
+        text: k,
+        value: v,
+      }));
+    },
+    statusTypeFilters() {
+      return Object.entries(this.statusTypes).map(([v, k]) => ({
+        text: k,
+        value: Number(v),
+      }));
+    },
   },
   async mounted() {
     const [materialTypes, auditTypes] = await Promise.all([
@@ -650,6 +661,12 @@ export default {
   },
 
   methods: {
+    handleFilterChange({ typeCode, statusCode }) {
+      this.typeCode = !typeCode || !typeCode.length ? null : typeCode[0];
+      this.statusCode =
+        !statusCode || !statusCode.length ? null : statusCode[0];
+      this.getList();
+    },
     handleTypeCodeChange(val) {
       if (val === "ipc") {
         this.form = {
@@ -916,11 +933,12 @@ export default {
       this.getList();
     },
     async getList() {
-      const { pageIndex, pageSize, name, creator, statusCode } = this;
+      const { pageIndex, pageSize, name, creator, statusCode, typeCode } = this;
       const { code, data, msg } = await MaterialApi.get({
         name,
         creator,
         statusCode,
+        typeCode,
         paging: 1,
         pageIndex,
         pageSize,
