@@ -37,3 +37,13 @@ export class ProgramApi {
     };
     static getMaterials = cPost('/Api/Programme/ComponentMaterials');
 }
+
+export class ScheduleApi {
+    static get = cPost("/Api/Schedule/ScheduleList");
+    static async getPlayModes() {
+        if (ScheduleApi.playMode) return ScheduleApi.playMode
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "PlayMode" })
+        ScheduleApi.playMode = data
+        return data;
+    };
+}

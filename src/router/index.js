@@ -183,6 +183,11 @@ const routes = [
         name: '节目制作',
         component: () => import('views/program/programs'),
       },
+      {
+        path: '/program/schedule',
+        name: '日程管理',
+        component: () => import('views/program/schedule'),
+      },
     ]
   },
 ]
