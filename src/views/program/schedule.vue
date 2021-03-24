@@ -1,5 +1,5 @@
 <template>
-  <table-page class="index">
+  <table-page class="index schedule">
     <template v-slot:header>
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item>信息发布</el-breadcrumb-item>
@@ -49,7 +49,7 @@
             size="small"
             type="primary"
             v-if="canI.addschedule"
-            @click="addDynamic"
+            @click="handleAdd"
             >新建日程</el-button
           >
           <el-button
@@ -84,13 +84,13 @@
         label="日程名称"
       ></el-table-column>
       <el-table-column
-        prop="typeCode"
-        key="typeCode"
-        column-key="typeCode"
+        prop="playMode"
+        key="playMode"
+        column-key="playMode"
         label="播放方式"
       >
         <template slot-scope="scope">
-          {{ materialTypes[scope.row.typeCode] }}
+          {{ playModes[scope.row.playMode] }}
         </template>
       </el-table-column>
       <el-table-column
@@ -142,16 +142,10 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
+            type="primary"
             v-if="canI.editschedule"
             @click="handleEdit(scope.row)"
             >编辑</el-button
-          >
-          <el-button
-            size="mini"
-            type="success"
-            v-if="canI.getscheduleinfo"
-            @click="preview(scope.row)"
-            >查看</el-button
           >
           <el-popconfirm
             v-if="canI.deleteschedule"
@@ -177,12 +171,21 @@
       @handleSizeChange="handleSizeChange"
       @handleCurrentChange="handleCurrentChange"
     />
-    <el-dialog title="新建日程" append-to-body :visible.sync="showAddForm">
+    <el-dialog
+      :title="editCode ? '编辑日程' : '新建日程'"
+      class="schedule-add-dialog"
+      append-to-body
+      :visible.sync="showAddForm"
+    >
       <add-form
         :playModes="playModes"
         :showAddForm="showAddForm"
+        :intervalTypes="intervalTypes"
+        :resolutions="resolutions"
+        :code="editCode"
         @closeAddForm="showAddForm = false"
-        @submitAddForm="submitAddForm"
+        @added="postAdd"
+        @saved="postSave"
       ></add-form>
     </el-dialog>
   </table-page>
@@ -191,7 +194,7 @@
 <script>
 import TablePage from "../../components/TablePage";
 import pagination from "../../components/pagination/pagination";
-import { ScheduleApi } from "./program.js";
+import { ScheduleApi, ProgramApi } from "./program.js";
 import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
@@ -214,22 +217,15 @@ export default {
       progress: 0,
       materialTypes: {},
       playModes: {},
+      intervalTypes: {},
+      resolutions: [],
+      editCode: null,
       typeCode: null,
       auditTypes: {},
       statusTypes: {
         0: "待审核",
         1: "审核通过",
         2: "不通过",
-      },
-      protocols: {
-        RTMP: "实时流协议",
-        UDP: "数据报协议",
-        HTTP: "超文本传输协议",
-        RTP: "实时传输协议",
-      },
-      bitRateTypes: {
-        main: "主码流",
-        sub: "副码流",
       },
       showModal: false,
       modalMat: null,
@@ -256,89 +252,7 @@ export default {
     isIpc() {
       return this.form.typeCode === "ipc";
     },
-    rules() {
-      return this.form.typeCode === "在线网页" ||
-        this.form.typeCode === "流媒体"
-        ? {
-            typeCode: [
-              {
-                required: true,
-                message: "请选择动态素材类型",
-                trigger: "blur",
-              },
-            ],
-            name: [
-              { required: true, message: "请输入素材名称", trigger: "blur" },
-            ],
-            url: [{ required: true, message: "请输入url", trigger: "blur" }],
-            desc: [
-              { required: true, message: "请输入素材描述", trigger: "blur" },
-            ],
-          }
-        : this.form.typeCode === "ipc"
-        ? {
-            name: [
-              { required: true, message: "请输入素材名称", trigger: "blur" },
-            ],
-            ipType: [
-              { required: true, message: "请选择IP类型", trigger: "blur" },
-            ],
-            ipAddress: [
-              { required: true, message: "请输入IP地址", trigger: "blur" },
-            ],
-            port: [
-              { required: true, message: "请输入端口号", trigger: "blur" },
-            ],
-            channel: [
-              { required: true, message: "请输入通道号", trigger: "blur" },
-            ],
-            userName: [
-              { required: true, message: "请输入用户名", trigger: "blur" },
-            ],
-            password: [
-              { required: true, message: "请输入密码", trigger: "blur" },
-            ],
-            protocol: [
-              { required: true, message: "请选择传输协议", trigger: "blur" },
-            ],
-            bitRateType: [
-              { required: true, message: "请选择码率类型", trigger: "blur" },
-            ],
-            desc: [
-              { required: true, message: "请输入素材描述", trigger: "blur" },
-            ],
-          }
-        : {
-            name: [
-              { required: true, message: "请输入素材名称", trigger: "blur" },
-            ],
-            file: [
-              {
-                type: "array",
-                required: true,
-                message: "请上传素材",
-                trigger: "blur",
-              },
-            ],
-            auditType: [
-              { required: true, message: "请选择审核方式", trigger: "blur" },
-            ],
-            desc: [
-              { required: true, message: "请输入素材描述", trigger: "blur" },
-            ],
-            sameReplace: [
-              {
-                type: "boolean",
-                required: true,
-                message: "请选择是否同名替换",
-                trigger: "blur",
-              },
-            ],
-          };
-    },
-    isEdit() {
-      return !!this.form.code;
-    },
+
     materialTypeFilters() {
       return Object.entries(this.materialTypes).map(([v, k]) => ({
         text: k,
@@ -356,8 +270,20 @@ export default {
     let { code, data, msg } = await GetRolePermissions({
       MenuCode: this.presentMenu.code,
     });
-    const [playModes] = await Promise.all([ScheduleApi.getPlayModes()]);
-    this.playModes = playModes;
+    const [
+      playModes,
+      intervalTypes,
+      { data: resolutions },
+    ] = await Promise.all([
+      ScheduleApi.getPlayModes(),
+      ScheduleApi.getIntervalTypes(),
+      ProgramApi.getResolutions(),
+    ]);
+    Object.assign(this, {
+      playModes,
+      intervalTypes,
+      resolutions,
+    });
     if (code === ERR_OK) {
       this.canI = data
         .map(({ actionId }) => actionId)
@@ -370,6 +296,15 @@ export default {
   },
 
   methods: {
+    postAdd() {
+      this.reset();
+      this.getList();
+      this.showAddForm = false;
+    },
+    postSave() {
+      this.getList();
+      this.showAddForm = false;
+    },
     handleFilterChange({ typeCode, statusCode }) {
       this.typeCode = !typeCode || !typeCode.length ? null : typeCode[0];
       this.statusCode =
@@ -412,8 +347,15 @@ export default {
       if (code === "200") this.getList();
     },
     async bulkDelete() {
-      await this.handleDelete(this.toDelCodes);
-      this.toDelCodes = [];
+      try {
+        await this.$confirm("您确认要进行批量删除吗?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        await this.handleDelete(this.toDelCodes);
+        this.toDelCodes = [];
+      } catch (error) {}
     },
     dateFormatter(row) {
       let [date, time] = row.addTime.split("T");
@@ -423,73 +365,13 @@ export default {
     handleProgress({ percent }) {
       this.progress = percent;
     },
+    handleAdd() {
+      this.editCode = null;
+      this.showAddForm = true;
+    },
     handleEdit(row) {
-      const {
-        code,
-        name,
-        fileCode,
-        fileUrl,
-        auditType,
-        desc,
-        typeCode,
-        url,
-        ipType,
-        ipAddress,
-        port,
-        channel,
-        userName,
-        password,
-        protocol,
-        bitRateType,
-      } = row;
-      if (["流媒体", "在线网页"].includes(typeCode)) {
-        this.isStaticForm = false;
-        this.form = {
-          code,
-          typeCode,
-          name,
-          url,
-          desc,
-        };
-      } else if (typeCode === "ipc") {
-        this.isStaticForm = false;
-        this.form = {
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
-          desc,
-        };
-      } else {
-        this.form = {
-          code,
-          typeCode,
-          name,
-          file: [
-            {
-              name: fileCode,
-              url: fileUrl,
-            },
-          ],
-          auditType,
-          desc,
-          sameReplace: true,
-        };
-        this.isStaticForm = true;
-        this.progress = 0;
-      }
-
-      this.$nextTick(() => {
-        if (this.$refs.form) this.$refs.form.clearValidate();
-        this.showForm = true;
-      });
+      this.editCode = row.code;
+      this.showAddForm = true;
     },
     addStatic() {
       this.form = {
@@ -519,86 +401,7 @@ export default {
         this.showForm = true;
       });
     },
-    async submit() {
-      const isValid = await new Promise((resolve) =>
-        this.$refs.form.validate(resolve)
-      );
-      if (!isValid) return;
-      if (this.isStatic) {
-        const { name, file, auditType, desc, sameReplace, code } = this.form;
-        const res = await (this.isEdit ? ScheduleApi.put : ScheduleApi.post)({
-          name,
-          fileCode: file[0].name,
-          auditType,
-          desc,
-          sameReplace,
-          code,
-        });
-        if (res.code !== "200") return this.$message.error(res.msg);
-        this.$message.success(res.msg);
-        if (!this.isEdit) {
-          this.reset();
-        }
-        this.getList();
-        this.showForm = false;
-      } else if (this.isIpc) {
-        const {
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
-          desc,
-        } = this.form;
-        const res = await (this.isEdit
-          ? ScheduleApi.put
-          : ScheduleApi.postDynamic)({
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
-          desc,
-        });
-        if (res.code !== "200") return this.$message.error(res.msg);
-        this.$message.success(res.msg);
-        if (!this.isEdit) {
-          this.reset();
-        }
-        this.getList();
-        this.showForm = false;
-      } else {
-        const { code, typeCode, name, url, desc } = this.form;
-        const res = await (this.isEdit
-          ? ScheduleApi.put
-          : ScheduleApi.postDynamic)({
-          code,
-          typeCode,
-          name,
-          url,
-          desc,
-        });
-        if (res.code !== "200") return this.$message.error(res.msg);
-        this.$message.success(res.msg);
-        if (!this.isEdit) {
-          this.reset();
-        }
-        this.getList();
-        this.showForm = false;
-      }
-    },
+
     reset() {
       this.name = "";
       this.creator = "";
@@ -681,5 +484,10 @@ export default {
 }
 .dialog-footer {
   text-align: center;
+}
+</style>
+<style>
+.schedule-add-dialog .el-dialog {
+  width: 70%;
 }
 </style>

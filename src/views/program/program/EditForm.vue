@@ -1228,6 +1228,7 @@ export default {
               )
               .map((component, i) => ({
                 ...component,
+                materials: component.materials.map(({ code }) => code),
                 zIndex: i,
               }))
           : [],

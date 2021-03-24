@@ -40,10 +40,21 @@ export class ProgramApi {
 
 export class ScheduleApi {
     static get = cPost("/Api/Schedule/ScheduleList");
+    static post = cPost("/Api/Schedule/AddSchedule");
+    static put = cPost("/Api/Schedule/EditSchedule");
+    static delete = cPost('/Api/Schedule/Del');
+    static getDetail = cPost(`/Api/Schedule/ScheduleInfo`);
+    static async getIntervalTypes() {
+        if (ScheduleApi.intervalTypes) return ScheduleApi.intervalTypes
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "IntervalType" })
+        ScheduleApi.intervalTypes = data
+        return data;
+    };
     static async getPlayModes() {
         if (ScheduleApi.playMode) return ScheduleApi.playMode
         const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "PlayMode" })
         ScheduleApi.playMode = data
         return data;
     };
+    static getPrograms = cPost('/Api/Schedule/ProgrammeList');
 }
