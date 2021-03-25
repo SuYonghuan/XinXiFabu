@@ -46,6 +46,32 @@
         >
           <v-layer>
             <v-rect
+              name="backgroundColor"
+              :config="{
+                x: 0,
+                y: 0,
+                width: form.width,
+                height: form.height,
+                draggable: false,
+                fill: form.backgroundColor,
+                strokeEnabled: false,
+                zIndex: -2,
+              }"
+            ></v-rect>
+            <v-image
+              v-if="backgroundImage"
+              :config="{
+                x: 0,
+                y: 0,
+                width: form.width,
+                height: form.height,
+                draggable: false,
+                image: backgroundImage,
+                strokeEnabled: false,
+                zIndex: -1,
+              }"
+            ></v-image>
+            <v-rect
               v-for="(component, i) in form.components"
               :key="i"
               :name="'name_' + i"
@@ -79,6 +105,7 @@
               @dragend="handleDragend"
               @transformend="handleTransformEnd"
             ></v-rect>
+
             <v-transformer
               ref="transformer"
               :config="{
@@ -962,6 +989,7 @@ export default {
       showPreview: false,
       previewMaterial: null,
       selectedShapeName: "",
+      backgroundImage: null,
     };
   },
   computed: {
@@ -1069,10 +1097,11 @@ export default {
     },
     handleDragend({
       target: {
-        index,
-        attrs: { x, y },
+        attrs: { name, x, y },
       },
     }) {
+      if (!name.includes("_")) return;
+      const index = Number(name.split("_")[1]);
       const component = this.form.components[index];
       Object.assign(component, {
         offsetX: Math.floor(x),
@@ -1306,6 +1335,16 @@ export default {
         this.init();
       } else {
         this.form = null;
+      }
+    },
+    "form.backgroundMaterial"(val) {
+      if (!val) this.backgroundImage = null;
+      else if (val.fileUrl) {
+        const image = new Image();
+        image.src = val.fileUrl;
+        image.onload = () => {
+          this.backgroundImage = image;
+        };
       }
     },
   },
