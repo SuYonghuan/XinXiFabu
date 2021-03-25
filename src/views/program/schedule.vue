@@ -135,7 +135,7 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="220px;"
+        width="300px;"
         key="operating"
         label="操作"
       >
@@ -153,6 +153,9 @@
             v-if="canI.getscheduleinfo"
             @click="handleDetail(scope.row)"
             >查看</el-button
+          >
+          <el-button size="mini" type="warning" v-if="canI.unpublishschedule"
+            >下架</el-button
           >
           <el-popconfirm
             v-if="canI.deleteschedule"
@@ -308,6 +311,7 @@ export default {
       this.canI = data
         .map(({ actionId }) => actionId)
         .reduce((acc, nxt) => ({ ...acc, [nxt]: true }), {});
+      console.log(this.canI);
       if (this.canI.getschedulelist) {
         this.getList();
       }
