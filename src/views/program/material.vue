@@ -229,12 +229,9 @@
               @remove="form.file = []"
               :on-progress="handleProgress"
             >
-              <object
-                v-if="form.file && form.file.length"
-                class="avatar"
-                :data="form.file[0].url"
-              >
-              </object>
+              <div class="object" v-if="form.file && form.file.length">
+                <object :data="form.file[0].url"> </object>
+              </div>
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
@@ -904,7 +901,7 @@ export default {
           this.form.file = [
             {
               name: data.fileGuid,
-              url: change.url,
+              url: this.config.url + data.filePath,
             },
           ];
           this.progress = 100;
@@ -965,12 +962,19 @@ export default {
 .prefix {
   margin-right: 10px;
 }
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
 .dialog-footer {
   text-align: center;
+}
+.object {
+  position: relative;
+  width: 148px;
+  height: 148px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.object object {
+  max-width: 100%;
+  max-height: 100%;
 }
 </style>
