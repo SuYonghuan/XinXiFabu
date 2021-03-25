@@ -188,6 +188,11 @@ const routes = [
         name: '日程管理',
         component: () => import('views/program/schedule'),
       },
+      {
+        path: '/audit/schedule',
+        name: '素材审核',
+        component: () => import('views/audit/schedule'),
+      },
     ]
   },
 ]

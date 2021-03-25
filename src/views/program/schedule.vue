@@ -147,6 +147,13 @@
             @click="handleEdit(scope.row)"
             >编辑</el-button
           >
+          <el-button
+            size="mini"
+            type="success"
+            v-if="canI.getscheduleinfo"
+            @click="handleDetail(scope.row)"
+            >查看</el-button
+          >
           <el-popconfirm
             v-if="canI.deleteschedule"
             style="margin-left: 10px;"
@@ -173,7 +180,6 @@
     />
     <el-dialog
       :title="editCode ? '编辑日程' : '新建日程'"
-      class="schedule-add-dialog"
       append-to-body
       :visible.sync="showAddForm"
     >
@@ -188,6 +194,18 @@
         @saved="postSave"
       ></add-form>
     </el-dialog>
+    <el-dialog title="日程详情" append-to-body :visible.sync="showDetailForm">
+      <detail-form
+        :playModes="playModes"
+        :showForm="showDetailForm"
+        :intervalTypes="intervalTypes"
+        :resolutions="resolutions"
+        :code="editCode"
+        api="getDetail"
+        @showForm="showDetailForm = false"
+        @closeForm="showDetailForm = false"
+      ></detail-form>
+    </el-dialog>
   </table-page>
 </template>
 
@@ -199,6 +217,7 @@ import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import AddForm from "./schedule/AddForm";
+import DetailForm from "./schedule/DetailForm";
 
 export default {
   data() {
@@ -231,6 +250,7 @@ export default {
       modalMat: null,
       toDelCodes: [],
       showAddForm: false,
+      showDetailForm: false,
     };
   },
   computed: {
@@ -288,7 +308,6 @@ export default {
       this.canI = data
         .map(({ actionId }) => actionId)
         .reduce((acc, nxt) => ({ ...acc, [nxt]: true }), {});
-      console.log(this.canI);
       if (this.canI.getschedulelist) {
         this.getList();
       }
@@ -372,6 +391,10 @@ export default {
     handleEdit(row) {
       this.editCode = row.code;
       this.showAddForm = true;
+    },
+    handleDetail(row) {
+      this.editCode = row.code;
+      this.showDetailForm = true;
     },
     addStatic() {
       this.form = {
@@ -466,7 +489,7 @@ export default {
     },
   },
 
-  components: { TablePage, pagination, AddForm },
+  components: { TablePage, pagination, AddForm, DetailForm },
 };
 </script>
 
@@ -484,10 +507,5 @@ export default {
 }
 .dialog-footer {
   text-align: center;
-}
-</style>
-<style>
-.schedule-add-dialog .el-dialog {
-  width: 70%;
 }
 </style>

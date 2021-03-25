@@ -44,6 +44,9 @@ export class ScheduleApi {
     static put = cPost("/Api/Schedule/EditSchedule");
     static delete = cPost('/Api/Schedule/Del');
     static getDetail = cPost(`/Api/Schedule/ScheduleInfo`);
+    static getAuditDetail = cPost(`/Api/Schedule/AuditScheduleInfo`);
+    static getAuditList = cPost('/Api/Schedule/AuditScheduleList');
+    static audit = cPost('/Api/Schedule/AuditSchedule');
     static async getIntervalTypes() {
         if (ScheduleApi.intervalTypes) return ScheduleApi.intervalTypes
         const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "IntervalType" })
