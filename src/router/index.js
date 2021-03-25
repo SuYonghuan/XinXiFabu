@@ -193,6 +193,12 @@ const routes = [
         name: '素材审核',
         component: () => import('views/audit/schedule'),
       },
+      {
+        path: '/program/published-schedules',
+        name: '发布列表',
+        component: () => import('views/program/published-schedules'),
+      },
+
     ]
   },
 ]

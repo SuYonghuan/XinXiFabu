@@ -40,9 +40,11 @@ export class ProgramApi {
 
 export class ScheduleApi {
     static get = cPost("/Api/Schedule/ScheduleList");
+    static getPublishedList = cPost("/Api/Schedule/PublishedList");
     static post = cPost("/Api/Schedule/AddSchedule");
     static put = cPost("/Api/Schedule/EditSchedule");
     static delete = cPost('/Api/Schedule/Del');
+    static unpublish = cPost('/Api/Schedule/UnPublishSchedule');
     static getDetail = cPost(`/Api/Schedule/ScheduleInfo`);
     static getAuditDetail = cPost(`/Api/Schedule/AuditScheduleInfo`);
     static getAuditList = cPost('/Api/Schedule/AuditScheduleList');

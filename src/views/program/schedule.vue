@@ -70,13 +70,13 @@
       @selection-change="handleSelectionChange"
       height="620px"
       ref="table"
-      @filter-change="handleFilterChange"
     >
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         key="selection"
         type="selection"
         width="55"
+        :selectable="(row) => row"
       ></el-table-column>
       <el-table-column
         prop="name"
@@ -165,9 +165,21 @@
             @click="handleDetail(scope.row)"
             >查看</el-button
           >
-          <el-button size="mini" type="warning" v-if="canI.unpublishschedule"
-            >下架</el-button
+
+          <el-popconfirm
+            v-if="canI.unpublishschedule"
+            style="margin-left: 10px;"
+            confirm-button-text="好的"
+            cancel-button-text="不用了"
+            icon="el-icon-info"
+            icon-color="red"
+            title="确定下架该日程吗？"
+            @confirm="handleUnpublish([scope.row.code])"
           >
+            <el-button slot="reference" size="mini" type="warning"
+              >下架</el-button
+            >
+          </el-popconfirm>
           <el-popconfirm
             v-if="canI.deleteschedule"
             style="margin-left: 10px;"
@@ -175,7 +187,7 @@
             cancel-button-text="不用了"
             icon="el-icon-info"
             icon-color="red"
-            title="确定删除该素材吗？"
+            title="确定删除该日程吗？"
             @confirm="handleDelete([scope.row.code])"
           >
             <el-button slot="reference" size="mini" type="danger"
@@ -262,15 +274,11 @@ export default {
       intervalTypes: {},
       resolutions: [],
       editCode: null,
-      typeCode: null,
-      auditTypes: {},
       statusTypes: {
         0: "待审核",
         1: "审核通过",
         2: "不通过",
       },
-      showModal: false,
-      modalMat: null,
       toDelCodes: [],
       showAddForm: false,
       showDetailForm: false,
@@ -279,36 +287,6 @@ export default {
   },
   computed: {
     ...mapGetters(["presentMenu", "config"]),
-    dialogTitle() {
-      return (
-        (this.form.code ? "编辑" : "创建") +
-        (this.isStaticForm ? "本地" : "动态") +
-        "素材"
-      );
-    },
-    isStatic() {
-      return (
-        this.form.typeCode !== "在线网页" &&
-        this.form.typeCode !== "流媒体" &&
-        this.form.typeCode !== "ipc"
-      );
-    },
-    isIpc() {
-      return this.form.typeCode === "ipc";
-    },
-
-    materialTypeFilters() {
-      return Object.entries(this.materialTypes).map(([v, k]) => ({
-        text: k,
-        value: v,
-      }));
-    },
-    statusTypeFilters() {
-      return Object.entries(this.statusTypes).map(([v, k]) => ({
-        text: k,
-        value: Number(v),
-      }));
-    },
   },
   async mounted() {
     let { code, data, msg } = await GetRolePermissions({
@@ -352,38 +330,13 @@ export default {
       this.getList();
       this.showAddForm = false;
     },
-    handleFilterChange({ typeCode, statusCode }) {
-      this.typeCode = !typeCode || !typeCode.length ? null : typeCode[0];
-      this.statusCode =
-        !statusCode || !statusCode.length ? null : statusCode[0];
-      this.getList();
-    },
-    handleTypeCodeChange(val) {
-      if (val === "ipc") {
-        this.form = {
-          typeCode: val,
-          ipType: "IPV4",
-          ipAddress: "",
-          port: 554,
-          channel: "ch1",
-          userName: "",
-          password: "",
-          protocol: "TCP",
-          bitRateType: "main",
-          desc: "",
-        };
-      } else {
-        this.form = {
-          typeCode: val,
-          name: "",
-          url: "",
-          desc: "",
-        };
-      }
-
-      this.$nextTick(() => {
-        if (this.$refs.form) this.$refs.form.clearValidate();
+    async handleUnpublish(codes) {
+      const { code, msg } = await ScheduleApi.unpublish({ codes });
+      this.$message({
+        type: code === "200" ? "success" : "error",
+        message: code === "200" ? "下架成功" : msg,
       });
+      if (code === "200") this.getList();
     },
     async handleDelete(codes) {
       const { code, msg } = await ScheduleApi.delete({ codes });
@@ -424,35 +377,6 @@ export default {
       this.editCode = row.code;
       this.showDetailForm = true;
     },
-    addStatic() {
-      this.form = {
-        name: "",
-        file: [],
-        auditType: "",
-        desc: "",
-        sameReplace: true,
-      };
-      this.isStaticForm = true;
-      this.progress = 0;
-      this.$nextTick(() => {
-        if (this.$refs.form) this.$refs.form.clearValidate();
-        this.showForm = true;
-      });
-    },
-    addDynamic() {
-      this.form = {
-        typeCode: "在线网页",
-        name: "",
-        url: "",
-        desc: "",
-      };
-      this.isStaticForm = false;
-      this.$nextTick(() => {
-        if (this.$refs.form) this.$refs.form.clearValidate();
-        this.showForm = true;
-      });
-    },
-
     reset() {
       this.name = "";
       this.creator = "";
@@ -460,30 +384,6 @@ export default {
       this.list = [];
       this.total = 0;
     },
-    onUpload(change) {
-      if (change.response) {
-        const { data, msg, code } = change.response;
-        if (code === ERR_OK) {
-          this.form.file = [
-            {
-              name: data.fileGuid,
-              url: change.url,
-            },
-          ];
-          this.progress = 100;
-          this.$refs.form && this.$refs.form.validateField(["file"]);
-        } else this.$message({ message: msg, type: "error" });
-      }
-    },
-    preview(row) {
-      this.modalMat = row;
-      this.$nextTick(() => {
-        this.showModal = true;
-      });
-
-      // window.open(row.fileUrl);
-    },
-
     handleSelectionChange(data) {
       this.toDelCodes = data.map(({ code }) => code);
     },
@@ -496,12 +396,11 @@ export default {
       this.getList();
     },
     async getList() {
-      const { pageIndex, pageSize, name, creator, statusCode, typeCode } = this;
+      const { pageIndex, pageSize, name, creator, statusCode } = this;
       const { code, data, msg } = await ScheduleApi.get({
         name,
         creator,
         statusCode,
-        typeCode,
         paging: 1,
         pageIndex,
         pageSize,
