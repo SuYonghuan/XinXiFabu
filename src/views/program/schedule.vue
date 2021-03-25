@@ -100,13 +100,24 @@
         label="审核状态"
       >
         <template slot-scope="scope">
-          {{ statusTypes[scope.row.statusCode] }}
+          <el-tooltip v-if="scope.row.auditOpinion" placement="top">
+            <div slot="content" style="max-width:300px;">
+              {{ scope.row.auditOpinion }}
+            </div>
+            <div>{{ statusTypes[scope.row.statusCode] }}</div>
+          </el-tooltip>
+          <div v-else>{{ statusTypes[scope.row.statusCode] }}</div>
         </template>
       </el-table-column>
       <el-table-column
         prop="creator"
         key="creator"
         label="创建者"
+      ></el-table-column>
+      <el-table-column
+        prop="status"
+        key="status"
+        label="日程状态"
       ></el-table-column>
       <el-table-column
         prop="auditor"
