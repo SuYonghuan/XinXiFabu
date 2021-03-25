@@ -508,6 +508,7 @@ export default {
         2: "不通过",
       },
       protocols: {
+        TCP: "传输控制协议",
         RTMP: "实时流协议",
         UDP: "数据报协议",
         HTTP: "超文本传输协议",
