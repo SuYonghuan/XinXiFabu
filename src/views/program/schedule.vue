@@ -321,7 +321,6 @@ export default {
       this.canI = data
         .map(({ actionId }) => actionId)
         .reduce((acc, nxt) => ({ ...acc, [nxt]: true }), {});
-      console.log(this.canI);
       if (this.canI.getschedulelist) {
         this.getList();
       }
@@ -499,7 +498,6 @@ export default {
       if (code == "200") {
         const { list, allCount } = data;
         this.list = list;
-        console.log(list);
         this.total = allCount;
       } else {
         this.$message({ message: msg, type: "error" });

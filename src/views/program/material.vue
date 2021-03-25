@@ -115,7 +115,13 @@
         :filter-multiple="false"
       >
         <template slot-scope="scope">
-          {{ statusTypes[scope.row.statusCode] }}
+          <el-tooltip v-if="scope.row.auditOpinion" placement="top">
+            <div slot="content" style="max-width:300px;">
+              {{ scope.row.auditOpinion }}
+            </div>
+            <div>{{ statusTypes[scope.row.statusCode] }}</div>
+          </el-tooltip>
+          <div v-else>{{ statusTypes[scope.row.statusCode] }}</div>
         </template>
       </el-table-column>
       <el-table-column
@@ -944,7 +950,6 @@ export default {
       if (code == "200") {
         const { list, allCount } = data;
         this.list = list;
-        console.log(list);
         this.total = allCount;
       } else {
         this.$message({ message: msg, type: "error" });

@@ -135,7 +135,7 @@
     />
     <el-dialog title="审核" append-to-body :visible.sync="showForm">
       <el-form ref="form" :model="form" :rules="rules">
-        <el-form-item label="审核结果" prop="audit">
+        <el-form-item label="审核结果" prop="statusCode">
           <el-radio-group v-model="form.statusCode">
             <el-radio
               v-for="(name, code) in auditOptions"
@@ -145,7 +145,7 @@
             >
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="审批意见" prop="desc">
+        <el-form-item label="审批意见" prop="auditOpinion">
           <el-input
             type="textarea"
             :rows="4"
@@ -284,11 +284,11 @@ export default {
       );
       if (!isValid) return;
       const { codes } = this;
-      const { statusCode, auditOptions } = this.form;
+      const { statusCode, auditOpinion } = this.form;
       const res = await ScheduleApi.audit({
         codes,
         statusCode,
-        auditOptions,
+        auditOpinion,
       });
       if (res.code !== "200") return this.$message.error(res.msg);
       this.$message.success(res.msg);

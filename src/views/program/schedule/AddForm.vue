@@ -528,7 +528,6 @@ export default {
       });
       if (code === "200") {
         const { list, allCount } = data;
-        console.log(list);
         this.programs = list;
         this.total = allCount;
       } else this.$message({ type: "error", message: msg });
