@@ -100,12 +100,18 @@
         label="审核状态"
       >
         <template slot-scope="scope">
-          <el-tooltip v-if="scope.row.auditOpinion" placement="top">
-            <div slot="content" style="max-width:300px;">
+          <el-popover
+            trigger="hover"
+            v-if="scope.row.auditOpinion"
+            placement="top"
+          >
+            <div>
               {{ scope.row.auditOpinion }}
             </div>
-            <div>{{ statusTypes[scope.row.statusCode] }}</div>
-          </el-tooltip>
+            <el-link :underline="false" type="primary" slot="reference">
+              {{ statusTypes[scope.row.statusCode] }}
+            </el-link>
+          </el-popover>
           <div v-else>{{ statusTypes[scope.row.statusCode] }}</div>
         </template>
       </el-table-column>
@@ -132,16 +138,17 @@
       ></el-table-column>
       <el-table-column prop="desc" key="desc" label="描述">
         <template slot-scope="scope">
-          <el-tooltip placement="top">
-            <div slot="content" style="max-width:300px;">
+          <el-popover trigger="hover" placement="top">
+            <div>
               {{ scope.row.desc }}
             </div>
             <div
+              slot="reference"
               style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;"
             >
               {{ scope.row.desc }}
             </div>
-          </el-tooltip>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column
