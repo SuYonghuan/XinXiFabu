@@ -42,7 +42,7 @@
             size="small"
             type="primary"
             v-if="canI.publishschedule"
-            @click="addStatic"
+            @click="showPublishForm = true"
             >日程发布</el-button
           >
           <el-button
@@ -209,6 +209,14 @@
         @closeForm="showDetailForm = false"
       ></detail-form>
     </el-dialog>
+    <el-dialog title="日程发布" append-to-body :visible.sync="showPublishForm">
+      <publish-form
+        :showForm="showPublishForm"
+        @closeForm="showPublishForm = false"
+        :resolutions="resolutions"
+        @published="handlePublished"
+      ></publish-form>
+    </el-dialog>
   </table-page>
 </template>
 
@@ -221,6 +229,7 @@ import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import AddForm from "./schedule/AddForm";
 import DetailForm from "./schedule/DetailForm";
+import PublishForm from "./schedule/PublishForm";
 
 export default {
   data() {
@@ -254,6 +263,7 @@ export default {
       toDelCodes: [],
       showAddForm: false,
       showDetailForm: false,
+      showPublishForm: false,
     };
   },
   computed: {
@@ -319,6 +329,10 @@ export default {
   },
 
   methods: {
+    handlePublished() {
+      this.showPublishForm = false;
+      this.getList();
+    },
     postAdd() {
       this.reset();
       this.getList();
@@ -493,7 +507,7 @@ export default {
     },
   },
 
-  components: { TablePage, pagination, AddForm, DetailForm },
+  components: { TablePage, pagination, AddForm, DetailForm, PublishForm },
 };
 </script>
 
