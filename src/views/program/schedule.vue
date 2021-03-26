@@ -120,11 +120,22 @@
         key="creator"
         label="创建者"
       ></el-table-column>
-      <el-table-column
-        prop="status"
-        key="status"
-        label="日程状态"
-      ></el-table-column>
+      <el-table-column prop="deviceCount" key="deviceCount" label="日程状态">
+        <template slot-scope="scope">
+          <el-popover
+            v-if="scope.row.deviceCount > 0"
+            trigger="click"
+            placement="bottom"
+            width="550"
+          >
+            <schedule-devices :code="scope.row.code"></schedule-devices>
+            <el-link :underline="false" type="primary" slot="reference">
+              已发布
+            </el-link>
+          </el-popover>
+          <div v-else>待发布</div>
+        </template>
+      </el-table-column>
       <el-table-column
         prop="auditor"
         key="auditor"
@@ -163,6 +174,7 @@
             type="primary"
             v-if="canI.editschedule"
             @click="handleEdit(scope.row)"
+            :disabled="scope.row.deviceCount > 0"
             >编辑</el-button
           >
           <el-button
@@ -183,7 +195,11 @@
             title="确定下架该日程吗？"
             @confirm="handleUnpublish([scope.row.code])"
           >
-            <el-button slot="reference" size="mini" type="warning"
+            <el-button
+              slot="reference"
+              size="mini"
+              type="warning"
+              :disabled="!(scope.row.deviceCount > 0)"
               >下架</el-button
             >
           </el-popconfirm>
@@ -197,7 +213,11 @@
             title="确定删除该日程吗？"
             @confirm="handleDelete([scope.row.code])"
           >
-            <el-button slot="reference" size="mini" type="danger"
+            <el-button
+              slot="reference"
+              size="mini"
+              type="danger"
+              :disabled="scope.row.deviceCount > 0"
               >删除</el-button
             >
           </el-popconfirm>
@@ -260,6 +280,7 @@ import { ERR_OK } from "http/config";
 import AddForm from "./schedule/AddForm";
 import DetailForm from "./schedule/DetailForm";
 import PublishForm from "./schedule/PublishForm";
+import ScheduleDevices from "./schedule/ScheduleDevices";
 
 export default {
   data() {
@@ -422,7 +443,14 @@ export default {
     },
   },
 
-  components: { TablePage, pagination, AddForm, DetailForm, PublishForm },
+  components: {
+    TablePage,
+    pagination,
+    AddForm,
+    DetailForm,
+    PublishForm,
+    ScheduleDevices,
+  },
 };
 </script>
 
