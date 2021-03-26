@@ -75,6 +75,9 @@
         ></el-tree>
       </el-col>
     </el-row>
+    <el-form-item label="覆盖冲突">
+      <el-switch v-model="confirm"> </el-switch>
+    </el-form-item>
     <div style="text-align: right;">
       <el-button @click="$emit('closeForm')">取 消</el-button>
       <el-button
@@ -106,6 +109,7 @@ export default {
       ],
       releaseTime: null,
       effectTime: null,
+      confirm: false,
     };
   },
   props: ["showForm", "resolutions"],
@@ -129,6 +133,7 @@ export default {
       this.selectedDevices = [];
       this.releaseTime = null;
       this.effectTime = null;
+      this.confirm = false;
     },
     async init() {
       this.schedules = [];
@@ -183,12 +188,14 @@ export default {
         effectTime,
         selectedSchedules,
         selectedDevices,
+        confirm,
       } = this;
       const { code, msg } = await ScheduleApi.publish({
         releaseTime,
         effectTime,
         schedules: selectedSchedules.map(({ code }) => code),
         devices: selectedDevices.map(({ code }) => code),
+        confirm,
       });
       if (code === "200") {
         this.$message({ type: "success", message: msg });

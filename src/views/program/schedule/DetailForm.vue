@@ -170,7 +170,7 @@ export default {
       form: null,
       dateTypes: {
         1: "普通模式",
-        2: "时段模式",
+        2: "插播模式",
       },
       showSelectProgram: false,
       selectedProgram: null,

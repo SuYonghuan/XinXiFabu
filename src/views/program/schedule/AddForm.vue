@@ -149,7 +149,7 @@
               <el-dropdown-item :disabled="hasNormalDataType" :command="1"
                 >普通模式</el-dropdown-item
               >
-              <el-dropdown-item :command="2">时段模式</el-dropdown-item>
+              <el-dropdown-item :command="2">插播模式</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-form-item>
@@ -307,7 +307,7 @@ export default {
       form: null,
       dateTypes: {
         1: "普通模式",
-        2: "时段模式",
+        2: "插播模式",
       },
       showSelectProgram: false,
       selectedProgram: null,

@@ -857,7 +857,14 @@
           @click="addMaterial(material)"
         >
           <div class="item">
-            <object v-if="material.fileUrl" :data="material.fileUrl"></object>
+            <object
+              v-if="currentMaterialType === 'video'"
+              :data="material.previewPath"
+            ></object>
+            <object
+              v-else-if="material.fileUrl"
+              :data="material.fileUrl"
+            ></object>
             <img
               v-else-if="activeComponent"
               :src="logos[activeComponent.typeCode]"
@@ -1008,6 +1015,9 @@ export default {
         : `${this.componentTypes[this.activeComponent.typeCode]}选择 ${
             this.activeComponent.width
           }*${this.activeComponent.height}`;
+    },
+    currentMaterialType() {
+      return this.activeComponent ? this.activeComponent.typeCode : "image";
     },
   },
   methods: {
@@ -1301,9 +1311,9 @@ export default {
       this.showSelectMaterial = true;
     },
     async getMaterials() {
-      const { pageIndex, activeComponent, q } = this;
+      const { pageIndex, currentMaterialType, q } = this;
       const { data, code, msg } = await ProgramApi.getMaterials({
-        typeCode: activeComponent ? activeComponent.typeCode : "image",
+        typeCode: currentMaterialType,
         name: q,
         paging: 1,
         pageIndex,
@@ -1488,6 +1498,10 @@ h5 {
   max-height: 100%;
 }
 .res-dialog-list li object {
+  max-width: 100%;
+  max-height: 100%;
+}
+.res-dialog-list li video {
   max-width: 100%;
   max-height: 100%;
 }
