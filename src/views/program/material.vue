@@ -117,7 +117,7 @@
         <template slot-scope="scope">
           <el-popover
             trigger="hover"
-            v-if="scope.row.auditOpinion"
+            v-if="scope.row.auditOpinion && scope.row.statusCode != 0"
             placement="top"
           >
             <div>
@@ -268,9 +268,6 @@
               v-model="form.desc"
             >
             </el-input>
-          </el-form-item>
-          <el-form-item label="同名素材替换">
-            <el-switch v-model="form.sameReplace"> </el-switch>
           </el-form-item>
           <el-form-item label="上传进度">
             <el-progress
@@ -481,7 +478,24 @@
       :visible.sync="showModal"
     >
       <template v-if="modalMat">
+        <video
+          v-if="modalMat.typeCode === '视频'"
+          style="width:100%;min-height:500px;"
+          controls
+          :src="modalMat.fileUrl"
+        ></video>
+        <img
+          v-else-if="modalMat.typeCode === '图片'"
+          style="width:100%;min-height:500px;"
+          :src="modalMat.fileUrl"
+        />
+        <audio
+          v-else-if="modalMat.typeCode === '音频'"
+          controls
+          :src="modalMat.fileUrl"
+        ></audio>
         <object
+          v-else
           style="width:100%;min-height:500px;"
           :data="modalMat.fileUrl"
         ></object>
@@ -625,14 +639,6 @@ export default {
             ],
             desc: [
               { required: true, message: "请输入素材描述", trigger: "blur" },
-            ],
-            sameReplace: [
-              {
-                type: "boolean",
-                required: true,
-                message: "请选择是否同名替换",
-                trigger: "blur",
-              },
             ],
           };
     },
@@ -783,7 +789,6 @@ export default {
           ],
           auditType,
           desc,
-          sameReplace: true,
         };
         this.isStaticForm = true;
         this.progress = 0;
@@ -800,7 +805,6 @@ export default {
         file: [],
         auditType: "",
         desc: "",
-        sameReplace: true,
       };
       this.isStaticForm = true;
       this.progress = 0;
@@ -828,13 +832,12 @@ export default {
       );
       if (!isValid) return;
       if (this.isStatic) {
-        const { name, file, auditType, desc, sameReplace, code } = this.form;
+        const { name, file, auditType, desc, code } = this.form;
         const res = await (this.isEdit ? MaterialApi.put : MaterialApi.post)({
           name,
           fileCode: file[0].name,
           auditType,
           desc,
-          sameReplace,
           code,
         });
         if (res.code !== "200") return this.$message.error(res.msg);

@@ -76,7 +76,7 @@
         key="selection"
         type="selection"
         width="55"
-        :selectable="(row) => row"
+        :selectable="(row) => !row.deviceCount"
       ></el-table-column>
       <el-table-column
         prop="name"
@@ -102,7 +102,7 @@
         <template slot-scope="scope">
           <el-popover
             trigger="hover"
-            v-if="scope.row.auditOpinion"
+            v-if="scope.row.auditOpinion && scope.row.statusCode != 0"
             placement="top"
           >
             <div>

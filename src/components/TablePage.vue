@@ -1,5 +1,5 @@
 <template>
-  <el-container style="height: calc(100vh - 61px); padding: 20px">
+  <el-container>
     <el-header :height="headerHeight ? headerHeight : '70px'">
       <slot name="header"></slot>
     </el-header>
@@ -17,5 +17,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>
