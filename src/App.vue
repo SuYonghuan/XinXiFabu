@@ -109,5 +109,8 @@ body,
   color: #606266;
   font-size: 14px;
   line-height: 1.7;
+  .el-breadcrumb {
+    font-size: 12px;
+  }
 }
 </style>

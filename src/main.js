@@ -10,6 +10,7 @@ import 'common/scss/index.scss'
 import 'element-ui/lib/theme-chalk/index.css'
 ElementUI.Dialog.props.closeOnClickModal = false
 ElementUI.Dialog.props.closeOnPressEscape = false
+ElementUI.Breadcrumb.props.separatorClass.default = 'el-icon-arrow-right'
 Vue.use(ElementUI)
 Vue.use(VueKonva)
 Vue.config.productionTip = false
