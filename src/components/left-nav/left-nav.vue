@@ -11,10 +11,11 @@
     active-text-color="#2F6BFF"
   >
     <div class="logobox">
-      <i
-        :class="collapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+      <img
+        src="./el-icon-s-fold.svg"
+        class="svgi"
         @click="$emit('toggleCollapse')"
-      ></i>
+      />
       <img
         class="logoimg"
         v-if="!collapsed"
@@ -29,7 +30,7 @@
       class="submenu"
     >
       <template slot="title">
-        <i :class="menu.icon"></i>
+        <svgi class="svgi" :name="menu.textCH" />
         <span slot="title">{{ menu.textCH }}</span>
       </template>
       <el-menu-item-group>
@@ -39,7 +40,6 @@
           :key="chmenu.code"
           @click="menuClick(chmenu)"
         >
-          <!--          <i class="iconfont" :class="chmenu.icon"></i>-->
           <span slot="title">{{ chmenu.textCH }}</span>
         </el-menu-item>
       </el-menu-item-group>
@@ -51,6 +51,7 @@
 import { mapGetters } from "vuex";
 import { setCookie } from "common/js/cookie";
 import { mapMutations } from "vuex";
+import svgi from "./svgi";
 export default {
   name: "leftNav",
   props: ["collapsed"],
@@ -66,6 +67,7 @@ export default {
   computed: {
     ...mapGetters(["menus", "website"]),
   },
+  components: { svgi },
 };
 </script>
 
@@ -89,9 +91,9 @@ export default {
   color: #9d9d9d;
   height: 80px;
   background: #171f46;
-  padding-left: 25px;
+  padding-left: 24px;
   line-height: 80px;
-  i {
+  .svgi {
     vertical-align: middle;
     margin-right: 17px;
     width: 24px;
@@ -116,27 +118,26 @@ export default {
     }
     &.is-active {
       .el-submenu__title {
-        background: #2f6bff !important;
-        margin: 0 8px;
-        border-radius: 8px;
-        padding-left: 15px !important;
+        position: relative;
+        background-image: url(./submenu-active-bg.svg);
+        background-position-x: 8px;
+        background-repeat: no-repeat;
+        .svgi * {
+          fill: #fff;
+        }
         i {
           color: #fff;
         }
       }
     }
     .el-submenu__title {
-      padding-left: 25px !important;
+      padding-left: 24px !important;
       i {
         color: #868f9f;
         &.el-submenu__icon-arrow {
           font-size: 14px;
         }
       }
-    }
-
-    .el-submenu [class^="el-icon-"] {
-      margin-right: 17px;
     }
     .el-menu-item {
       min-width: 256px !important;
@@ -152,16 +153,26 @@ export default {
       padding: 0px !important;
     }
   }
-  .el-submenu [class^="el-icon-"] {
+  .el-submenu .svgi {
     vertical-align: middle;
     margin-right: 17px;
     width: 24px;
     text-align: center;
     font-size: 20px;
   }
+  .el-submenu .svgi * {
+    fill: #868f9f;
+  }
 }
 .el-menu--collapse {
   width: 68px;
   height: 100%;
+  .submenu {
+    &.is-active {
+      .el-submenu__title {
+        background-image: url(./active-bg-small.svg);
+      }
+    }
+  }
 }
 </style>
