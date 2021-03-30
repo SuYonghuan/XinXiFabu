@@ -44,14 +44,6 @@
             @click="handleAdd"
             >新建日程</el-button
           >
-          <el-button
-            size="small"
-            :disabled="!toDelCodes.length"
-            type="danger"
-            v-if="canI.deleteschedule"
-            @click="bulkDelete"
-            >批量删除</el-button
-          >
         </div>
       </el-row>
     </template>
@@ -217,7 +209,18 @@
       </el-table-column>
     </el-table>
     <el-row type="flex" style="margin-top: 24px;" justify="space-between">
-      <el-col></el-col>
+      <el-col>
+        <el-button
+          size="small"
+          class="btn2"
+          :disabled="!toDelCodes.length"
+          v-if="canI.deleteschedule"
+          @click="bulkDelete"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
+          >删除</el-button
+        ></el-col
+      >
       <pagination
         :list="list"
         :page="pageIndex"

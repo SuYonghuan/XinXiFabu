@@ -29,16 +29,6 @@
             </svg>
           </div>
         </el-col>
-        <div style="width: 400px; text-align: right">
-          <el-button
-            size="small"
-            type="primary"
-            v-if="canI.auditschedule"
-            :disabled="!codes.length"
-            @click="bulkAudit"
-            >审核</el-button
-          >
-        </div>
       </el-row>
     </template>
     <el-table
@@ -48,12 +38,12 @@
       max-height="560px"
       ref="table"
     >
-      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         key="selection"
         type="selection"
         width="55"
       ></el-table-column>
+      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         prop="name"
         key="name"
@@ -119,7 +109,16 @@
       </el-table-column>
     </el-table>
     <el-row type="flex" style="margin-top: 24px;" justify="space-between">
-      <el-col></el-col>
+      <el-col>
+        <el-button
+          size="small"
+          type="primary"
+          v-if="canI.auditschedule"
+          :disabled="!codes.length"
+          @click="bulkAudit"
+          >审核</el-button
+        >
+      </el-col>
       <pagination
         :list="list"
         :page="pageIndex"
