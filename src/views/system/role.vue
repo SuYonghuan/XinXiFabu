@@ -75,7 +75,7 @@
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose"
-      max-height="680px"
+      max-height="560px"
       append-to-body
     >
       <el-form

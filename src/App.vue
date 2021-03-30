@@ -114,6 +114,34 @@ body,
     line-height: 18px;
   }
   .el-table {
+    position: relative;
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 349px;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      width: 4px;
+      height: 349px;
+      background: #f6f6f6;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #2f6bff;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-track-piece:start {
+      background: #e6eaf0;
+    }
+    ::-webkit-scrollbar-track-piece:end {
+      background: #e6eaf0;
+      margin-bottom: 98px;
+    }
+    &::before {
+      content: none;
+    }
     background-color: transparent;
     color: #868f9f;
     margin-top: 31px;
@@ -154,6 +182,11 @@ body,
         td:last-child {
           border-top-right-radius: 8px;
           border-bottom-right-radius: 8px;
+        }
+        .cell {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }

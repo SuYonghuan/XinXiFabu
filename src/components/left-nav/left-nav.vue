@@ -16,7 +16,7 @@
         aria-hidden="true"
         @click="$emit('toggleCollapse')"
       >
-        <use xlink:href="#iconshouqi"></use>
+        <use xlink:href="#iconzhedie"></use>
       </svg>
       <img
         class="logoimg"

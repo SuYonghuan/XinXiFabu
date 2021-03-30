@@ -22,24 +22,6 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <!--<el-form-item label="组名称排序">-->
-      <!--<el-select v-model="search.NameOrder" @change="changSelect(1)" placeholder="组名称排序">-->
-      <!--<el-option-->
-      <!--v-for="item in sort"-->
-      <!--:label="item.label"-->
-      <!--:value="item.value">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--</el-form-item>-->
-      <!--<el-form-item label="设备数量排序">-->
-      <!--<el-select v-model="search.Order" @change="changSelect(2)" placeholder="设备数量排序">-->
-      <!--<el-option-->
-      <!--v-for="item in sort"-->
-      <!--:label="item.label"-->
-      <!--:value="item.value">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--</el-form-item>-->
       <el-form-item>
         <el-button @click="onSearch">查询</el-button>
         <el-button @click="replaySearch">清空</el-button>
@@ -121,7 +103,7 @@
           {{ timestampToTime(scope.row.updateTime) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="170px">
         <template slot-scope="scope">
           <el-button
             type="primary"
@@ -783,7 +765,7 @@ export default {
 
 .tip-div {
   position: absolute;
-  top: 234px;
-  left: 700px;
+  top: 275px;
+  left: 452px;
 }
 </style>
