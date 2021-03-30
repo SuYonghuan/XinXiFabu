@@ -55,13 +55,13 @@
       max-height="560px"
       ref="table"
     >
-      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         key="selection"
         type="selection"
         width="55"
         :selectable="(row) => !row.deviceCount"
       ></el-table-column>
+      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         prop="name"
         key="name"
