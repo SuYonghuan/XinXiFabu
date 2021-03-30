@@ -29,7 +29,7 @@
     <el-table
       :data="tableData"
       @selection-change="handleDeletion"
-      height="620px"
+      height="680px"
       style="width: 100%"
     >
       <el-table-column align="center" type="selection" width="60">
@@ -75,7 +75,7 @@
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose"
-      max-height="620px"
+      max-height="680px"
       append-to-body
     >
       <el-form

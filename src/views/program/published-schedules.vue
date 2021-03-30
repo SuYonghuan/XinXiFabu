@@ -40,7 +40,7 @@
       </el-row>
     </template>
 
-    <el-table v-if="canI.publishedlist" :data="list" height="620px" ref="table">
+    <el-table v-if="canI.publishedlist" :data="list" height="680px" ref="table">
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         prop="name"

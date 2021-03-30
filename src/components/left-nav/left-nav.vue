@@ -11,11 +11,13 @@
     active-text-color="#2F6BFF"
   >
     <div class="logobox">
-      <img
-        src="./el-icon-s-fold.svg"
-        class="svgi"
+      <svg
+        class="icon svgi"
+        aria-hidden="true"
         @click="$emit('toggleCollapse')"
-      />
+      >
+        <use xlink:href="#iconshouqi"></use>
+      </svg>
       <img
         class="logoimg"
         v-if="!collapsed"
@@ -30,7 +32,9 @@
       class="submenu"
     >
       <template slot="title">
-        <svgi class="svgi" :name="menu.textCH" />
+        <svg class="icon svgi" aria-hidden="true">
+          <use :xlink:href="menu.icon"></use>
+        </svg>
         <span slot="title">{{ menu.textCH }}</span>
       </template>
       <el-menu-item-group>
@@ -122,8 +126,8 @@ export default {
         background-image: url(./submenu-active-bg.svg);
         background-position-x: 8px;
         background-repeat: no-repeat;
-        .svgi * {
-          fill: #fff;
+        .svgi {
+          color: #fff;
         }
         i {
           color: #fff;
@@ -159,9 +163,7 @@ export default {
     width: 24px;
     text-align: center;
     font-size: 20px;
-  }
-  .el-submenu .svgi * {
-    fill: #868f9f;
+    color: #868f9f;
   }
 }
 .el-menu--collapse {

@@ -29,7 +29,7 @@
       :data="tableData"
       @selection-change="handleDeletion"
       style="width: 100%;margin-top: 20px;"
-      height="620px"
+      height="680px"
     >
       <el-table-column
         align="center"

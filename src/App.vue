@@ -111,6 +111,57 @@ body,
   line-height: 1.7;
   .el-breadcrumb {
     font-size: 12px;
+    line-height: 18px;
   }
+  .el-table {
+    background-color: transparent;
+    color: #868f9f;
+    .el-table__header {
+      font-family: Source Han Sans CN;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 14px;
+      thead {
+        color: #868f9f;
+      }
+      th,
+      tr {
+        background-color: transparent;
+      }
+    }
+    th,
+    td {
+      border: none;
+      padding: 7px 0;
+    }
+    .el-table__body {
+      border-spacing: 0 4px;
+      .el-table__row {
+        border: none;
+        margin-top: 4px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: transparent;
+        td {
+          background-color: #fff;
+        }
+        td:first-child {
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
+        }
+        td:last-child {
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
+        }
+      }
+    }
+  }
+}
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
 }
 </style>

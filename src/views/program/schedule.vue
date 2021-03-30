@@ -68,7 +68,7 @@
       v-if="canI.getschedulelist"
       :data="list"
       @selection-change="handleSelectionChange"
-      height="620px"
+      height="680px"
       ref="table"
     >
       <el-table-column type="index" key="index"></el-table-column>

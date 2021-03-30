@@ -68,7 +68,7 @@
       v-if="canI.getmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      height="620px"
+      height="680px"
       ref="table"
       @filter-change="handleFilterChange"
     >

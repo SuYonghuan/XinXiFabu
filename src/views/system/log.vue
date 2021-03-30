@@ -30,7 +30,7 @@
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%" height="620px">
+    <el-table :data="tableData" style="width: 100%" height="680px">
       <el-table-column prop="moduleName" label="操作模块"></el-table-column>
       <el-table-column prop="type" label="操作类型"></el-table-column>
       <el-table-column prop="addTime" label="操作时间"></el-table-column>

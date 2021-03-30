@@ -1,16 +1,14 @@
 <template>
-  <el-container style="width:100vw;height:100vh;">
-    <el-aside :width="(collapsed ? 68 : 256) + 'px'">
+  <el-container class="index-container">
+    <el-aside class="left" :width="(collapsed ? 68 : 256) + 'px'">
       <leftNav
         :collapsed="collapsed"
         @toggleCollapse="collapsed = !collapsed"
       ></leftNav>
     </el-aside>
-    <el-container style="background: #f6f6f6;">
-      <el-header height="80px" style="border-bottom: 1px solid #e6e7ec;"
-        ><topNav></topNav
-      ></el-header>
-      <el-main class="child-view"> <router-view /></el-main>
+    <el-container class="right">
+      <el-header class="header" height="80px"><topNav></topNav></el-header>
+      <el-main class="main"> <router-view /></el-main>
     </el-container>
   </el-container>
 </template>
@@ -31,18 +29,21 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.index-content {
-  position: relative;
-  z-index: 5;
-  background: #f6f6f6;
-  display: flex;
+.index-container {
   width: 100vw;
   height: 100vh;
-
-  .child-view {
-    height: calc(100vh - 81px) !important;
-    padding: 40px 40px 0px 40px;
-    background: #f6f6f6;
+  background: #f6f6f6;
+  > .left {
+    transition: all 0.3s;
+    overflow: hidden;
+  }
+  > .right {
+    > .header {
+      border-bottom: 1px solid #e6e7ec;
+    }
+    > .main {
+      padding: 21px 64px;
+    }
   }
 }
 </style>
