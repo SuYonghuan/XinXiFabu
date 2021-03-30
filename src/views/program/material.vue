@@ -1,11 +1,7 @@
 <template>
   <table-page class="index">
     <template v-slot:header>
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item>信息发布</el-breadcrumb-item>
-        <el-breadcrumb-item>素材管理</el-breadcrumb-item>
-      </el-breadcrumb>
-      <el-row class="gap" type="flex" justify="space-between">
+      <el-row type="flex" justify="space-between">
         <el-col>
           <span class="prefix">素材名称</span>
           <el-input
@@ -68,7 +64,7 @@
       v-if="canI.getmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      height="680px"
+      max-height="690px"
       ref="table"
       @filter-change="handleFilterChange"
     >
@@ -199,13 +195,16 @@
         </template>
       </el-table-column>
     </el-table>
-    <pagination
-      :list="list"
-      :page="pageIndex"
-      :total="total"
-      @handleSizeChange="handleSizeChange"
-      @handleCurrentChange="handleCurrentChange"
-    />
+    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+      <el-col></el-col>
+      <pagination
+        :list="list"
+        :page="pageIndex"
+        :total="total"
+        @handleSizeChange="handleSizeChange"
+        @handleCurrentChange="handleCurrentChange"
+      />
+    </el-row>
 
     <el-dialog
       :title="dialogTitle"

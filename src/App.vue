@@ -132,7 +132,8 @@ body,
     th,
     td {
       border: none;
-      padding: 7px 0;
+      height: 58px;
+      padding: 0;
     }
     .el-table__body {
       border-spacing: 0 4px;
@@ -152,6 +153,79 @@ body,
         td:last-child {
           border-top-right-radius: 8px;
           border-bottom-right-radius: 8px;
+        }
+      }
+    }
+  }
+  h2 {
+    font-family: Source Han Sans CN;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 36px;
+    color: #172647;
+    line-height: 86px;
+  }
+  .el-pagination {
+    padding: 0;
+    span:not([class*="suffix"]),
+    button {
+      font-size: 12px;
+      line-height: 32px;
+      height: 32px;
+      color: #868f9f;
+    }
+    .el-pagination__total {
+      margin-right: 16px;
+    }
+
+    .el-select {
+      input {
+        font-size: 12px;
+        height: 32px;
+        line-height: 32px;
+        color: #868f9f;
+        padding-left: 0;
+        padding-right: 26px;
+        border-radius: 6px;
+        border: 1px solid #e6eaf0;
+      }
+      .el-input {
+        width: 95px;
+        margin: 0;
+      }
+    }
+    .el-input__suffix {
+      right: 5px;
+      top: -2px;
+    }
+    .btn-prev,
+    .btn-next {
+      width: 32px;
+      height: 32px;
+      background: #ffffff;
+      border-radius: 6px;
+      color: #868f9f;
+      margin: 0 6px;
+    }
+    .btn-next {
+      margin-right: 0;
+    }
+    .el-pager {
+      .number {
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 6px;
+        font-family: BrownStd;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 14px;
+        color: #868f9f;
+        line-height: 32px;
+        margin: 0 2px;
+        &.active {
+          background: #2f6bff;
+          color: #fff;
         }
       }
     }

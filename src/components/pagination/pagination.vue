@@ -5,7 +5,8 @@
     :page-sizes="pageSizes"
     :current-page="page"
     :page-size="pageSize"
-    layout="total, sizes, prev, pager, next, jumper"
+    background
+    layout="total, sizes, prev, pager, next"
     :total="total"
     :prev-click="prevClick"
     :next-click="nextClick"
@@ -13,43 +14,43 @@
 </template>
 <script>
 export default {
-  name: 'Pagination',
+  name: "Pagination",
   props: {
     pageSizes: {
       type: Array,
-      default: () => [10, 20, 30, 40]
+      default: () => [10, 20, 30, 40],
     },
     list: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     total: {
       type: Number,
-      default: 0
+      default: 0,
     },
     page: {
       type: Number,
-      default: 1
+      default: 1,
     },
     pageSize: {
       type: Number,
-      default: 10
-    }
+      default: 10,
+    },
   },
 
   methods: {
     handleSizeChange(val) {
-      this.$emit('handleSizeChange', val)
+      this.$emit("handleSizeChange", val);
     },
     handleCurrentChange(val) {
-      this.$emit('handleCurrentChange', val)
+      this.$emit("handleCurrentChange", val);
     },
     prevClick() {
-      this.$emit('prevClick', this.page)
+      this.$emit("prevClick", this.page);
     },
     nextClick() {
-      this.$emit('nextClick', this.page)
-    }
-  }
-}
+      this.$emit("nextClick", this.page);
+    },
+  },
+};
 </script>

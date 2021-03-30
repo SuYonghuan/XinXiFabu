@@ -1,11 +1,7 @@
 <template>
   <table-page>
     <template v-slot:header>
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item>信息发布</el-breadcrumb-item>
-        <el-breadcrumb-item>节目制作</el-breadcrumb-item>
-      </el-breadcrumb>
-      <el-row class="gap" type="flex" justify="space-between">
+      <el-row type="flex" justify="space-between">
         <el-col>
           <span class="prefix">节目名称</span>
           <el-input
@@ -44,13 +40,16 @@
       @editProgram="editProgram"
       @deleteProgram="deleteProgram"
     ></program-table>
-    <pagination
-      :list="list"
-      :page="pageIndex"
-      :total="total"
-      @handleSizeChange="handleSizeChange"
-      @handleCurrentChange="handleCurrentChange"
-    />
+    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+      <el-col></el-col>
+      <pagination
+        :list="list"
+        :page="pageIndex"
+        :total="total"
+        @handleSizeChange="handleSizeChange"
+        @handleCurrentChange="handleCurrentChange"
+      />
+    </el-row>
     <el-dialog title="新增节目" append-to-body :visible.sync="showAddForm">
       <add-form
         :resolutions="resolutions"

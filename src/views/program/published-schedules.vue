@@ -1,11 +1,7 @@
 <template>
   <table-page class="index schedule">
     <template v-slot:header>
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item>信息发布</el-breadcrumb-item>
-        <el-breadcrumb-item>发布列表</el-breadcrumb-item>
-      </el-breadcrumb>
-      <el-row class="gap" type="flex" justify="space-between">
+      <el-row type="flex" justify="space-between">
         <el-col>
           <span class="prefix">日程名称</span>
           <el-input
@@ -40,7 +36,12 @@
       </el-row>
     </template>
 
-    <el-table v-if="canI.publishedlist" :data="list" height="680px" ref="table">
+    <el-table
+      v-if="canI.publishedlist"
+      max-height="690px"
+      :data="list"
+      ref="table"
+    >
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         prop="name"
@@ -96,13 +97,16 @@
       <el-table-column prop="devNum" key="devNum" label="设备名称">
       </el-table-column>
     </el-table>
-    <pagination
-      :list="list"
-      :page="pageIndex"
-      :total="total"
-      @handleSizeChange="handleSizeChange"
-      @handleCurrentChange="handleCurrentChange"
-    />
+    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+      <el-col></el-col>
+      <pagination
+        :list="list"
+        :page="pageIndex"
+        :total="total"
+        @handleSizeChange="handleSizeChange"
+        @handleCurrentChange="handleCurrentChange"
+      />
+    </el-row>
   </table-page>
 </template>
 

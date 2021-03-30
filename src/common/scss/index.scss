@@ -1,2 +1,7 @@
-@import './reset.scss';
-@import './base.scss';
+$--color-primary: #2f6bff;
+
+$--font-path: "~element-ui/lib/theme-chalk/fonts";
+
+@import "./reset.scss";
+@import "./base.scss";
+@import "~element-ui/packages/theme-chalk/src/index";

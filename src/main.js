@@ -7,7 +7,6 @@ import { get } from 'http/http'
 import VueKonva from 'vue-konva'
 
 import 'common/scss/index.scss'
-import 'element-ui/lib/theme-chalk/index.css'
 ElementUI.Dialog.props.closeOnClickModal = false
 ElementUI.Dialog.props.closeOnPressEscape = false
 ElementUI.Breadcrumb.props.separatorClass.default = 'el-icon-arrow-right'

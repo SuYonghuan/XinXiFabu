@@ -42,7 +42,7 @@
           v-for="chmenu in menu.child"
           :index="chmenu.href"
           :key="chmenu.code"
-          @click="menuClick(chmenu)"
+          @click="menuClick({ ...chmenu, parent: menu.textCH })"
         >
           <span slot="title">{{ chmenu.textCH }}</span>
         </el-menu-item>
