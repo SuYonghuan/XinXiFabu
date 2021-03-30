@@ -116,6 +116,7 @@ body,
   .el-table {
     background-color: transparent;
     color: #868f9f;
+    margin-top: 31px;
     .el-table__header {
       font-family: Source Han Sans CN;
       font-style: normal;
@@ -228,6 +229,68 @@ body,
           color: #fff;
         }
       }
+    }
+  }
+  .meta1 {
+    font-family: Source Han Sans CN;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 12px;
+    line-height: 44px;
+    color: #868f9f;
+    margin-right: 16px;
+  }
+  .input1 {
+    height: 44px;
+    line-height: 44px;
+    width: 200px;
+    margin-right: 32px;
+    input {
+      height: 44px;
+      line-height: 44px;
+      width: 200px;
+      padding-left: 12px;
+      color: #868f9f;
+      &::placeholder {
+        color: #bbc1cc;
+        opacity: 1; /* Firefox */
+      }
+    }
+    &.big {
+      width: 400px;
+      input {
+        width: 400px;
+      }
+    }
+  }
+  .btn1 {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 10px;
+    svg {
+      width: 24px;
+      height: 24px;
+      color: #2f6bff;
+    }
+  }
+  .btn1 + .btn1 {
+    margin-left: 8px;
+  }
+  .btn2 {
+    height: 44px;
+    line-height: 44px;
+    padding: 0 16px;
+    border-radius: 8px;
+    font-family: Source Han Sans CN;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    color: #868f9f;
+    svg {
+      margin-right: 8px;
     }
   }
 }

@@ -3,24 +3,21 @@
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
         <el-col>
-          <span class="prefix">节目名称</span>
+          <span class="meta1">节目名称</span>
           <el-input
-            class="prefix"
+            class="input1 big"
             v-model="name"
             placeholder="请输入节目名称"
-            style="width: 200px"
             size="small"
             :clearable="true"
             @keyup.enter.native="getList"
           >
           </el-input>
-          <el-button
-            @click="getList"
-            size="small"
-            type="primary"
-            icon="el-icon-search"
-            >搜索</el-button
-          >
+          <div class="btn1" @click="getList">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button

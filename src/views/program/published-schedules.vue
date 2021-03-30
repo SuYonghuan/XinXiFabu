@@ -3,42 +3,38 @@
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
         <el-col>
-          <span class="prefix">日程名称</span>
+          <span class="meta1">日程名称</span>
           <el-input
-            class="prefix"
+            class="input1"
             v-model="name"
             placeholder="请输入素材名称"
-            style="width: 200px"
             size="small"
             :clearable="true"
             @keyup.enter.native="getList"
           >
           </el-input>
-          <span class="prefix">发布人</span>
+          <span class="meta1">发布人</span>
           <el-input
-            class="prefix"
+            class="input1"
             v-model="publisher"
             placeholder="请输入发布人"
-            style="width: 200px"
             size="small"
             :clearable="true"
             @keyup.enter.native="getList"
           >
           </el-input>
-          <el-button
-            @click="getList"
-            size="small"
-            type="primary"
-            icon="el-icon-search"
-            >搜索</el-button
-          >
+          <div class="btn1" @click="getList">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
         </el-col>
       </el-row>
     </template>
 
     <el-table
       v-if="canI.publishedlist"
-      max-height="690px"
+      max-height="560px"
       :data="list"
       ref="table"
     >

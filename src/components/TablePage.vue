@@ -14,9 +14,6 @@
     <el-main style="padding:0">
       <slot></slot>
     </el-main>
-    <el-footer height="32px">
-      <slot name="footer"></slot>
-    </el-footer>
   </el-container>
 </template>
 <script>
@@ -31,5 +28,8 @@ export default {
 
 <style lang="scss">
 .table-page {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 </style>

@@ -2,21 +2,20 @@
   <table-page class="index">
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
-        <el-col>
-          <span class="prefix">素材名称</span>
+        <el-col style="display: flex;">
+          <span class="meta1">素材名称</span>
           <el-input
-            class="prefix"
+            class="input1"
             v-model="name"
             placeholder="请输入素材名称"
-            style="width: 200px"
             size="small"
             :clearable="true"
             @keyup.enter.native="getList"
           >
           </el-input>
-          <span class="prefix">上传者</span>
+          <span class="meta1">上传者</span>
           <el-input
-            class="prefix"
+            class="input1"
             v-model="creator"
             placeholder="请输入上传者"
             style="width: 200px"
@@ -25,13 +24,11 @@
             @keyup.enter.native="getList"
           >
           </el-input>
-          <el-button
-            @click="getList"
-            size="small"
-            type="primary"
-            icon="el-icon-search"
-            >搜索</el-button
-          >
+          <div class="btn1" @click="getList">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button
@@ -48,14 +45,6 @@
             @click="addDynamic"
             >创建动态素材</el-button
           >
-          <el-button
-            size="small"
-            :disabled="!toDelCodes.length"
-            type="danger"
-            v-if="canI.deletematerial"
-            @click="bulkDelete"
-            >批量删除</el-button
-          >
         </div>
       </el-row>
     </template>
@@ -64,16 +53,16 @@
       v-if="canI.getmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      max-height="690px"
+      max-height="560px"
       ref="table"
       @filter-change="handleFilterChange"
     >
-      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         key="selection"
         type="selection"
         width="55"
       ></el-table-column>
+      <el-table-column type="index" key="index"></el-table-column>
       <el-table-column prop="name" key="name" label="素材名"></el-table-column>
       <el-table-column
         prop="typeCode"
@@ -196,7 +185,19 @@
       </el-table-column>
     </el-table>
     <el-row type="flex" style="margin-top: 24px;" justify="space-between">
-      <el-col></el-col>
+      <el-col>
+        <el-button
+          size="small"
+          class="btn2"
+          :disabled="!toDelCodes.length"
+          v-if="canI.deletematerial"
+          @click="bulkDelete"
+        >
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
+          >删除</el-button
+        >
+      </el-col>
       <pagination
         :list="list"
         :page="pageIndex"
