@@ -1,11 +1,6 @@
 <template>
   <div v-if="form" class="pef">
-    <el-row
-      class="header"
-      type="flex"
-      justify="space-between"
-      style="margin-bottom:30px;"
-    >
+    <el-row class="header" type="flex" justify="space-between">
       <el-col class="left">
         <svg class="icon " aria-hidden="true">
           <use xlink:href="#iconjiemuzhizuo"></use>
@@ -41,28 +36,21 @@
       </el-col>
     </el-row>
 
-    <el-row>
-      <el-col :span="5">
-        <el-row>
-          <el-col
-            style="text-align: center;height: 140px;"
-            :span="8"
-            :key="code"
-            v-for="code in componentTypeOrder"
-          >
-            <img
-              @click="appendComponent(code)"
-              class="logo"
-              :src="logos[code]"
-              :alt="componentTypes[code]"
-            />
-            <div @click="appendComponent(code)">
-              {{ componentTypes[code] }}
-            </div>
-          </el-col>
-        </el-row>
-      </el-col>
-      <el-col :span="14" class="canvas-wrapper">
+    <div class="main">
+      <div class="left">
+        <div
+          class="btn"
+          :key="code"
+          v-for="code in componentTypeOrder"
+          @click="appendComponent(code)"
+        >
+          <svg class="icon" aria-hidden="true">
+            <use :xlink:href="logos[code]"></use>
+          </svg>
+          {{ componentTypes[code] }}
+        </div>
+      </div>
+      <el-col :span="14" class="middle canvas-wrapper">
         <v-stage
           class="stage"
           :style="`transform: scale(${stageScale})`"
@@ -145,717 +133,682 @@
           </v-layer>
         </v-stage>
       </el-col>
-      <el-col :span="5">
-        <el-form
-          v-if="form"
-          class="form"
-          label-width="100px"
-          ref="form"
-          :model="form"
-          :rules="rules"
-        >
-          <h5>节目设置</h5>
-          <el-form-item label="节目时长" prop="duration">
-            <el-time-picker
-              v-model="form.duration"
-              value-format="HH:mm:ss"
-              placeholder="选择时长"
-            >
-            </el-time-picker>
-          </el-form-item>
-          <h5>页面控件</h5>
-          <div
-            :class="(activeComponent ? '' : 'selected') + ' component-item'"
-            @click="activeComponent = null"
-          >
-            背景
-          </div>
 
-          <div
-            v-for="(component, i) in form.components"
-            :key="i"
-            :class="
-              (activeComponent === component ? 'selected' : '') +
-                ' component-item'
-            "
-            @click="setActiveComponent(i)"
+      <el-form
+        v-if="form"
+        class="right form"
+        label-width="100px"
+        ref="form"
+        :model="form"
+        :rules="rules"
+      >
+        <h5>节目设置</h5>
+        <el-form-item label="节目时长" prop="duration">
+          <el-time-picker
+            v-model="form.duration"
+            value-format="HH:mm:ss"
+            placeholder="选择时长"
           >
-            <span class="cube" :style="'background: ' + component.color"></span>
-            <span>{{ componentTypes[component.typeCode] }}组件</span>
-            <template v-if="form.components.length === 1">
+          </el-time-picker>
+        </el-form-item>
+        <h5>页面控件</h5>
+        <div
+          :class="(activeComponent ? '' : 'selected') + ' component-item'"
+          @click="activeComponent = null"
+        >
+          背景
+        </div>
+
+        <div
+          v-for="(component, i) in form.components"
+          :key="i"
+          :class="
+            (activeComponent === component ? 'selected' : '') +
+              ' component-item'
+          "
+          @click="setActiveComponent(i)"
+        >
+          <span class="cube" :style="'background: ' + component.color"></span>
+          <span>{{ componentTypes[component.typeCode] }}组件</span>
+          <template v-if="form.components.length === 1">
+            <el-button
+              size="mini"
+              type="text"
+              class="updown"
+              icon="el-icon-delete-solid"
+              @click="removeComponent(i)"
+            ></el-button
+          ></template>
+          <el-button-group v-else>
+            <template v-if="i === 0">
               <el-button
                 size="mini"
                 type="text"
                 class="updown"
-                icon="el-icon-delete-solid"
-                @click="removeComponent(i)"
-              ></el-button
-            ></template>
-            <el-button-group v-else>
-              <template v-if="i === 0">
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-arrow-down"
-                  @click="down(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-bottom"
-                  @click="bottom(i)"
-                ></el-button>
-              </template>
-              <template v-else-if="i === form.components.length - 1">
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-arrow-up"
-                  @click="up(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-top"
-                  @click="top(i)"
-                ></el-button>
-              </template>
-              <template v-else>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-top"
-                  @click="top(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-arrow-up"
-                  @click="up(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-arrow-down"
-                  @click="down(i)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-bottom"
-                  @click="bottom(i)"
-                ></el-button>
-              </template>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-delete-solid"
-                @click="removeComponent(i)"
+                icon="el-icon-arrow-down"
+                @click="down(i)"
               ></el-button>
-            </el-button-group>
-          </div>
-          <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
-          <template v-if="!activeComponent">
-            <el-form-item label="背景颜色" prop="backgroundColor">
-              <el-color-picker v-model="form.backgroundColor" show-alpha>
-              </el-color-picker>
-            </el-form-item>
-            <el-form-item label="背景图片" prop="backgroundMaterial">
               <el-button
-                type="primary"
-                v-if="!form.backgroundMaterial"
-                @click="openMaterialModal"
-                >选择素材</el-button
-              >
-              <div v-else>
-                {{ form.backgroundMaterial.name || "默认名称" }}
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-view"
-                  @click="preview(form.backgroundMaterial)"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-delete-solid"
-                  @click="form.backgroundMaterial = null"
-                ></el-button>
-              </div>
-            </el-form-item>
-          </template>
-          <template v-else>
-            <el-form
-              style="padding-left:20px;"
-              label-width="70px"
-              label-position="left"
-              :model="activeComponent"
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-bottom"
+                @click="bottom(i)"
+              ></el-button>
+            </template>
+            <template v-else-if="i === form.components.length - 1">
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-arrow-up"
+                @click="up(i)"
+              ></el-button>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-top"
+                @click="top(i)"
+              ></el-button>
+            </template>
+            <template v-else>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-top"
+                @click="top(i)"
+              ></el-button>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-arrow-up"
+                @click="up(i)"
+              ></el-button>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-arrow-down"
+                @click="down(i)"
+              ></el-button>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-bottom"
+                @click="bottom(i)"
+              ></el-button>
+            </template>
+            <el-button
+              size="mini"
+              type="text"
+              class="updown"
+              icon="el-icon-delete-solid"
+              @click="removeComponent(i)"
+            ></el-button>
+          </el-button-group>
+        </div>
+        <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
+        <template v-if="!activeComponent">
+          <el-form-item label="背景颜色" prop="backgroundColor">
+            <el-color-picker v-model="form.backgroundColor" show-alpha>
+            </el-color-picker>
+          </el-form-item>
+          <el-form-item label="背景图片" prop="backgroundMaterial">
+            <el-button
+              type="primary"
+              v-if="!form.backgroundMaterial"
+              @click="openMaterialModal"
+              >选择素材</el-button
             >
-              <div class="pos-items">
-                <el-form-item
-                  label-width="20px"
-                  class="short-item"
-                  label="X"
-                  prop="offsetX"
+            <div v-else>
+              {{ form.backgroundMaterial.name || "默认名称" }}
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-view"
+                @click="preview(form.backgroundMaterial)"
+              ></el-button>
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-delete-solid"
+                @click="form.backgroundMaterial = null"
+              ></el-button>
+            </div>
+          </el-form-item>
+        </template>
+        <template v-else>
+          <el-form
+            style="padding-left:20px;"
+            label-width="70px"
+            label-position="left"
+            :model="activeComponent"
+          >
+            <div class="pos-items">
+              <el-form-item
+                label-width="20px"
+                class="short-item"
+                label="X"
+                prop="offsetX"
+              >
+                <el-input
+                  type="number"
+                  :min="0"
+                  v-model="activeComponent.offsetX"
+                ></el-input>
+              </el-form-item>
+              <el-form-item
+                label-width="20px"
+                class="short-item"
+                label="Y"
+                prop="offsetY"
+              >
+                <el-input
+                  type="number"
+                  v-model="activeComponent.offsetY"
+                ></el-input>
+              </el-form-item>
+              <br />
+              <el-form-item
+                label-width="20px"
+                class="short-item"
+                label="宽"
+                prop="width"
+              >
+                <el-input
+                  type="number"
+                  v-model="activeComponent.width"
+                ></el-input>
+              </el-form-item>
+              <el-form-item
+                label-width="20px"
+                class="short-item"
+                label="高"
+                prop="height"
+              >
+                <el-input
+                  type="number"
+                  v-model="activeComponent.height"
+                ></el-input>
+              </el-form-item>
+            </div>
+            <template v-if="activeComponent.typeCode === 'image'">
+              <el-form-item label="显示效果">
+                <el-select v-model="activeComponent.transition">
+                  <el-option
+                    :key="op"
+                    :value="op"
+                    :label="op"
+                    v-for="op in [
+                      '随机',
+                      '马赛克',
+                      '上下滚动',
+                      '左右滚动',
+                      '渐入',
+                    ]"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="切换时间">
+                <el-input-number
+                  v-model="activeComponent.transitionPeriod"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="86400"
+                ></el-input-number
+                >秒
+              </el-form-item>
+              <el-form-item label="素材">
+                <el-button type="primary" @click="openMaterialModal"
+                  >添加素材</el-button
                 >
-                  <el-input
-                    type="number"
-                    :min="0"
-                    v-model="activeComponent.offsetX"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item
-                  label-width="20px"
-                  class="short-item"
-                  label="Y"
-                  prop="offsetY"
+              </el-form-item>
+              <el-table
+                v-if="activeComponent.materials.length"
+                :data="activeComponent.materials"
+              >
+                <el-table-column prop="name" key="name" label="名称">
+                  <template slot-scope="scope">
+                    <div class="ellipsis">{{ scope.row.name }}</div>
+                  </template></el-table-column
                 >
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.offsetY"
-                  ></el-input>
-                </el-form-item>
-                <br />
-                <el-form-item
-                  label-width="20px"
-                  class="short-item"
-                  label="宽"
-                  prop="width"
-                >
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.width"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item
-                  label-width="20px"
-                  class="short-item"
-                  label="高"
-                  prop="height"
-                >
-                  <el-input
-                    type="number"
-                    v-model="activeComponent.height"
-                  ></el-input>
-                </el-form-item>
-              </div>
-              <template v-if="activeComponent.typeCode === 'image'">
-                <el-form-item label="显示效果">
-                  <el-select v-model="activeComponent.transition">
-                    <el-option
-                      :key="op"
-                      :value="op"
-                      :label="op"
-                      v-for="op in [
-                        '随机',
-                        '马赛克',
-                        '上下滚动',
-                        '左右滚动',
-                        '渐入',
-                      ]"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="切换时间">
-                  <el-input-number
-                    v-model="activeComponent.transitionPeriod"
-                    :step="1"
-                    step-strictly
-                    :min="1"
-                    :max="86400"
-                  ></el-input-number
-                  >秒
-                </el-form-item>
-                <el-form-item label="素材">
-                  <el-button type="primary" @click="openMaterialModal"
-                    >添加素材</el-button
-                  >
-                </el-form-item>
-                <el-table
-                  v-if="activeComponent.materials.length"
-                  :data="activeComponent.materials"
-                >
-                  <el-table-column prop="name" key="name" label="名称">
-                    <template slot-scope="scope">
-                      <div class="ellipsis">{{ scope.row.name }}</div>
-                    </template></el-table-column
-                  >
-                  <el-table-column
-                    prop="op"
-                    key="op"
-                    label="操作"
-                    width="180px"
-                  >
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-view"
-                        @click="preview(scope.row)"
-                      ></el-button>
-                      <el-button
-                        v-if="scope.$index !== 0"
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="swap(scope.$index, scope.$index - 1)"
-                      ></el-button>
-                      <el-button
-                        v-if="
-                          scope.$index !== activeComponent.materials.length - 1
-                        "
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="swap(scope.$index, scope.$index + 1)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-delete-solid"
-                        @click="removeMaterial(scope.$index)"
-                      ></el-button> </template
-                  ></el-table-column>
-                </el-table>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'video'">
-                <el-form-item label="素材">
-                  <el-button type="primary" @click="openMaterialModal"
-                    >添加素材</el-button
-                  >
-                </el-form-item>
-                <el-table
-                  v-if="activeComponent.materials.length"
-                  :data="activeComponent.materials"
-                >
-                  <el-table-column prop="name" key="name" label="名称">
-                    <template slot-scope="scope">
-                      <div class="ellipsis">{{ scope.row.name }}</div>
-                    </template></el-table-column
-                  >
-                  <el-table-column
-                    prop="op"
-                    key="op"
-                    label="操作"
-                    width="180px"
-                  >
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-view"
-                        @click="preview(scope.row)"
-                      ></el-button>
-                      <el-button
-                        v-if="scope.$index !== 0"
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="swap(scope.$index, scope.$index - 1)"
-                      ></el-button>
-                      <el-button
-                        v-if="
-                          scope.$index !== activeComponent.materials.length - 1
-                        "
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="swap(scope.$index, scope.$index + 1)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-delete-solid"
-                        @click="removeMaterial(scope.$index)"
-                      ></el-button> </template
-                  ></el-table-column>
-                </el-table>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'url'">
-                <el-form-item label="刷新时间" prop="refreshPeriod">
-                  <el-time-picker
-                    v-model="activeComponent.refreshPeriod"
-                    value-format="HH:mm:ss"
-                    placeholder="选择刷新时间"
-                  >
-                  </el-time-picker>
-                </el-form-item>
-                <el-form-item label="素材" prop="materials">
-                  <el-button
-                    type="primary"
-                    v-if="!activeComponent.materials.length"
-                    @click="openMaterialModal"
-                    >选择素材</el-button
-                  >
-                  <div v-else>
-                    {{ activeComponent.materials[0].name }}
+                <el-table-column prop="op" key="op" label="操作" width="180px">
+                  <template slot-scope="scope">
                     <el-button
                       size="mini"
                       type="text"
                       class="updown"
                       icon="el-icon-view"
-                      @click="preview(activeComponent.materials[0])"
+                      @click="preview(scope.row)"
+                    ></el-button>
+                    <el-button
+                      v-if="scope.$index !== 0"
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-up"
+                      @click="swap(scope.$index, scope.$index - 1)"
+                    ></el-button>
+                    <el-button
+                      v-if="
+                        scope.$index !== activeComponent.materials.length - 1
+                      "
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-down"
+                      @click="swap(scope.$index, scope.$index + 1)"
                     ></el-button>
                     <el-button
                       size="mini"
                       type="text"
                       class="updown"
                       icon="el-icon-delete-solid"
-                      @click="activeComponent.materials = []"
-                    ></el-button>
-                  </div>
-                </el-form-item>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'html'">
-                <el-form-item label="刷新时间" prop="refreshPeriod">
-                  <el-time-picker
-                    v-model="activeComponent.refreshPeriod"
-                    value-format="HH:mm:ss"
-                    placeholder="选择刷新时间"
-                  >
-                  </el-time-picker>
-                </el-form-item>
-                <el-form-item label="素材" prop="materials">
-                  <el-button
-                    type="primary"
-                    v-if="!activeComponent.materials.length"
-                    @click="openMaterialModal"
-                    >选择素材</el-button
-                  >
-                  <div v-else>
-                    {{ activeComponent.materials[0].name }}
+                      @click="removeMaterial(scope.$index)"
+                    ></el-button> </template
+                ></el-table-column>
+              </el-table>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'video'">
+              <el-form-item label="素材">
+                <el-button type="primary" @click="openMaterialModal"
+                  >添加素材</el-button
+                >
+              </el-form-item>
+              <el-table
+                v-if="activeComponent.materials.length"
+                :data="activeComponent.materials"
+              >
+                <el-table-column prop="name" key="name" label="名称">
+                  <template slot-scope="scope">
+                    <div class="ellipsis">{{ scope.row.name }}</div>
+                  </template></el-table-column
+                >
+                <el-table-column prop="op" key="op" label="操作" width="180px">
+                  <template slot-scope="scope">
                     <el-button
                       size="mini"
                       type="text"
                       class="updown"
                       icon="el-icon-view"
-                      @click="preview(activeComponent.materials[0])"
+                      @click="preview(scope.row)"
+                    ></el-button>
+                    <el-button
+                      v-if="scope.$index !== 0"
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-up"
+                      @click="swap(scope.$index, scope.$index - 1)"
+                    ></el-button>
+                    <el-button
+                      v-if="
+                        scope.$index !== activeComponent.materials.length - 1
+                      "
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-down"
+                      @click="swap(scope.$index, scope.$index + 1)"
                     ></el-button>
                     <el-button
                       size="mini"
                       type="text"
                       class="updown"
                       icon="el-icon-delete-solid"
-                      @click="activeComponent.materials = []"
+                      @click="removeMaterial(scope.$index)"
+                    ></el-button> </template
+                ></el-table-column>
+              </el-table>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'url'">
+              <el-form-item label="刷新时间" prop="refreshPeriod">
+                <el-time-picker
+                  v-model="activeComponent.refreshPeriod"
+                  value-format="HH:mm:ss"
+                  placeholder="选择刷新时间"
+                >
+                </el-time-picker>
+              </el-form-item>
+              <el-form-item label="素材" prop="materials">
+                <el-button
+                  type="primary"
+                  v-if="!activeComponent.materials.length"
+                  @click="openMaterialModal"
+                  >选择素材</el-button
+                >
+                <div v-else>
+                  {{ activeComponent.materials[0].name }}
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="updown"
+                    icon="el-icon-view"
+                    @click="preview(activeComponent.materials[0])"
+                  ></el-button>
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="updown"
+                    icon="el-icon-delete-solid"
+                    @click="activeComponent.materials = []"
+                  ></el-button>
+                </div>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'html'">
+              <el-form-item label="刷新时间" prop="refreshPeriod">
+                <el-time-picker
+                  v-model="activeComponent.refreshPeriod"
+                  value-format="HH:mm:ss"
+                  placeholder="选择刷新时间"
+                >
+                </el-time-picker>
+              </el-form-item>
+              <el-form-item label="素材" prop="materials">
+                <el-button
+                  type="primary"
+                  v-if="!activeComponent.materials.length"
+                  @click="openMaterialModal"
+                  >选择素材</el-button
+                >
+                <div v-else>
+                  {{ activeComponent.materials[0].name }}
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="updown"
+                    icon="el-icon-view"
+                    @click="preview(activeComponent.materials[0])"
+                  ></el-button>
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="updown"
+                    icon="el-icon-delete-solid"
+                    @click="activeComponent.materials = []"
+                  ></el-button>
+                </div>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'text'">
+              <el-form-item label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
+                >
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item label="背景透明度" prop="backgroundOpacity">
+                <el-slider
+                  v-model="activeComponent.backgroundOpacity"
+                ></el-slider>
+              </el-form-item>
+              <el-form-item label="字体颜色" prop="backgroundColor">
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item label="样式">
+                <el-select v-model="activeComponent.fontStyle">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['正常', '加粗', '斜体', '加粗、斜体']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="滚动速度">
+                <el-select v-model="activeComponent.animationSpeed">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['慢', '中等', '快', '很快']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="字幕滚动">
+                <el-select v-model="activeComponent.animation">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['从左往右', '从右往左']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="素材">
+                <el-button type="primary" @click="openMaterialModal"
+                  >添加素材</el-button
+                >
+              </el-form-item>
+              <el-table
+                v-if="activeComponent.materials.length"
+                :data="activeComponent.materials"
+              >
+                <el-table-column prop="name" key="name" label="名称">
+                  <template slot-scope="scope">
+                    <div class="ellipsis">{{ scope.row.name }}</div>
+                  </template></el-table-column
+                >
+                <el-table-column prop="op" key="op" label="操作" width="180px">
+                  <template slot-scope="scope">
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-view"
+                      @click="preview(scope.row)"
                     ></el-button>
-                  </div>
-                </el-form-item>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'text'">
-                <el-form-item label="背景色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.backgroundColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-                <el-form-item label="背景透明度" prop="backgroundOpacity">
-                  <el-slider
-                    v-model="activeComponent.backgroundOpacity"
-                  ></el-slider>
-                </el-form-item>
-                <el-form-item label="字体颜色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.fontColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-                <el-form-item label="字体大小">
-                  <el-input-number
-                    v-model="activeComponent.fontSize"
-                    :step="1"
-                    step-strictly
-                    :min="1"
-                    :max="1000"
-                  ></el-input-number
-                  >px
-                </el-form-item>
-                <el-form-item label="样式">
-                  <el-select v-model="activeComponent.fontStyle">
-                    <el-option
-                      :key="key"
-                      :value="key"
-                      :label="key"
-                      v-for="key in ['正常', '加粗', '斜体', '加粗、斜体']"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="滚动速度">
-                  <el-select v-model="activeComponent.animationSpeed">
-                    <el-option
-                      :key="key"
-                      :value="key"
-                      :label="key"
-                      v-for="key in ['慢', '中等', '快', '很快']"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="字幕滚动">
-                  <el-select v-model="activeComponent.animation">
-                    <el-option
-                      :key="key"
-                      :value="key"
-                      :label="key"
-                      v-for="key in ['从左往右', '从右往左']"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="素材">
-                  <el-button type="primary" @click="openMaterialModal"
-                    >添加素材</el-button
-                  >
-                </el-form-item>
-                <el-table
-                  v-if="activeComponent.materials.length"
-                  :data="activeComponent.materials"
+                    <el-button
+                      v-if="scope.$index !== 0"
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-up"
+                      @click="swap(scope.$index, scope.$index - 1)"
+                    ></el-button>
+                    <el-button
+                      v-if="
+                        scope.$index !== activeComponent.materials.length - 1
+                      "
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-down"
+                      @click="swap(scope.$index, scope.$index + 1)"
+                    ></el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="removeMaterial(scope.$index)"
+                    ></el-button> </template
+                ></el-table-column>
+              </el-table>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'weather'">
+              <el-form-item label="城市名称">
+                <el-input
+                  :maxlength="20"
+                  v-model="activeComponent.cityName"
+                ></el-input>
+              </el-form-item>
+              <el-form-item label="数据选择">
+                <el-select v-model="activeComponent.components" multiple>
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in weatherComponents"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="字体颜色" prop="backgroundColor">
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
                 >
-                  <el-table-column prop="name" key="name" label="名称">
-                    <template slot-scope="scope">
-                      <div class="ellipsis">{{ scope.row.name }}</div>
-                    </template></el-table-column
-                  >
-                  <el-table-column
-                    prop="op"
-                    key="op"
-                    label="操作"
-                    width="180px"
-                  >
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-view"
-                        @click="preview(scope.row)"
-                      ></el-button>
-                      <el-button
-                        v-if="scope.$index !== 0"
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="swap(scope.$index, scope.$index - 1)"
-                      ></el-button>
-                      <el-button
-                        v-if="
-                          scope.$index !== activeComponent.materials.length - 1
-                        "
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="swap(scope.$index, scope.$index + 1)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-delete-solid"
-                        @click="removeMaterial(scope.$index)"
-                      ></el-button> </template
-                  ></el-table-column>
-                </el-table>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'weather'">
-                <el-form-item label="城市名称">
-                  <el-input
-                    :maxlength="20"
-                    v-model="activeComponent.cityName"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item label="数据选择">
-                  <el-select v-model="activeComponent.components" multiple>
-                    <el-option
-                      :key="key"
-                      :value="key"
-                      :label="key"
-                      v-for="key in weatherComponents"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="字体颜色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.fontColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-                <el-form-item label="字体大小">
-                  <el-input-number
-                    v-model="activeComponent.fontSize"
-                    :step="1"
-                    step-strictly
-                    :min="1"
-                    :max="1000"
-                  ></el-input-number
-                  >px
-                </el-form-item>
-                <el-form-item label="背景色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.backgroundColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'clock'">
-                <el-form-item label="字体颜色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.fontColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-                <el-form-item label="字体大小">
-                  <el-input-number
-                    v-model="activeComponent.fontSize"
-                    :step="1"
-                    step-strictly
-                    :min="1"
-                    :max="1000"
-                  ></el-input-number
-                  >px
-                </el-form-item>
-                <el-form-item label="背景色" prop="backgroundColor">
-                  <el-color-picker
-                    v-model="activeComponent.backgroundColor"
-                    show-alpha
-                  >
-                  </el-color-picker>
-                </el-form-item>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'audio'">
-                <el-form-item label="素材">
-                  <el-button type="primary" @click="openMaterialModal"
-                    >添加素材</el-button
-                  >
-                </el-form-item>
-                <el-table
-                  v-if="activeComponent.materials.length"
-                  :data="activeComponent.materials"
+                </el-color-picker>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'clock'">
+              <el-form-item label="字体颜色" prop="backgroundColor">
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
                 >
-                  <el-table-column prop="name" key="name" label="名称">
-                    <template slot-scope="scope">
-                      <div class="ellipsis">{{ scope.row.name }}</div>
-                    </template></el-table-column
-                  >
-                  <el-table-column
-                    prop="op"
-                    key="op"
-                    label="操作"
-                    width="180px"
-                  >
-                    <template slot-scope="scope">
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-view"
-                        @click="preview(scope.row)"
-                      ></el-button>
-                      <el-button
-                        v-if="scope.$index !== 0"
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="swap(scope.$index, scope.$index - 1)"
-                      ></el-button>
-                      <el-button
-                        v-if="
-                          scope.$index !== activeComponent.materials.length - 1
-                        "
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="swap(scope.$index, scope.$index + 1)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-delete-solid"
-                        @click="removeMaterial(scope.$index)"
-                      ></el-button> </template
-                  ></el-table-column>
-                </el-table>
-              </template>
-              <template v-else-if="activeComponent.typeCode === 'stream'">
-                <el-form-item label="素材">
-                  <el-button type="primary" @click="openMaterialModal"
-                    >添加素材</el-button
-                  >
-                </el-form-item>
-                <el-table
-                  v-if="activeComponent.materials.length"
-                  :data="activeComponent.materials"
+                </el-color-picker>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'audio'">
+              <el-form-item label="素材">
+                <el-button type="primary" @click="openMaterialModal"
+                  >添加素材</el-button
                 >
-                  <el-table-column prop="name" key="name" label="名称">
-                    <template slot-scope="scope">
-                      <div class="ellipsis">{{ scope.row.name }}</div>
-                    </template></el-table-column
-                  >
-                  <el-table-column
-                    prop="op"
-                    key="op"
-                    label="操作"
-                    width="180px"
-                  >
-                    <template slot-scope="scope">
-                      <el-button
-                        v-if="scope.$index !== 0"
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="swap(scope.$index, scope.$index - 1)"
-                      ></el-button>
-                      <el-button
-                        v-if="
-                          scope.$index !== activeComponent.materials.length - 1
-                        "
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="swap(scope.$index, scope.$index + 1)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-delete-solid"
-                        @click="removeMaterial(scope.$index)"
-                      ></el-button> </template
-                  ></el-table-column>
-                </el-table>
-              </template>
-            </el-form>
-          </template>
-        </el-form>
-      </el-col>
-    </el-row>
+              </el-form-item>
+              <el-table
+                v-if="activeComponent.materials.length"
+                :data="activeComponent.materials"
+              >
+                <el-table-column prop="name" key="name" label="名称">
+                  <template slot-scope="scope">
+                    <div class="ellipsis">{{ scope.row.name }}</div>
+                  </template></el-table-column
+                >
+                <el-table-column prop="op" key="op" label="操作" width="180px">
+                  <template slot-scope="scope">
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-view"
+                      @click="preview(scope.row)"
+                    ></el-button>
+                    <el-button
+                      v-if="scope.$index !== 0"
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-up"
+                      @click="swap(scope.$index, scope.$index - 1)"
+                    ></el-button>
+                    <el-button
+                      v-if="
+                        scope.$index !== activeComponent.materials.length - 1
+                      "
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-down"
+                      @click="swap(scope.$index, scope.$index + 1)"
+                    ></el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="removeMaterial(scope.$index)"
+                    ></el-button> </template
+                ></el-table-column>
+              </el-table>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'stream'">
+              <el-form-item label="素材">
+                <el-button type="primary" @click="openMaterialModal"
+                  >添加素材</el-button
+                >
+              </el-form-item>
+              <el-table
+                v-if="activeComponent.materials.length"
+                :data="activeComponent.materials"
+              >
+                <el-table-column prop="name" key="name" label="名称">
+                  <template slot-scope="scope">
+                    <div class="ellipsis">{{ scope.row.name }}</div>
+                  </template></el-table-column
+                >
+                <el-table-column prop="op" key="op" label="操作" width="180px">
+                  <template slot-scope="scope">
+                    <el-button
+                      v-if="scope.$index !== 0"
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-up"
+                      @click="swap(scope.$index, scope.$index - 1)"
+                    ></el-button>
+                    <el-button
+                      v-if="
+                        scope.$index !== activeComponent.materials.length - 1
+                      "
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-arrow-down"
+                      @click="swap(scope.$index, scope.$index + 1)"
+                    ></el-button>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="removeMaterial(scope.$index)"
+                    ></el-button> </template
+                ></el-table-column>
+              </el-table>
+            </template>
+          </el-form>
+        </template>
+      </el-form>
+    </div>
     <el-dialog
       class="md"
       :title="materialDialogTitle"
@@ -939,7 +892,17 @@ function importAll(r) {
   });
   return obj;
 }
-const logos = importAll(require.context("./logo", false, /\.(png|jpe?g|svg)$/));
+const logos = {
+  audio: "#iconyinpin",
+  clock: "#iconshijian",
+  html: "#iconHTML",
+  image: "#icontupian",
+  stream: "#iconliumeiti",
+  text: "#iconwendang",
+  url: "#iconlianjie",
+  video: "#iconshipin",
+  weather: "#icontianqi-1",
+};
 const componentKeys = [
   "code",
   "addTime",
@@ -1394,9 +1357,14 @@ export default {
 
 <style scoped lang="scss">
 .pef {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   .header {
     background: #ffffff;
     height: 80px;
+    flex: 0 0 80px;
     line-height: 80px;
     border-bottom: 1px solid #e6e7ec;
     .left {
@@ -1482,6 +1450,45 @@ export default {
       }
     }
   }
+  .main {
+    flex: 1;
+    display: flex;
+    .left {
+      flex: 0 0 256px;
+      background: #fff;
+      text-align: center;
+      padding-top: 8px;
+      .btn {
+        position: relative;
+        text-align: left;
+        padding-left: 60px;
+        width: 240px;
+        color: #868f9f;
+        border-radius: 8px;
+        margin: auto;
+        font-size: 14px;
+        line-height: 56px;
+        height: 56px;
+        &:active {
+          background: #2f6bff;
+          color: #fff;
+        }
+        .icon {
+          position: absolute;
+          font-size: 20px;
+          top: 18px;
+          left: 16px;
+        }
+      }
+    }
+    .middle {
+      flex: 1;
+    }
+    .right {
+      flex: 0 0 400px;
+      overflow-y: scroll;
+    }
+  }
   .ellipsis {
     white-space: nowrap;
     overflow: hidden;
@@ -1500,14 +1507,7 @@ export default {
     box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(221, 221, 221, 1);
   }
-  .form {
-    margin-left: 36px;
-    border-left: 1px solid #999;
-    height: calc(100vh - 200px);
-    overflow-y: scroll;
-    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(221, 221, 221, 1);
-  }
+
   h5 {
     padding-left: 19px;
     color: rgba(80, 80, 80, 1);
