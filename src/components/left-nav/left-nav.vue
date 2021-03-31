@@ -165,6 +165,10 @@ export default {
     font-size: 20px;
     color: #868f9f;
   }
+  .el-menu-item-group {
+    margin: 0 8px;
+    border-radius: 8px;
+  }
 }
 .el-menu--collapse {
   width: 68px;

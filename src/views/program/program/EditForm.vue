@@ -1,14 +1,43 @@
 <template>
-  <div v-if="form">
-    <el-row type="flex" justify="space-between" style="margin-bottom:30px;">
-      <el-col>
-        <span class="prefix">节目名称：{{ form.name }}</span>
-        <span class="prefix">分辨率：{{ form.resolution }}</span>
+  <div v-if="form" class="pef">
+    <el-row
+      class="header"
+      type="flex"
+      justify="space-between"
+      style="margin-bottom:30px;"
+    >
+      <el-col class="left">
+        <svg class="icon " aria-hidden="true">
+          <use xlink:href="#iconjiemuzhizuo"></use>
+        </svg>
+        节目制作
       </el-col>
-      <el-col style="text-align: right;">
-        <el-button disabled>预 览</el-button>
-        <el-button type="primary" @click="submit">保 存</el-button>
-        <el-button @click="$emit('close')">关 闭</el-button>
+      <el-col class="middle">
+        <span class="meta1">节目名称</span>
+        <input class="input1" :value="form.name" readonly />
+        <span class="meta1">屏幕属性</span>
+        <input class="input1" :value="form.resolution" readonly />
+      </el-col>
+      <el-col class="right">
+        <div style="flex:1"></div>
+        <div class="btn">
+          <svg class="icon " aria-hidden="true">
+            <use xlink:href="#iconyanjing"></use>
+          </svg>
+          预览
+        </div>
+        <div class="btn success" @click="submit">
+          <svg class="icon " aria-hidden="true">
+            <use xlink:href="#iconchucun"></use>
+          </svg>
+          保存
+        </div>
+        <div class="btn primary" @click="$emit('close')">
+          <svg class="icon " aria-hidden="true">
+            <use xlink:href="#iconFrame-1"></use>
+          </svg>
+          关闭
+        </div>
       </el-col>
     </el-row>
 
@@ -1363,164 +1392,254 @@ export default {
 };
 </script>
 
-<style scoped>
-.ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.prefix {
-  margin-right: 10px;
-}
-.edit .el-dialog {
-  width: 100%;
-  height: 100%;
-}
-.canvas-wrapper {
-  height: calc(100vh - 200px);
-  position: relative;
-  box-shadow: 0px 2px 10px 0px rgb(0 0 0 / 30%);
-  border: 1px solid rgba(221, 221, 221, 1);
-}
-.form {
-  margin-left: 36px;
-  border-left: 1px solid #999;
-  height: calc(100vh - 200px);
-  overflow-y: scroll;
-  box-shadow: 0px 2px 10px 0px rgb(0 0 0 / 30%);
-  border: 1px solid rgba(221, 221, 221, 1);
-}
-h5 {
-  padding-left: 19px;
-  color: rgba(80, 80, 80, 1);
-  font-size: 19px;
-  line-height: 50px;
-  font-weight: bold;
-  border-top: 1px solid #999;
-}
-.component-item {
-  position: relative;
-  display: flex;
-  padding-left: 25px;
-  font-size: 14px;
-  line-height: 28px;
-  margin-bottom: 12px;
-  justify-content: space-between;
-  cursor: pointer;
-}
-.selected {
-  background: #eff9ff;
-}
-.updown {
-  width: 30px;
-}
-.stage {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  transform-origin: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.cube {
-  position: absolute;
-  display: block;
-  width: 14px;
-  height: 14px;
-  left: 5px;
-  top: 7px;
-}
-.pos-items {
-  position: relative;
-  padding-left: 40px;
-}
-.pos-items::before {
-  content: "位置";
-  position: absolute;
-  top: 14px;
-  left: 0;
-}
-.short-item {
-  display: inline-block;
-  width: 100px;
-}
-.short-item + .short-item {
-  margin-left: 10px;
-}
-.logo {
-  width: 57px;
-  height: 57px;
-}
+<style scoped lang="scss">
+.pef {
+  .header {
+    background: #ffffff;
+    height: 80px;
+    line-height: 80px;
+    border-bottom: 1px solid #e6e7ec;
+    .left {
+      position: relative;
+      padding-left: 80px;
+      flex: 0 0 256px;
+      font-family: Source Han Sans CN;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 18px;
+      color: #868f9f;
+      border-right: 1px solid #e6e7ec;
+      svg {
+        position: absolute;
+        left: 24px;
+        top: 24px;
+        font-size: 32px;
+        color: #2f6bff;
+      }
+    }
+    .middle {
+      padding-left: 64px;
+      .meta1 {
+        font-family: Source Han Sans CN;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 12px;
+        color: #868f9f;
+        margin-right: 16px;
+      }
+      .input1 {
+        height: 44px;
+        width: 200px;
+        margin-right: 32px;
+        padding-left: 12px;
+        color: #3a4763;
+        font-weight: bold;
+        font-size: 14px;
+        background: #f6f6f6;
+        border: 1px solid #e6eaf0;
+        box-sizing: border-box;
+        border-radius: 8px;
+      }
+    }
+    .right {
+      flex: 0 0 400px;
+      display: flex;
+      padding: 18px 64px 18px 0;
+      .btn {
+        vertical-align: middle;
+        text-align: left;
+        position: relative;
+        display: inline-block;
+        width: 88px;
+        height: 44px;
+        line-height: 44px;
+        padding-left: 44px;
+        border: 1px solid #e6eaf0;
+        border-radius: 8px;
+        color: #868f9f;
+        cursor: pointer;
+        svg {
+          position: absolute;
+          top: 12.5px;
+          left: 16px;
+          font-weight: bold;
+          font-size: 14px;
+        }
+        &.success,
+        &.primary {
+          border: none;
+          color: #fff;
+        }
+        &.success {
+          background: #12b362;
+        }
+        &.primary {
+          background: #2f6bff;
+        }
+      }
+      .btn + .btn {
+        margin-left: 8px;
+      }
+    }
+  }
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .prefix {
+    margin-right: 10px;
+  }
+  .edit .el-dialog {
+    width: 100%;
+    height: 100%;
+  }
+  .canvas-wrapper {
+    height: calc(100vh - 200px);
+    position: relative;
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(221, 221, 221, 1);
+  }
+  .form {
+    margin-left: 36px;
+    border-left: 1px solid #999;
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(221, 221, 221, 1);
+  }
+  h5 {
+    padding-left: 19px;
+    color: rgba(80, 80, 80, 1);
+    font-size: 19px;
+    line-height: 50px;
+    font-weight: bold;
+    border-top: 1px solid #999;
+  }
+  .component-item {
+    position: relative;
+    display: flex;
+    padding-left: 25px;
+    font-size: 14px;
+    line-height: 28px;
+    margin-bottom: 12px;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .selected {
+    background: #eff9ff;
+  }
+  .updown {
+    width: 30px;
+  }
+  .stage {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .cube {
+    position: absolute;
+    display: block;
+    width: 14px;
+    height: 14px;
+    left: 5px;
+    top: 7px;
+  }
+  .pos-items {
+    position: relative;
+    padding-left: 40px;
+  }
+  .pos-items::before {
+    content: "位置";
+    position: absolute;
+    top: 14px;
+    left: 0;
+  }
+  .short-item {
+    display: inline-block;
+    width: 100px;
+  }
+  .short-item + .short-item {
+    margin-left: 10px;
+  }
+  .logo {
+    width: 57px;
+    height: 57px;
+  }
 
-.res-dialog-list {
-  overflow: hidden;
-  margin-top: 10px;
-  border: 1px solid #ddd;
-}
-.res-dialog-list li {
-  float: left;
-  position: relative;
-  margin: 5px 10px;
-  width: 120px;
-  height: 140px;
-  cursor: pointer;
-  border-radius: 4px;
-  overflow: hidden;
-}
-.res-dialog-list li .item {
-  position: relative;
-  background: rgba(0, 0, 0, 0.2);
-  width: 120px;
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.res-dialog-list li:hover .li-hover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid rgba(24, 144, 255, 1);
-}
-.res-dialog-list li img {
-  max-width: 100%;
-  max-height: 100%;
-}
-.res-dialog-list li object {
-  max-width: 100%;
-  max-height: 100%;
-}
-.res-dialog-list li video {
-  max-width: 100%;
-  max-height: 100%;
-}
-.res-dialog-list li p {
-  margin: 0;
-  padding: 0;
-  line-height: 20px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: 100%;
-  overflow: hidden;
-  text-align: center;
-}
-.res-dialog-list li p.meta {
-  position: absolute;
-  left: 0px;
-  bottom: 0px;
-  width: 100%;
-  height: 30px;
-  line-height: 30px;
-  color: rgb(255, 255, 255);
-  text-align: center;
-  background: rgba(0, 0, 0, 0.6);
-  font-size: 12px;
+  .res-dialog-list {
+    overflow: hidden;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+  }
+  .res-dialog-list li {
+    float: left;
+    position: relative;
+    margin: 5px 10px;
+    width: 120px;
+    height: 140px;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .res-dialog-list li .item {
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .res-dialog-list li:hover .li-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid rgba(24, 144, 255, 1);
+  }
+  .res-dialog-list li img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .res-dialog-list li object {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .res-dialog-list li video {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .res-dialog-list li p {
+    margin: 0;
+    padding: 0;
+    line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+  }
+  .res-dialog-list li p.meta {
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+  }
 }
 </style>
 <style>

@@ -184,7 +184,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .gap {
   margin: 20px auto;
 }
@@ -192,6 +192,16 @@ export default {
 .prefix {
   margin-right: 10px;
 }
+</style>
+<style lang="scss">
 .edit-program {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
 }
 </style>
