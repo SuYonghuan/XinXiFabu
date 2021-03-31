@@ -136,15 +136,16 @@
 
       <el-form
         v-if="form"
-        class="right form"
+        class="right"
         label-width="100px"
         ref="form"
         :model="form"
         :rules="rules"
       >
         <h5>节目设置</h5>
-        <el-form-item label="节目时长" prop="duration">
+        <el-form-item class="item" label="节目时长" prop="duration">
           <el-time-picker
+            class="input1"
             v-model="form.duration"
             value-format="HH:mm:ss"
             placeholder="选择时长"
@@ -156,9 +157,11 @@
           :class="(activeComponent ? '' : 'selected') + ' component-item'"
           @click="activeComponent = null"
         >
+          <svg class="icon avatar" aria-hidden="true">
+            <use xlink:href="#iconhuaban"></use>
+          </svg>
           背景
         </div>
-
         <div
           v-for="(component, i) in form.components"
           :key="i"
@@ -168,88 +171,69 @@
           "
           @click="setActiveComponent(i)"
         >
-          <span class="cube" :style="'background: ' + component.color"></span>
+          <svg
+            class="icon avatar"
+            aria-hidden="true"
+            :style="`color:${component.color}`"
+          >
+            <use :xlink:href="logos[component.typeCode]"></use>
+          </svg>
           <span>{{ componentTypes[component.typeCode] }}组件</span>
-          <template v-if="form.components.length === 1">
-            <el-button
-              size="mini"
-              type="text"
-              class="updown"
-              icon="el-icon-delete-solid"
+          <div v-if="form.components.length === 1">
+            <svg
+              class="icon btn"
+              aria-hidden="true"
               @click="removeComponent(i)"
-            ></el-button
-          ></template>
-          <el-button-group v-else>
-            <template v-if="i === 0">
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-down"
-                @click="down(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-bottom"
-                @click="bottom(i)"
-              ></el-button>
-            </template>
-            <template v-else-if="i === form.components.length - 1">
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-up"
-                @click="up(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-top"
-                @click="top(i)"
-              ></el-button>
-            </template>
-            <template v-else>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-top"
-                @click="top(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-up"
-                @click="up(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-arrow-down"
-                @click="down(i)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-bottom"
-                @click="bottom(i)"
-              ></el-button>
-            </template>
-            <el-button
-              size="mini"
-              type="text"
-              class="updown"
-              icon="el-icon-delete-solid"
+            >
+              <use xlink:href="#iconshanchu"></use>
+            </svg>
+          </div>
+          <div v-else>
+            <svg
+              :class="['icon', 'btn', i === 0 ? 'hidden' : '']"
+              aria-hidden="true"
+              @click="top(i)"
+            >
+              <use xlink:href="#iconzhiding"></use>
+            </svg>
+            <svg
+              :class="['icon', 'btn', i === 0 ? 'hidden' : '']"
+              aria-hidden="true"
+              @click="up(i)"
+            >
+              <use xlink:href="#iconshang"></use>
+            </svg>
+            <svg
+              :class="[
+                'icon',
+                'btn',
+                i === form.components.length - 1 ? 'hidden' : '',
+              ]"
+              aria-hidden="true"
+              @click="down(i)"
+            >
+              <use xlink:href="#iconxia"></use>
+            </svg>
+            <svg
+              :class="[
+                'icon',
+                'btn',
+                i === form.components.length - 1 ? 'hidden' : '',
+              ]"
+              aria-hidden="true"
+              @click="bottom(i)"
+            >
+              <use xlink:href="#iconzhidi"></use>
+            </svg>
+            <svg
+              class="icon btn"
+              aria-hidden="true"
+              style="margin-left:16px;"
               @click="removeComponent(i)"
-            ></el-button>
-          </el-button-group>
+            >
+              <use xlink:href="#iconshanchu"></use>
+            </svg>
+          </div>
         </div>
         <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
         <template v-if="!activeComponent">
@@ -990,8 +974,8 @@ export default {
     stageScale() {
       if (!this.form) return 0;
       return Math.min(
-        ((window.innerWidth - 40) * 0.5833333) / this.form.width,
-        (window.innerHeight - 200) / this.form.height
+        (this.$root.ww - 656 - 240) / this.form.width,
+        (this.$root.wh - 80 - 120) / this.form.height
       );
     },
     materialDialogTitle() {
@@ -1121,8 +1105,11 @@ export default {
     },
     appendComponent(typeCode) {
       if (!this.form.components) this.form.components = [];
-      if (this.form.components.length >= 8)
-        return this.$message({ type: "warning", message: "最多添加8个组件。" });
+      if (this.form.components.length >= 16)
+        return this.$message({
+          type: "warning",
+          message: "最多添加16个组件。",
+        });
       const component = {
         typeCode,
         zIndex: this.form.components.length,
@@ -1483,10 +1470,69 @@ export default {
     }
     .middle {
       flex: 1;
+      height: calc(100vh - 80px);
+      position: relative;
+      background: #ececec;
     }
     .right {
       flex: 0 0 400px;
       overflow-y: scroll;
+      height: calc(100vh - 80px);
+      h5 {
+        margin-top: -1px;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 27px;
+        padding-top: 24px;
+        padding-left: 24px;
+        padding-bottom: 12px;
+        color: #3a4763;
+        border-top: 1px solid #e6e7ec;
+      }
+      .item {
+        input {
+          width: 200px;
+          height: 44px;
+          background: #ffffff;
+          border: 1px solid #e6eaf0;
+          box-sizing: border-box;
+          border-radius: 6px;
+        }
+      }
+      .component-item {
+        position: relative;
+        display: flex;
+        margin: 0 12px;
+        padding-left: 48px;
+        padding-right: 12px;
+        font-size: 14px;
+        line-height: 45px;
+        height: 45px;
+        justify-content: space-between;
+        cursor: pointer;
+        color: #868f9f;
+        border-radius: 6px;
+        .avatar {
+          position: absolute;
+          font-size: 20px;
+          top: 13px;
+          left: 12px;
+        }
+        .btn {
+          font-size: 20px;
+          &.hidden {
+            visibility: hidden;
+            cursor: none;
+          }
+        }
+        .btn + .btn {
+          margin-left: 8px;
+        }
+        &.selected {
+          background: #2f6bff;
+          color: #fff;
+        }
+      }
     }
   }
   .ellipsis {
@@ -1501,34 +1547,7 @@ export default {
     width: 100%;
     height: 100%;
   }
-  .canvas-wrapper {
-    height: calc(100vh - 200px);
-    position: relative;
-    box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(221, 221, 221, 1);
-  }
 
-  h5 {
-    padding-left: 19px;
-    color: rgba(80, 80, 80, 1);
-    font-size: 19px;
-    line-height: 50px;
-    font-weight: bold;
-    border-top: 1px solid #999;
-  }
-  .component-item {
-    position: relative;
-    display: flex;
-    padding-left: 25px;
-    font-size: 14px;
-    line-height: 28px;
-    margin-bottom: 12px;
-    justify-content: space-between;
-    cursor: pointer;
-  }
-  .selected {
-    background: #eff9ff;
-  }
   .updown {
     width: 30px;
   }
@@ -1573,73 +1592,72 @@ export default {
     width: 57px;
     height: 57px;
   }
-
-  .res-dialog-list {
-    overflow: hidden;
-    margin-top: 10px;
-    border: 1px solid #ddd;
-  }
-  .res-dialog-list li {
-    float: left;
-    position: relative;
-    margin: 5px 10px;
-    width: 120px;
-    height: 140px;
-    cursor: pointer;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .res-dialog-list li .item {
-    position: relative;
-    background: rgba(0, 0, 0, 0.2);
-    width: 120px;
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .res-dialog-list li:hover .li-hover {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border: 2px solid rgba(24, 144, 255, 1);
-  }
-  .res-dialog-list li img {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  .res-dialog-list li object {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  .res-dialog-list li video {
-    max-width: 100%;
-    max-height: 100%;
-  }
-  .res-dialog-list li p {
-    margin: 0;
-    padding: 0;
-    line-height: 20px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-    overflow: hidden;
-    text-align: center;
-  }
-  .res-dialog-list li p.meta {
-    position: absolute;
-    left: 0px;
-    bottom: 0px;
-    width: 100%;
-    height: 30px;
-    line-height: 30px;
-    color: rgb(255, 255, 255);
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    font-size: 12px;
-  }
+}
+.res-dialog-list {
+  overflow: hidden;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+}
+.res-dialog-list li {
+  float: left;
+  position: relative;
+  margin: 5px 10px;
+  width: 120px;
+  height: 140px;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.res-dialog-list li .item {
+  position: relative;
+  background: rgba(0, 0, 0, 0.2);
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.res-dialog-list li:hover .li-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid rgba(24, 144, 255, 1);
+}
+.res-dialog-list li img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.res-dialog-list li object {
+  max-width: 100%;
+  max-height: 100%;
+}
+.res-dialog-list li video {
+  max-width: 100%;
+  max-height: 100%;
+}
+.res-dialog-list li p {
+  margin: 0;
+  padding: 0;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+}
+.res-dialog-list li p.meta {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
 }
 </style>
 <style>

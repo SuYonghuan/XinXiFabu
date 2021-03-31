@@ -32,6 +32,8 @@ get('/static/config/config.json')
       render: h => h(App),
       data() {
         return {
+          ww: window.innerWidth,
+          wh: window.innerHeight,
           tableMaxHeight: window.innerHeight - 266,
         }
       },
@@ -46,6 +48,8 @@ get('/static/config/config.json')
       methods: {
         onResize() {
           this.tableMaxHeight = window.innerHeight - 266
+          this.ww = window.innerWidth;
+          this.wh = window.innerHeight;
         }
       }
     }).$mount('#app')
