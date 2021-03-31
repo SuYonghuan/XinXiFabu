@@ -7,7 +7,7 @@
       <h2>{{ presentMenu.textCH }}</h2>
       <slot name="header"></slot>
     </el-header>
-    <el-main style="padding:0">
+    <el-main style="padding:0;overflow:hidden;">
       <slot></slot>
     </el-main>
   </el-container>

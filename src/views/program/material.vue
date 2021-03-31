@@ -53,7 +53,7 @@
       v-if="canI.getmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      max-height="560px"
+      :max-height="$root.tableMaxHeight + 'px'"
       ref="table"
       @filter-change="handleFilterChange"
     >
@@ -184,7 +184,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
           size="small"
@@ -660,6 +660,7 @@ export default {
     },
   },
   async mounted() {
+    console.log(this.$root.windowHeight);
     const [materialTypes, auditTypes] = await Promise.all([
       MaterialApi.getMaterialTypes(),
       MaterialApi.getAuditTypes(),

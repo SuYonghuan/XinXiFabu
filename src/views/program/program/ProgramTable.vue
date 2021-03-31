@@ -2,7 +2,7 @@
   <el-table
     v-if="canI.getprogrammelist"
     :data="list"
-    max-height="560px"
+    :max-height="$root.tableMaxHeight + 'px'"
     ref="table"
   >
     <el-table-column type="index" key="index"></el-table-column>

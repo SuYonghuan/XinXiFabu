@@ -29,7 +29,25 @@ get('/static/config/config.json')
     new Vue({
       router,
       store,
-      render: h => h(App)
+      render: h => h(App),
+      data() {
+        return {
+          tableMaxHeight: window.innerHeight - 266,
+        }
+      },
+      mounted() {
+        this.$nextTick(() => {
+          window.addEventListener('resize', this.onResize);
+        })
+      },
+      beforeDestroy() {
+        window.removeEventListener('resize', this.onResize);
+      },
+      methods: {
+        onResize() {
+          this.tableMaxHeight = window.innerHeight - 266
+        }
+      }
     }).$mount('#app')
   })
   .catch((err) => {

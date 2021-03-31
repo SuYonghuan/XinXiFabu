@@ -35,7 +35,7 @@
       v-if="canI.auditmateriallist"
       :data="list"
       @selection-change="handleSelectionChange"
-      max-height="560px"
+      :max-height="$root.tableMaxHeight + 'px'"
       ref="table"
     >
       <el-table-column
@@ -119,7 +119,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
           size="small"

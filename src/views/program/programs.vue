@@ -37,7 +37,7 @@
       @editProgram="editProgram"
       @deleteProgram="deleteProgram"
     ></program-table>
-    <el-row type="flex" style="margin-top: 24px;" justify="space-between">
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col></el-col>
       <pagination
         :list="list"

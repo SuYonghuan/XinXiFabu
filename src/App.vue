@@ -151,7 +151,6 @@ body,
     }
     background-color: transparent;
     color: #868f9f;
-    margin-top: 31px;
     .el-table__header {
       font-family: Source Han Sans CN;
       font-style: normal;
