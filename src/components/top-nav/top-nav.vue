@@ -1,7 +1,12 @@
 /** * 头部菜单 */
 <template>
   <div class="nav_right">
-    <div style="flex: 1"></div>
+    <div style="flex: 1">
+      <el-breadcrumb>
+        <el-breadcrumb-item>{{ presentMenu.parent }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ presentMenu.textCH }}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
     <el-dropdown trigger="click" style="width:20px" v-show="!autoAuth">
       <el-badge
         style="width:20px;height:80px;"
@@ -82,7 +87,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["user"]),
+    ...mapGetters(["user", "presentMenu"]),
   },
   created() {
     this.GetNoReadMessage();

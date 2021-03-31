@@ -2,7 +2,7 @@
   <table-page>
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
-        <el-col>
+        <el-col style="display:flex;">
           <span class="meta1">节目名称</span>
           <el-input
             class="input1 big"
@@ -56,7 +56,7 @@
       ></add-form>
     </el-dialog>
     <el-dialog
-      title="节目制作"
+      class="edit-program"
       append-to-body
       :visible.sync="showEditForm"
       fullscreen
@@ -191,5 +191,7 @@ export default {
 
 .prefix {
   margin-right: 10px;
+}
+.edit-program {
 }
 </style>

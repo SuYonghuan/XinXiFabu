@@ -1,12 +1,5 @@
 <template>
   <div class="deptManager-content">
-    <!--  面包屑  -->
-    <el-breadcrumb>
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>应用管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
-    </el-breadcrumb>
-
     <!--  表格  -->
     <el-table
       :data="tableData"

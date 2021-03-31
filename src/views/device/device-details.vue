@@ -1,13 +1,5 @@
 <template>
   <div class="device-details">
-    <!--  面包屑  -->
-    <el-breadcrumb>
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>设备管理</el-breadcrumb-item>
-      <el-breadcrumb-item>终端设备列表</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
-    </el-breadcrumb>
-
     <el-card class="box-card top-card">
       <div class="device-card">
         <div>

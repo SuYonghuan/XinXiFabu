@@ -2,12 +2,8 @@
   <el-container class="table-page">
     <el-header
       style="padding:0"
-      :height="headerHeight ? headerHeight : '144px'"
+      :height="headerHeight ? headerHeight : '100px'"
     >
-      <el-breadcrumb>
-        <el-breadcrumb-item>{{ presentMenu.parent }}</el-breadcrumb-item>
-        <el-breadcrumb-item>{{ presentMenu.textCH }}</el-breadcrumb-item>
-      </el-breadcrumb>
       <h2>{{ presentMenu.textCH }}</h2>
       <slot name="header"></slot>
     </el-header>

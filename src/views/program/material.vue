@@ -242,6 +242,7 @@
               :on-change="onUpload"
               @remove="form.file = []"
               :on-progress="handleProgress"
+              :before-upload="beforeUpload"
             >
               <div class="object" v-if="form.file && form.file.length">
                 <object :data="form.file[0].url"> </object>
@@ -679,6 +680,31 @@ export default {
   },
 
   methods: {
+    beforeUpload(file) {
+      const type = file.type.includes("video")
+        ? "视频"
+        : file.type.includes("音频")
+        ? "audio"
+        : file.type.includes("image")
+        ? "图片"
+        : file.type === "text/html"
+        ? "html"
+        : file.type === "text/plain"
+        ? "文本"
+        : null;
+      if (!type) {
+        this.$message.error("文件类型不支持");
+        return false;
+      }
+      const unit = type === "文本" ? "KB" : "MB";
+      const number = type === "文本" ? 5 : type === "html" ? 10 : 500;
+      const limit = (unit === "KB" ? 1024 : 1024 * 1024) * number;
+      if (file.size > limit) {
+        this.$message.error(`${type}大小不能超过 ${number}${unit}!`);
+        return false;
+      }
+    },
+
     handleFilterChange({ typeCode, statusCode }) {
       this.typeCode = !typeCode || !typeCode.length ? null : typeCode[0];
       this.statusCode =

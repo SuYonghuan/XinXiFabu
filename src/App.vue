@@ -110,8 +110,15 @@ body,
   font-size: 14px;
   line-height: 1.7;
   .el-breadcrumb {
-    font-size: 12px;
-    line-height: 18px;
+    font-family: Source Han Sans CN;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 80px;
+    padding-left: 44px;
+    .el-breadcrumb__separator {
+      color: #bbc1cc;
+    }
   }
   .el-table {
     position: relative;
@@ -195,9 +202,10 @@ body,
     font-family: Source Han Sans CN;
     font-style: normal;
     font-weight: bold;
-    font-size: 36px;
+    font-size: 24px;
+    line-height: 36px;
     color: #172647;
-    line-height: 86px;
+    margin-bottom: 16px;
   }
   .el-pagination {
     padding: 0;

@@ -1,12 +1,5 @@
 <template>
   <div class="password-content">
-    <!--  面包屑  -->
-    <el-breadcrumb>
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>系统管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
-    </el-breadcrumb>
-
     <el-card class="box-card">
       <p class="content-p">
         <span>密码长度</span>

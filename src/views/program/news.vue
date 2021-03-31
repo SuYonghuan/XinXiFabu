@@ -1,12 +1,5 @@
 <template>
   <div class="deptManager-content">
-    <!--  面包屑  -->
-    <el-breadcrumb>
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>节目管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
-    </el-breadcrumb>
-
     <el-tabs type="border-card" style="margin-top: 40px" @tab-click="tabClick">
       <el-tab-pane label="节目">
         <!--  搜索  -->

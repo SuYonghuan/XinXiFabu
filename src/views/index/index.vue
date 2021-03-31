@@ -42,7 +42,7 @@ export default {
       border-bottom: 1px solid #e6e7ec;
     }
     > .main {
-      padding: 21px 64px;
+      padding: 16px 64px;
     }
   }
 }
