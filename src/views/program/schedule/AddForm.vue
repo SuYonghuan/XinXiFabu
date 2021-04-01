@@ -114,26 +114,55 @@
           </el-form-item>
         </template>
         <template v-else>
-          <el-form-item label="日期" prop="dateDay">
-            <el-date-picker
-              :disabled="isEdit"
-              v-model="form.timeIntervals[0].dateDay"
-              type="date"
-              value-format="yyyy-MM-dd"
-              placeholder="选择日期"
-            >
-            </el-date-picker>
+          <el-form-item label="月">
+            <div class="months">
+              <div
+                :class="[
+                  'month',
+                  monthKeys[k].length ? 'orange' : '',
+                  month == k ? 'active' : '',
+                ]"
+                v-for="(v, k) in monthDates"
+                :key="k"
+                @click="
+                  month = k;
+                  handleMonthDateChange();
+                "
+              >
+                {{ k }}
+              </div>
+            </div>
           </el-form-item>
-          <el-form-item label="时间段" prop="timeIntervals">
+          <el-form-item label="日">
+            <div class="dates">
+              <div
+                :class="[
+                  'date',
+                  form.ranges[`${month}_${n}`] ? 'orange' : '',
+                  date == n ? 'active' : '',
+                ]"
+                v-for="n in monthDates[month]"
+                :key="n"
+                @click="
+                  date = n;
+                  handleMonthDateChange();
+                "
+              >
+                {{ n }}
+              </div>
+            </div>
+          </el-form-item>
+          <el-form-item label="时间段" prop="ranges">
             <el-time-picker
               is-range
               :disabled="isEdit"
-              v-model="form.timeIntervals[0].range"
+              v-model="range"
               value-format="HH:mm:ss"
               range-separator="至"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
               placeholder="选择时间范围"
+              @change="setRange"
             >
             </el-time-picker>
           </el-form-item>
@@ -312,6 +341,37 @@ export default {
       showSelectProgram: false,
       selectedProgram: null,
       currentPlayList: null,
+      month: 1,
+      date: 1,
+      monthDates: {
+        1: 31,
+        2: 29,
+        3: 31,
+        4: 30,
+        5: 31,
+        6: 30,
+        7: 31,
+        8: 31,
+        9: 30,
+        10: 31,
+        11: 30,
+        12: 31,
+      },
+      monthKeys: {
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: [],
+        9: [],
+        10: [],
+        11: [],
+        12: [],
+      },
+      range: null,
     };
   },
   props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
@@ -385,6 +445,45 @@ export default {
               },
             ],
           }
+        : this.form.playMode === "customize"
+        ? {
+            name: [
+              { required: true, message: "请填写日程名称", trigger: "blur" },
+            ],
+            playMode: [
+              { required: true, message: "请选择播放方式", trigger: "change" },
+            ],
+            resolution: [
+              { required: true, message: "请选择分辨率", trigger: "blur" },
+            ],
+            programme: [{ required: true, message: "请选择节目" }],
+            ranges: [
+              {
+                required: true,
+                validator: (rule, value, callback) => {
+                  if (
+                    !Object.values(value).find(
+                      (range) => range && range[0] && range[1]
+                    )
+                  )
+                    return callback(new Error("请选择某天的时间段"));
+                  const sameKV = Object.entries(value).find(
+                    ([_, range]) =>
+                      range && range[0] === range[1] && range[0] !== ""
+                  );
+                  if (sameKV)
+                    return callback(
+                      new Error(
+                        `${sameKV[0].split("_")[0]}月${
+                          sameKV[0].split("_")[1]
+                        }日开始结束时间不能相等`
+                      )
+                    );
+                  callback();
+                },
+              },
+            ],
+          }
         : {
             name: [
               { required: true, message: "请填写日程名称", trigger: "blur" },
@@ -422,6 +521,25 @@ export default {
     this.init();
   },
   methods: {
+    handleMonthDateChange() {
+      if (this.date > this.monthDates[this.month]) {
+        this.date = 1;
+      }
+      this.range = this.form.ranges[`${this.month}_${this.date}`];
+    },
+    setRange(val) {
+      const key = `${this.month}_${this.date}`;
+
+      const keys = this.monthKeys[this.month];
+      if (!val) {
+        this.monthKeys[this.month] = this.monthKeys[this.month].filter(
+          (lkey) => lkey !== key
+        );
+      } else if (!keys.includes(key)) {
+        this.monthKeys[this.month] = [...keys, key];
+      }
+      this.form.ranges[key] = val;
+    },
     down(playList, { $index: i }) {
       const { programmes } = playList;
       const tmp = programmes[i + 1];
@@ -499,6 +617,8 @@ export default {
     handlePlayModeChange(key) {
       if (key === "carousel") {
         this.form.playList = [];
+      } else if (key === "customize") {
+        this.form.ranges = {};
       } else {
         this.form.timeIntervals = this.newTimeIntervalsByPlayMode(key);
       }
@@ -534,6 +654,23 @@ export default {
     },
     async init() {
       this.form = null;
+      this.range = null;
+      this.month = 1;
+      this.date = 1;
+      this.monthKeys = {
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
+        7: [],
+        8: [],
+        9: [],
+        10: [],
+        11: [],
+        12: [],
+      };
       if (!this.code) {
         this.form = {
           name: "",
@@ -550,25 +687,40 @@ export default {
         if (code == "200") {
           this.form = data;
           if (this.form.timeIntervals) {
-            const intervalMap = this.form.timeIntervals.reduce(
-              (acc, { typeCode, beginTime, endTime, dateDay }) => ({
-                ...acc,
-                [typeCode]: {
-                  typeCode,
-                  range: [beginTime, endTime],
-                  dateDay,
+            if (this.form.playMode === "customize") {
+              this.form.ranges = this.form.timeIntervals.reduce(
+                (acc, { typeCode, beginTime, endTime, dateDay, dateMonth }) => {
+                  const key = dateMonth + "_" + dateDay;
+                  this.monthKeys[dateMonth].push(key);
+                  return {
+                    ...acc,
+                    [key]: [beginTime, endTime],
+                  };
                 },
-              }),
-              {}
-            );
-            const newIntervals = this.newTimeIntervalsByPlayMode(
-              this.form.playMode
-            );
-            this.form.timeIntervals = newIntervals.map((interval) =>
-              intervalMap[interval.typeCode]
-                ? intervalMap[interval.typeCode]
-                : interval
-            );
+                {}
+              );
+              this.range = this.form.ranges[`${this.month}_${this.date}`];
+            } else {
+              const intervalMap = this.form.timeIntervals.reduce(
+                (acc, { typeCode, beginTime, endTime, dateDay }) => ({
+                  ...acc,
+                  [typeCode]: {
+                    typeCode,
+                    range: [beginTime, endTime],
+                    dateDay,
+                  },
+                }),
+                {}
+              );
+              const newIntervals = this.newTimeIntervalsByPlayMode(
+                this.form.playMode
+              );
+              this.form.timeIntervals = newIntervals.map((interval) =>
+                intervalMap[interval.typeCode]
+                  ? intervalMap[interval.typeCode]
+                  : interval
+              );
+            }
           }
           if (this.form.playList) {
             this.form.playList = this.form.playList.map(
@@ -593,6 +745,7 @@ export default {
         programme,
         timeIntervals,
         playList,
+        ranges,
       } = this.form;
       return {
         code,
@@ -612,6 +765,23 @@ export default {
                       endTime: range[1],
                     }),
               })),
+            }
+          : playMode === "customize"
+          ? {
+              programCode: programme.code,
+              timeIntervals: Object.entries(ranges)
+                .filter(([_, range]) => range)
+                .map(([key, range]) => {
+                  let [month, date] = key.split("_");
+                  return {
+                    typeCode: 8,
+                    beginTime: range[0],
+                    endTime: range[1],
+                    dateDay: Number(date),
+
+                    dateMonth: Number(month),
+                  };
+                }),
             }
           : {
               programCode: programme.code,
@@ -649,8 +819,50 @@ export default {
 };
 </script>
 
-<style>
-.schedule-add-form .updown {
-  width: 30px;
+<style lang="scss">
+.schedule-add-form {
+  .updown {
+    width: 30px;
+  }
+  .months {
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    cursor: pointer;
+    .month {
+      background: #a6a6a6;
+      flex: 1;
+      text-align: center;
+
+      &.orange {
+        background: lightcoral;
+      }
+      &.active {
+        background: rgba(255, 195, 0, 1);
+      }
+    }
+    .month + .month {
+      margin-left: 1px;
+    }
+  }
+  .dates {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid #dbdbdb;
+    cursor: pointer;
+    .date {
+      flex: 1;
+      text-align: center;
+      &.orange {
+        background: lightcoral;
+      }
+      &.active {
+        background: rgba(255, 195, 0, 1);
+      }
+    }
+    .date + .date {
+      border-left: 1px solid #dbdbdb;
+    }
+  }
 }
 </style>
