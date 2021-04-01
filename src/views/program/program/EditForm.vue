@@ -241,31 +241,13 @@
             <el-color-picker v-model="form.backgroundColor" show-alpha>
             </el-color-picker>
           </el-form-item>
-          <el-form-item label="背景图片" prop="backgroundMaterial">
-            <el-button
-              type="primary"
-              v-if="!form.backgroundMaterial"
-              @click="openMaterialModal"
-              >选择素材</el-button
-            >
-            <div v-else>
-              {{ form.backgroundMaterial.name || "默认名称" }}
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-view"
-                @click="preview(form.backgroundMaterial)"
-              ></el-button>
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-delete-solid"
-                @click="form.backgroundMaterial = null"
-              ></el-button>
-            </div>
-          </el-form-item>
+          <mat-list
+            :data="form.backgroundMaterial ? [form.backgroundMaterial] : []"
+            @preview="preview"
+            @remove="form.backgroundMaterial = null"
+            :showAdd="!form.backgroundMaterial"
+            @selectMat="openMaterialModal"
+          ></mat-list>
         </template>
         <template v-else>
           <div class="pos-items">
