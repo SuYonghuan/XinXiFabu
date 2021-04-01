@@ -19,6 +19,15 @@ ConfigFun = function () {
 		this.y = y;
 	}
 
+  this.WallLine = function (start, end) {
+    this.start = start;  //起始点位
+    this.end = end;     //结束点位
+    this.leftParLine;   //左侧平行线段
+    this.rightParLine;  //右侧平行线段
+    this.leftPoint;     //左侧平行线交点
+    this.rightPoint;    //右侧平行线交点
+  }
+
   this.getMapInfo = function (mallCode,mallName="",buildOrder=0){
     let url = "http://saas.1000my.com:8013";
     let tim = Config.timeStamp();
