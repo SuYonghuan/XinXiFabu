@@ -138,6 +138,7 @@
         v-if="form"
         class="right"
         label-width="72px"
+        label-position="left"
         ref="form"
         :model="form"
         :rules="rules"
@@ -237,7 +238,7 @@
         </div>
         <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
         <template v-if="!activeComponent">
-          <el-form-item label="背景颜色" prop="backgroundColor">
+          <el-form-item class="item" label="背景颜色" prop="backgroundColor">
             <el-color-picker v-model="form.backgroundColor" show-alpha>
             </el-color-picker>
           </el-form-item>
@@ -315,7 +316,7 @@
             </el-form-item>
           </div>
           <template v-if="activeComponent.typeCode === 'image'">
-            <el-form-item label="显示效果">
+            <el-form-item class="item" label="显示效果">
               <el-select v-model="activeComponent.transition">
                 <el-option
                   :key="op"
@@ -331,7 +332,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="切换时间">
+            <el-form-item class="item" label="切换时间">
               <el-input-number
                 v-model="activeComponent.transitionPeriod"
                 :step="1"
@@ -361,7 +362,7 @@
             ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'url'">
-            <el-form-item label="刷新时间" prop="refreshPeriod">
+            <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
               <el-time-picker
                 v-model="activeComponent.refreshPeriod"
                 value-format="HH:mm:ss"
@@ -378,7 +379,7 @@
             ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'html'">
-            <el-form-item label="刷新时间" prop="refreshPeriod">
+            <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
               <el-time-picker
                 v-model="activeComponent.refreshPeriod"
                 value-format="HH:mm:ss"
@@ -395,23 +396,28 @@
             ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'text'">
-            <el-form-item label="背景色" prop="backgroundColor">
+            <el-form-item class="item" label="背景色" prop="backgroundColor">
               <el-color-picker
                 v-model="activeComponent.backgroundColor"
                 show-alpha
               >
               </el-color-picker>
             </el-form-item>
-            <el-form-item label="背景透明度" prop="backgroundOpacity">
+            <el-form-item
+              label-width="86px"
+              class="item"
+              label="背景透明度"
+              prop="backgroundOpacity"
+            >
               <el-slider
                 v-model="activeComponent.backgroundOpacity"
               ></el-slider>
             </el-form-item>
-            <el-form-item label="字体颜色" prop="backgroundColor">
+            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
               <el-color-picker v-model="activeComponent.fontColor" show-alpha>
               </el-color-picker>
             </el-form-item>
-            <el-form-item label="字体大小">
+            <el-form-item class="item" label="字体大小">
               <el-input-number
                 v-model="activeComponent.fontSize"
                 :step="1"
@@ -421,7 +427,7 @@
               ></el-input-number
               >px
             </el-form-item>
-            <el-form-item label="样式">
+            <el-form-item class="item" label="样式">
               <el-select v-model="activeComponent.fontStyle">
                 <el-option
                   :key="key"
@@ -431,7 +437,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="滚动速度">
+            <el-form-item class="item" label="滚动速度">
               <el-select v-model="activeComponent.animationSpeed">
                 <el-option
                   :key="key"
@@ -441,7 +447,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="字幕滚动">
+            <el-form-item class="item" label="字幕滚动">
               <el-select v-model="activeComponent.animation">
                 <el-option
                   :key="key"
@@ -461,13 +467,13 @@
             ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'weather'">
-            <el-form-item label="城市名称">
+            <el-form-item class="item" label="城市名称">
               <el-input
                 :maxlength="20"
                 v-model="activeComponent.cityName"
               ></el-input>
             </el-form-item>
-            <el-form-item label="数据选择">
+            <el-form-item class="item" label="数据选择">
               <el-select v-model="activeComponent.components" multiple>
                 <el-option
                   :key="key"
@@ -477,11 +483,11 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="字体颜色" prop="backgroundColor">
+            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
               <el-color-picker v-model="activeComponent.fontColor" show-alpha>
               </el-color-picker>
             </el-form-item>
-            <el-form-item label="字体大小">
+            <el-form-item class="item" label="字体大小">
               <el-input-number
                 v-model="activeComponent.fontSize"
                 :step="1"
@@ -491,7 +497,7 @@
               ></el-input-number
               >px
             </el-form-item>
-            <el-form-item label="背景色" prop="backgroundColor">
+            <el-form-item class="item" label="背景色" prop="backgroundColor">
               <el-color-picker
                 v-model="activeComponent.backgroundColor"
                 show-alpha
@@ -500,11 +506,11 @@
             </el-form-item>
           </template>
           <template v-else-if="activeComponent.typeCode === 'clock'">
-            <el-form-item label="字体颜色" prop="backgroundColor">
+            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
               <el-color-picker v-model="activeComponent.fontColor" show-alpha>
               </el-color-picker>
             </el-form-item>
-            <el-form-item label="字体大小">
+            <el-form-item class="item" label="字体大小">
               <el-input-number
                 v-model="activeComponent.fontSize"
                 :step="1"
@@ -514,7 +520,7 @@
               ></el-input-number
               >px
             </el-form-item>
-            <el-form-item label="背景色" prop="backgroundColor">
+            <el-form-item class="item" label="背景色" prop="backgroundColor">
               <el-color-picker
                 v-model="activeComponent.backgroundColor"
                 show-alpha
@@ -1018,6 +1024,7 @@ export default {
         this.form = data;
         if (this.form.backgroundMaterial) {
           this.form.backgroundMaterial = {
+            name: this.form.backgroundMaterialName,
             code: this.form.backgroundMaterial,
             fileUrl: this.form.backgroundMaterialUrl,
           };
