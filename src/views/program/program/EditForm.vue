@@ -167,7 +167,7 @@
           :key="i"
           :class="
             (activeComponent === component ? 'selected' : '') +
-            ' component-item'
+              ' component-item'
           "
           @click="setActiveComponent(i)"
         >
@@ -359,106 +359,24 @@
               ></el-input-number
               >秒
             </el-form-item>
-            <h5>
-              素材列表
-              <el-button type="primary" @click="openMaterialModal"
-                >添加素材</el-button
-              >
-            </h5>
-            <el-table
-              v-if="activeComponent.materials.length"
+            <mat-list
               :data="activeComponent.materials"
-            >
-              <el-table-column prop="name" key="name" label="名称">
-                <template slot-scope="scope">
-                  <div class="ellipsis">{{ scope.row.name }}</div>
-                </template></el-table-column
-              >
-              <el-table-column prop="op" key="op" label="操作" width="180px">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-view"
-                    @click="preview(scope.row)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== 0"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-up"
-                    @click="swap(scope.$index, scope.$index - 1)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== activeComponent.materials.length - 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-down"
-                    @click="swap(scope.$index, scope.$index + 1)"
-                  ></el-button>
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeMaterial(scope.$index)"
-                  ></el-button> </template
-              ></el-table-column>
-            </el-table>
+              @swap="([i, j]) => swap(i, j)"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="true"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'video'">
-            <h5>
-              素材列表
-              <el-button type="primary" @click="openMaterialModal"
-                >添加素材</el-button
-              >
-            </h5>
-            <el-table
-              v-if="activeComponent.materials.length"
+            <mat-list
               :data="activeComponent.materials"
-            >
-              <el-table-column prop="name" key="name" label="名称">
-                <template slot-scope="scope">
-                  <div class="ellipsis">{{ scope.row.name }}</div>
-                </template></el-table-column
-              >
-              <el-table-column prop="op" key="op" label="操作" width="180px">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-view"
-                    @click="preview(scope.row)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== 0"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-up"
-                    @click="swap(scope.$index, scope.$index - 1)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== activeComponent.materials.length - 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-down"
-                    @click="swap(scope.$index, scope.$index + 1)"
-                  ></el-button>
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeMaterial(scope.$index)"
-                  ></el-button> </template
-              ></el-table-column>
-            </el-table>
+              @swap="([i, j]) => swap(i, j)"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="true"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'url'">
             <el-form-item label="刷新时间" prop="refreshPeriod">
@@ -469,32 +387,13 @@
               >
               </el-time-picker>
             </el-form-item>
-            <h5>
-              素材列表
-              <el-button
-                type="primary"
-                v-if="!activeComponent.materials.length"
-                @click="openMaterialModal"
-                >选择素材</el-button
-              >
-              <div v-else>
-                {{ activeComponent.materials[0].name }}
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-view"
-                  @click="preview(activeComponent.materials[0])"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-delete-solid"
-                  @click="activeComponent.materials = []"
-                ></el-button>
-              </div>
-            </h5>
+            <mat-list
+              :data="activeComponent.materials"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="!activeComponent.materials.length"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'html'">
             <el-form-item label="刷新时间" prop="refreshPeriod">
@@ -505,32 +404,13 @@
               >
               </el-time-picker>
             </el-form-item>
-            <h5>
-              素材列表
-              <el-button
-                type="primary"
-                v-if="!activeComponent.materials.length"
-                @click="openMaterialModal"
-                >选择素材</el-button
-              >
-              <div v-else>
-                {{ activeComponent.materials[0].name }}
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-view"
-                  @click="preview(activeComponent.materials[0])"
-                ></el-button>
-                <el-button
-                  size="mini"
-                  type="text"
-                  class="updown"
-                  icon="el-icon-delete-solid"
-                  @click="activeComponent.materials = []"
-                ></el-button>
-              </div>
-            </h5>
+            <mat-list
+              :data="activeComponent.materials"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="!activeComponent.materials.length"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'text'">
             <el-form-item label="背景色" prop="backgroundColor">
@@ -589,55 +469,14 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <h5>
-              素材列表
-              <el-button type="primary" @click="openMaterialModal"
-                >添加素材</el-button
-              >
-            </h5>
-            <el-table
-              v-if="activeComponent.materials.length"
+            <mat-list
               :data="activeComponent.materials"
-            >
-              <el-table-column prop="name" key="name" label="名称">
-                <template slot-scope="scope">
-                  <div class="ellipsis">{{ scope.row.name }}</div>
-                </template></el-table-column
-              >
-              <el-table-column prop="op" key="op" label="操作" width="180px">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-view"
-                    @click="preview(scope.row)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== 0"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-up"
-                    @click="swap(scope.$index, scope.$index - 1)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== activeComponent.materials.length - 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-down"
-                    @click="swap(scope.$index, scope.$index + 1)"
-                  ></el-button>
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeMaterial(scope.$index)"
-                  ></el-button> </template
-              ></el-table-column>
-            </el-table>
+              @swap="([i, j]) => swap(i, j)"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="true"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'weather'">
             <el-form-item label="城市名称">
@@ -702,99 +541,24 @@
             </el-form-item>
           </template>
           <template v-else-if="activeComponent.typeCode === 'audio'">
-            <h5>
-              素材列表
-              <el-button type="primary" @click="openMaterialModal"
-                >添加素材</el-button
-              >
-            </h5>
-            <el-table
-              v-if="activeComponent.materials.length"
+            <mat-list
               :data="activeComponent.materials"
-            >
-              <el-table-column prop="name" key="name" label="名称">
-                <template slot-scope="scope">
-                  <div class="ellipsis">{{ scope.row.name }}</div>
-                </template></el-table-column
-              >
-              <el-table-column prop="op" key="op" label="操作" width="180px">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-view"
-                    @click="preview(scope.row)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== 0"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-up"
-                    @click="swap(scope.$index, scope.$index - 1)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== activeComponent.materials.length - 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-down"
-                    @click="swap(scope.$index, scope.$index + 1)"
-                  ></el-button>
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeMaterial(scope.$index)"
-                  ></el-button> </template
-              ></el-table-column>
-            </el-table>
+              @swap="([i, j]) => swap(i, j)"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="true"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
           <template v-else-if="activeComponent.typeCode === 'stream'">
-            <h5>
-              素材列表
-              <el-button type="primary" @click="openMaterialModal"
-                >添加素材</el-button
-              >
-            </h5>
-            <el-table
-              v-if="activeComponent.materials.length"
+            <mat-list
               :data="activeComponent.materials"
-            >
-              <el-table-column prop="name" key="name" label="名称">
-                <template slot-scope="scope">
-                  <div class="ellipsis">{{ scope.row.name }}</div>
-                </template></el-table-column
-              >
-              <el-table-column prop="op" key="op" label="操作" width="180px">
-                <template slot-scope="scope">
-                  <el-button
-                    v-if="scope.$index !== 0"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-up"
-                    @click="swap(scope.$index, scope.$index - 1)"
-                  ></el-button>
-                  <el-button
-                    v-if="scope.$index !== activeComponent.materials.length - 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-arrow-down"
-                    @click="swap(scope.$index, scope.$index + 1)"
-                  ></el-button>
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeMaterial(scope.$index)"
-                  ></el-button> </template
-              ></el-table-column>
-            </el-table>
+              @swap="([i, j]) => swap(i, j)"
+              @preview="preview"
+              @remove="removeMaterial"
+              :showAdd="true"
+              @selectMat="openMaterialModal"
+            ></mat-list>
           </template>
         </template>
       </el-form>
@@ -874,7 +638,9 @@
 </template>
 
 <script>
+import MatList from "./EditForm/MatList";
 import { ProgramApi } from "../program.js";
+
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
@@ -902,6 +668,7 @@ const flatenComponent = ({ config, ...component }) => {
   return { ...component, ...config };
 };
 export default {
+  components: { MatList },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -1479,15 +1246,19 @@ export default {
     }
     .right {
       flex: 0 0 400px;
+      overflow-x: hidden;
       overflow-y: scroll;
       height: calc(100vh - 80px);
       h5 {
+        display: flex;
+        justify-content: space-between;
         margin-top: -1px;
         font-weight: bold;
         font-size: 18px;
         line-height: 27px;
         padding-top: 24px;
         padding-left: 24px;
+        padding-right: 12px;
         padding-bottom: 12px;
         color: #3a4763;
         border-top: 1px solid #e6e7ec;
@@ -1536,6 +1307,27 @@ export default {
           color: #fff;
         }
       }
+      .mat {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 12px;
+        width: 376px;
+        line-height: 45px;
+        height: 45px;
+        margin-left: 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: #868f9f;
+        .icon {
+          font-size: 20px;
+        }
+        .icon + .icon {
+          margin-left: 16px;
+        }
+        &:active {
+          background: #f2f5fa;
+        }
+      }
       .short-item {
         display: inline-block;
         line-height: 32px;
@@ -1552,11 +1344,7 @@ export default {
       }
     }
   }
-  .ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+
   .prefix {
     margin-right: 10px;
   }
