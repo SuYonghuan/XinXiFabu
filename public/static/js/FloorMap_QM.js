@@ -86,9 +86,12 @@ FloorMap_QM.prototype.initFloor = function () {
 				let shopArr = shopData.shopList;
 				for (let k = 0; k < shopArr.length; k++) {
 					if (shopArr[k].houseNum == mapData.shopArea[i].name) {
-						//show = shopArr[k].name;
 						if (mapData.shopArea[i].logoUrl && mapData.shopArea[i].isLabel == 0) { //添加logo
 							this.logoUtil.renderIcon(mapData.shopArea[i], this, parseInt(mapData.shopArea[i].toHeight) + 1);
+						}
+						if(shopArr[k].formatColor){
+							entColor = parseInt(shopArr[k].formatColor.replace("#", "0x"), 16);
+							borderColor = parseInt(shopArr[k].borderColor.replace("#", "0x"), 16);
 						}
 					}
 				}	
@@ -135,20 +138,22 @@ FloorMap_QM.prototype.initStairs = function () {
 }
 //初始化路径
 FloorMap_QM.prototype.initPath = function (){
-	let pathArr = mapObj.mapData.path.nodes;
-	for(let i=0;i<pathArr.length;i++){
-		let planeGeom = new THREE.PlaneGeometry(48, 48);
-		let texture = new THREE.Texture();
-		texture.image = Map_QM.createPointCanvas(pathArr[i].id);
-		texture.needsUpdate = true;
-		let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide, depthTest: false, transparent: true});
-		let plane = new THREE.Mesh(planeGeom, material)
-		plane.position.x = pathArr[i].x;
-		plane.position.y = -1*pathArr[i].y;
-		plane.position.z = 2;
-		plane.renderOrder = 210;
-		plane.name=pathArr[i].id;
-		this.pathObj.add(plane);
+	if(mapObj.mapData.path){
+		let pathArr = mapObj.mapData.path.nodes;
+		for(let i=0;i<pathArr.length;i++){
+			let planeGeom = new THREE.PlaneGeometry(48, 48);
+			let texture = new THREE.Texture();
+			texture.image = Map_QM.createPointCanvas(pathArr[i].id);
+			texture.needsUpdate = true;
+			let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide, depthTest: false, transparent: true});
+			let plane = new THREE.Mesh(planeGeom, material)
+			plane.position.x = pathArr[i].x;
+			plane.position.y = -1*pathArr[i].y;
+			plane.position.z = 2;
+			plane.renderOrder = 210;
+			plane.name=pathArr[i].id;
+			this.pathObj.add(plane);
+		}
 	}
 }
 
@@ -261,7 +266,6 @@ MyModel_QM.prototype.MyModelShape = function (areaArr, howllowArr, name, options
 			shape.bezierCurveTo(areaArr[i][2], -1 * areaArr[i][3], areaArr[i][4], -1 * areaArr[i][5], areaArr[i][6], -1 * areaArr[i][7]);
 		}
 	}
-
 	if (howllowArr && howllowArr.length > 0) {
 		for (let n = 0; n < howllowArr.length; n++) {
 			let hole = new THREE.Path(); // 添加孔洞
