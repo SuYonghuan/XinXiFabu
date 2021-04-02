@@ -94,23 +94,18 @@
           </el-form-item>
         </template>
         <template v-else>
-          <el-form-item label="日期" prop="dateDay">
-            <el-date-picker
-              readonly
-              v-model="form.timeIntervals[0].dateDay"
-              type="date"
-              value-format="yyyy-MM-dd"
-              placeholder="选择日期"
-            >
-            </el-date-picker>
-          </el-form-item>
-          <el-form-item label="时间段" prop="timeIntervals">
+          <el-form-item prop="timeIntervals" label="时间段"> </el-form-item>
+          <el-form-item
+            :label="interval.dateMonth + '月' + interval.dateDay + '日'"
+            :key="interval.code"
+            v-for="interval in form.timeIntervals"
+          >
             <el-time-picker
               readonly
               is-range
-              v-model="form.timeIntervals[0].range"
-              value-format="HH:mm:ss"
+              v-model="interval.range"
               range-separator="至"
+              value-format="HH:mm:ss"
               start-placeholder="开始时间"
               end-placeholder="结束时间"
               placeholder="选择时间范围"
@@ -233,25 +228,40 @@ export default {
         if (code == "200") {
           this.form = data;
           if (this.form.timeIntervals) {
-            const intervalMap = this.form.timeIntervals.reduce(
-              (acc, { typeCode, beginTime, endTime, dateDay }) => ({
-                ...acc,
-                [typeCode]: {
-                  typeCode,
+            if (this.form.playMode === "customize") {
+              this.form.timeIntervals = this.form.timeIntervals.map(
+                ({ beginTime, endTime, dateDay, dateMonth }) => ({
                   range: [beginTime, endTime],
                   dateDay,
-                },
-              }),
-              {}
-            );
-            const newIntervals = this.newTimeIntervalsByPlayMode(
-              this.form.playMode
-            );
-            this.form.timeIntervals = newIntervals.map((interval) =>
-              intervalMap[interval.typeCode]
-                ? intervalMap[interval.typeCode]
-                : interval
-            );
+                  dateMonth,
+                })
+              );
+              this.form.timeIntervals.sort((a, b) =>
+                a.dateMonth === b.dateMonth
+                  ? a.dateDay - b.dateDay
+                  : a.dateMonth - b.dateMonth
+              );
+            } else {
+              const intervalMap = this.form.timeIntervals.reduce(
+                (acc, { typeCode, beginTime, endTime, dateDay }) => ({
+                  ...acc,
+                  [typeCode]: {
+                    typeCode,
+                    range: [beginTime, endTime],
+                    dateDay,
+                  },
+                }),
+                {}
+              );
+              const newIntervals = this.newTimeIntervalsByPlayMode(
+                this.form.playMode
+              );
+              this.form.timeIntervals = newIntervals.map((interval) =>
+                intervalMap[interval.typeCode]
+                  ? intervalMap[interval.typeCode]
+                  : interval
+              );
+            }
           }
           if (this.form.playList) {
             this.form.playList = this.form.playList.map(
