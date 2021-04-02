@@ -81,7 +81,7 @@ h5 {
   display: flex;
   justify-content: space-between;
   padding: 0 12px;
-  width: 376px;
+  width: 284px;
   line-height: 45px;
   height: 45px;
   margin-left: 12px;

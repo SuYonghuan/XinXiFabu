@@ -143,412 +143,356 @@
         :model="form"
         :rules="rules"
       >
-        <h5>节目设置</h5>
-        <el-form-item class="item" label="节目时长" prop="duration">
-          <el-time-picker
-            class="input1"
-            v-model="form.duration"
-            value-format="HH:mm:ss"
-            placeholder="选择时长"
-          >
-          </el-time-picker>
-        </el-form-item>
-        <h5>页面控件</h5>
-        <div
-          :class="(activeComponent ? '' : 'selected') + ' component-item'"
-          @click="activeComponent = null"
-        >
-          <svg class="icon avatar" aria-hidden="true">
-            <use xlink:href="#iconhuaban"></use>
-          </svg>
-          背景
+        <div class="r1">
+          <h5>页面控件</h5>
+          <component-list
+            :logos="logos"
+            :list="form.components"
+            :activeComponent="activeComponent"
+            :componentTypes="componentTypes"
+            @selectBg="activeComponent = null"
+            @remove="removeComponent"
+            @selectComponent="setActiveComponent"
+          ></component-list>
         </div>
-        <div
-          v-for="(component, i) in form.components"
-          :key="i"
-          :class="
-            (activeComponent === component ? 'selected' : '') +
-              ' component-item'
-          "
-          @click="setActiveComponent(i)"
-        >
-          <svg
-            class="icon avatar"
-            aria-hidden="true"
-            :style="`color:${component.color}`"
-          >
-            <use :xlink:href="logos[component.typeCode]"></use>
-          </svg>
-          <span>{{ componentTypes[component.typeCode] }}组件</span>
-          <div v-if="form.components.length === 1">
-            <svg
-              class="icon btn"
-              aria-hidden="true"
-              @click="removeComponent(i)"
+        <div class="r2">
+          <h5>节目设置</h5>
+          <el-form-item class="item" label="节目时长" prop="duration">
+            <el-time-picker
+              class="input1"
+              v-model="form.duration"
+              value-format="HH:mm:ss"
+              placeholder="选择时长"
             >
-              <use xlink:href="#iconshanchu"></use>
-            </svg>
-          </div>
-          <div v-else>
-            <svg
-              :class="['icon', 'btn', i === 0 ? 'hidden' : '']"
-              aria-hidden="true"
-              @click="top(i)"
-            >
-              <use xlink:href="#iconzhiding"></use>
-            </svg>
-            <svg
-              :class="['icon', 'btn', i === 0 ? 'hidden' : '']"
-              aria-hidden="true"
-              @click="up(i)"
-            >
-              <use xlink:href="#iconshang"></use>
-            </svg>
-            <svg
-              :class="[
-                'icon',
-                'btn',
-                i === form.components.length - 1 ? 'hidden' : '',
-              ]"
-              aria-hidden="true"
-              @click="down(i)"
-            >
-              <use xlink:href="#iconxia"></use>
-            </svg>
-            <svg
-              :class="[
-                'icon',
-                'btn',
-                i === form.components.length - 1 ? 'hidden' : '',
-              ]"
-              aria-hidden="true"
-              @click="bottom(i)"
-            >
-              <use xlink:href="#iconzhidi"></use>
-            </svg>
-            <svg
-              class="icon btn"
-              aria-hidden="true"
-              style="margin-left: 16px"
-              @click="removeComponent(i)"
-            >
-              <use xlink:href="#iconshanchu"></use>
-            </svg>
-          </div>
-        </div>
-        <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
-        <template v-if="!activeComponent">
-          <el-form-item class="item" label="背景颜色" prop="backgroundColor">
-            <el-color-picker v-model="form.backgroundColor" show-alpha>
-            </el-color-picker>
+            </el-time-picker>
           </el-form-item>
-          <mat-list
-            :data="form.backgroundMaterial ? [form.backgroundMaterial] : []"
-            @preview="preview"
-            @remove="form.backgroundMaterial = null"
-            :showAdd="!form.backgroundMaterial"
-            @selectMat="openMaterialModal"
-          ></mat-list>
-        </template>
-        <template v-else>
-          <div class="pos-items">
-            <el-form-item
-              label-width="18px"
-              class="short-item"
-              label="X"
-              prop="offsetX"
-            >
-              <el-input-number
-                v-model="activeComponent.offsetX"
-                :min="0"
-                :max="form.width - activeComponent.width"
-                :step="1"
-                :controls="false"
-                step-strictly
-              ></el-input-number>
-            </el-form-item>
-            <el-form-item
-              label-width="18px"
-              class="short-item"
-              label="Y"
-              prop="offsetY"
-            >
-              <el-input-number
-                v-model="activeComponent.offsetY"
-                :min="0"
-                :max="form.height - activeComponent.height"
-                :step="1"
-                :controls="false"
-                step-strictly
-              ></el-input-number>
-            </el-form-item>
-            <br />
-            <el-form-item
-              label-width="18px"
-              class="short-item"
-              label="宽"
-              prop="width"
-            >
-              <el-input-number
-                v-model="activeComponent.width"
-                :min="1"
-                :max="form.width - activeComponent.offsetX"
-                :step="1"
-                :controls="false"
-                step-strictly
-              ></el-input-number>
-            </el-form-item>
-            <el-form-item
-              label-width="18px"
-              class="short-item"
-              label="高"
-              prop="height"
-              @change="updateTransformer"
-            >
-              <el-input-number
-                v-model="activeComponent.height"
-                :min="1"
-                :max="form.height - activeComponent.offsetY"
-                :step="1"
-                :controls="false"
-                step-strictly
-              ></el-input-number>
-            </el-form-item>
-          </div>
-          <template v-if="activeComponent.typeCode === 'image'">
-            <el-form-item class="item" label="显示效果">
-              <el-select v-model="activeComponent.transition">
-                <el-option
-                  :key="op"
-                  :value="op"
-                  :label="op"
-                  v-for="op in [
-                    '随机',
-                    '马赛克',
-                    '上下滚动',
-                    '左右滚动',
-                    '渐入',
-                  ]"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item class="item" label="切换时间">
-              <el-input-number
-                v-model="activeComponent.transitionPeriod"
-                :step="1"
-                step-strictly
-                :min="1"
-                :max="86400"
-              ></el-input-number
-              >秒
+
+          <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
+          <template v-if="!activeComponent">
+            <el-form-item class="item" label="背景颜色" prop="backgroundColor">
+              <el-color-picker v-model="form.backgroundColor" show-alpha>
+              </el-color-picker>
             </el-form-item>
             <mat-list
-              :data="activeComponent.materials"
-              @swap="([i, j]) => swap(i, j)"
+              :data="form.backgroundMaterial ? [form.backgroundMaterial] : []"
               @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="true"
+              @remove="form.backgroundMaterial = null"
+              :showAdd="!form.backgroundMaterial"
               @selectMat="openMaterialModal"
             ></mat-list>
           </template>
-          <template v-else-if="activeComponent.typeCode === 'video'">
-            <mat-list
-              :data="activeComponent.materials"
-              @swap="([i, j]) => swap(i, j)"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="true"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'url'">
-            <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
-              <el-time-picker
-                v-model="activeComponent.refreshPeriod"
-                value-format="HH:mm:ss"
-                placeholder="选择刷新时间"
+          <template v-else>
+            <div class="pos-items">
+              <el-form-item
+                label-width="18px"
+                class="short-item"
+                label="X"
+                prop="offsetX"
               >
-              </el-time-picker>
-            </el-form-item>
-            <mat-list
-              :data="activeComponent.materials"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="!activeComponent.materials.length"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'html'">
-            <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
-              <el-time-picker
-                v-model="activeComponent.refreshPeriod"
-                value-format="HH:mm:ss"
-                placeholder="选择刷新时间"
+                <el-input-number
+                  v-model="activeComponent.offsetX"
+                  :min="0"
+                  :max="form.width - activeComponent.width"
+                  :step="1"
+                  :controls="false"
+                  step-strictly
+                ></el-input-number>
+              </el-form-item>
+              <el-form-item
+                label-width="18px"
+                class="short-item"
+                label="Y"
+                prop="offsetY"
               >
-              </el-time-picker>
-            </el-form-item>
-            <mat-list
-              :data="activeComponent.materials"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="!activeComponent.materials.length"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'text'">
-            <el-form-item class="item" label="背景色" prop="backgroundColor">
-              <el-color-picker
-                v-model="activeComponent.backgroundColor"
-                show-alpha
+                <el-input-number
+                  v-model="activeComponent.offsetY"
+                  :min="0"
+                  :max="form.height - activeComponent.height"
+                  :step="1"
+                  :controls="false"
+                  step-strictly
+                ></el-input-number>
+              </el-form-item>
+              <br />
+              <el-form-item
+                label-width="18px"
+                class="short-item"
+                label="宽"
+                prop="width"
               >
-              </el-color-picker>
-            </el-form-item>
-            <el-form-item
-              label-width="86px"
-              class="item"
-              label="背景透明度"
-              prop="backgroundOpacity"
-            >
-              <el-slider
-                v-model="activeComponent.backgroundOpacity"
-              ></el-slider>
-            </el-form-item>
-            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
-              <el-color-picker v-model="activeComponent.fontColor" show-alpha>
-              </el-color-picker>
-            </el-form-item>
-            <el-form-item class="item" label="字体大小">
-              <el-input-number
-                v-model="activeComponent.fontSize"
-                :step="1"
-                step-strictly
-                :min="1"
-                :max="1000"
-              ></el-input-number
-              >px
-            </el-form-item>
-            <el-form-item class="item" label="样式">
-              <el-select v-model="activeComponent.fontStyle">
-                <el-option
-                  :key="key"
-                  :value="key"
-                  :label="key"
-                  v-for="key in ['正常', '加粗', '斜体', '加粗、斜体']"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item class="item" label="滚动速度">
-              <el-select v-model="activeComponent.animationSpeed">
-                <el-option
-                  :key="key"
-                  :value="key"
-                  :label="key"
-                  v-for="key in ['慢', '中等', '快', '很快']"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item class="item" label="字幕滚动">
-              <el-select v-model="activeComponent.animation">
-                <el-option
-                  :key="key"
-                  :value="key"
-                  :label="key"
-                  v-for="key in ['从左往右', '从右往左']"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <mat-list
-              :data="activeComponent.materials"
-              @swap="([i, j]) => swap(i, j)"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="true"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'weather'">
-            <el-form-item class="item" label="城市名称">
-              <el-input
-                :maxlength="20"
-                v-model="activeComponent.cityName"
-              ></el-input>
-            </el-form-item>
-            <el-form-item class="item" label="数据选择">
-              <el-select v-model="activeComponent.components" multiple>
-                <el-option
-                  :key="key"
-                  :value="key"
-                  :label="key"
-                  v-for="key in weatherComponents"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
-              <el-color-picker v-model="activeComponent.fontColor" show-alpha>
-              </el-color-picker>
-            </el-form-item>
-            <el-form-item class="item" label="字体大小">
-              <el-input-number
-                v-model="activeComponent.fontSize"
-                :step="1"
-                step-strictly
-                :min="1"
-                :max="1000"
-              ></el-input-number
-              >px
-            </el-form-item>
-            <el-form-item class="item" label="背景色" prop="backgroundColor">
-              <el-color-picker
-                v-model="activeComponent.backgroundColor"
-                show-alpha
+                <el-input-number
+                  v-model="activeComponent.width"
+                  :min="1"
+                  :max="form.width - activeComponent.offsetX"
+                  :step="1"
+                  :controls="false"
+                  step-strictly
+                ></el-input-number>
+              </el-form-item>
+              <el-form-item
+                label-width="18px"
+                class="short-item"
+                label="高"
+                prop="height"
+                @change="updateTransformer"
               >
-              </el-color-picker>
-            </el-form-item>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'clock'">
-            <el-form-item class="item" label="字体颜色" prop="backgroundColor">
-              <el-color-picker v-model="activeComponent.fontColor" show-alpha>
-              </el-color-picker>
-            </el-form-item>
-            <el-form-item class="item" label="字体大小">
-              <el-input-number
-                v-model="activeComponent.fontSize"
-                :step="1"
-                step-strictly
-                :min="1"
-                :max="1000"
-              ></el-input-number
-              >px
-            </el-form-item>
-            <el-form-item class="item" label="背景色" prop="backgroundColor">
-              <el-color-picker
-                v-model="activeComponent.backgroundColor"
-                show-alpha
+                <el-input-number
+                  v-model="activeComponent.height"
+                  :min="1"
+                  :max="form.height - activeComponent.offsetY"
+                  :step="1"
+                  :controls="false"
+                  step-strictly
+                ></el-input-number>
+              </el-form-item>
+            </div>
+            <template v-if="activeComponent.typeCode === 'image'">
+              <el-form-item class="item" label="显示效果">
+                <el-select v-model="activeComponent.transition">
+                  <el-option
+                    :key="op"
+                    :value="op"
+                    :label="op"
+                    v-for="op in [
+                      '随机',
+                      '马赛克',
+                      '上下滚动',
+                      '左右滚动',
+                      '渐入',
+                    ]"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="切换时间">
+                <el-input-number
+                  v-model="activeComponent.transitionPeriod"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="86400"
+                ></el-input-number
+                >秒
+              </el-form-item>
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="true"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'video'">
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="true"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'url'">
+              <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
+                <el-time-picker
+                  v-model="activeComponent.refreshPeriod"
+                  value-format="HH:mm:ss"
+                  placeholder="选择刷新时间"
+                >
+                </el-time-picker>
+              </el-form-item>
+              <mat-list
+                :data="activeComponent.materials"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="!activeComponent.materials.length"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'html'">
+              <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
+                <el-time-picker
+                  v-model="activeComponent.refreshPeriod"
+                  value-format="HH:mm:ss"
+                  placeholder="选择刷新时间"
+                >
+                </el-time-picker>
+              </el-form-item>
+              <mat-list
+                :data="activeComponent.materials"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="!activeComponent.materials.length"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'text'">
+              <el-form-item class="item" label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
+                >
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item
+                label-width="86px"
+                class="item"
+                label="背景透明度"
+                prop="backgroundOpacity"
               >
-              </el-color-picker>
-            </el-form-item>
+                <el-slider
+                  v-model="activeComponent.backgroundOpacity"
+                ></el-slider>
+              </el-form-item>
+              <el-form-item
+                class="item"
+                label="字体颜色"
+                prop="backgroundColor"
+              >
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item class="item" label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item class="item" label="样式">
+                <el-select v-model="activeComponent.fontStyle">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['正常', '加粗', '斜体', '加粗、斜体']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="滚动速度">
+                <el-select v-model="activeComponent.animationSpeed">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['慢', '中等', '快', '很快']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="字幕滚动">
+                <el-select v-model="activeComponent.animation">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in ['从左往右', '从右往左']"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="true"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'weather'">
+              <el-form-item class="item" label="城市名称">
+                <el-input
+                  :maxlength="20"
+                  v-model="activeComponent.cityName"
+                ></el-input>
+              </el-form-item>
+              <el-form-item class="item" label="数据选择">
+                <el-select v-model="activeComponent.components" multiple>
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in weatherComponents"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item
+                class="item"
+                label="字体颜色"
+                prop="backgroundColor"
+              >
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item class="item" label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item class="item" label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
+                >
+                </el-color-picker>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'clock'">
+              <el-form-item
+                class="item"
+                label="字体颜色"
+                prop="backgroundColor"
+              >
+                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                </el-color-picker>
+              </el-form-item>
+              <el-form-item class="item" label="字体大小">
+                <el-input-number
+                  v-model="activeComponent.fontSize"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >px
+              </el-form-item>
+              <el-form-item class="item" label="背景色" prop="backgroundColor">
+                <el-color-picker
+                  v-model="activeComponent.backgroundColor"
+                  show-alpha
+                >
+                </el-color-picker>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'audio'">
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="true"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'stream'">
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="preview"
+                @remove="removeMaterial"
+                :showAdd="true"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
           </template>
-          <template v-else-if="activeComponent.typeCode === 'audio'">
-            <mat-list
-              :data="activeComponent.materials"
-              @swap="([i, j]) => swap(i, j)"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="true"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-          <template v-else-if="activeComponent.typeCode === 'stream'">
-            <mat-list
-              :data="activeComponent.materials"
-              @swap="([i, j]) => swap(i, j)"
-              @preview="preview"
-              @remove="removeMaterial"
-              :showAdd="true"
-              @selectMat="openMaterialModal"
-            ></mat-list>
-          </template>
-        </template>
+        </div>
       </el-form>
     </div>
     <el-dialog
@@ -628,6 +572,8 @@
 <script>
 import MatList from "./EditForm/MatList";
 import { ProgramApi } from "../program.js";
+import draggable from "vuedraggable";
+import ComponentList from "./EditForm/ComponentList";
 
 const logos = {
   audio: "#iconyinpin",
@@ -656,7 +602,7 @@ const flatenComponent = ({ config, ...component }) => {
   return { ...component, ...config };
 };
 export default {
-  components: { MatList },
+  components: { MatList, draggable, ComponentList },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -732,7 +678,7 @@ export default {
     stageScale() {
       if (!this.form) return 0;
       return Math.min(
-        (this.$root.ww - 656 - 240) / this.form.width,
+        (this.$root.ww - 752 - 240) / this.form.width,
         (this.$root.wh - 80 - 120) / this.form.height
       );
     },
@@ -1234,10 +1180,53 @@ export default {
       background: #ececec;
     }
     .right {
-      flex: 0 0 400px;
+      flex: 0 0 496px;
       overflow-x: hidden;
-      overflow-y: scroll;
       height: calc(100vh - 80px);
+      display: flex;
+      .r1 {
+        flex: 0 0 188px;
+        .component-item {
+          position: relative;
+          display: flex;
+          margin: 0 12px;
+          padding-left: 48px;
+          padding-right: 12px;
+          font-size: 14px;
+          line-height: 45px;
+          height: 45px;
+          justify-content: space-between;
+          cursor: pointer;
+          color: #868f9f;
+          border-radius: 6px;
+          white-space: nowrap;
+          .icon-avatar {
+            position: absolute;
+            font-size: 20px;
+            top: 13px;
+            left: 12px;
+          }
+          .btn {
+            font-size: 20px;
+            &.hidden {
+              visibility: hidden;
+              cursor: none;
+            }
+          }
+          .btn + .btn {
+            margin-left: 8px;
+          }
+          &.selected {
+            background: #2f6bff;
+            color: #fff;
+          }
+        }
+      }
+      .r2 {
+        flex: 0 0 308px;
+        width: 308px;
+        border-left: 1px solid #e6e7ec;
+      }
       h5 {
         display: flex;
         justify-content: space-between;
@@ -1262,40 +1251,7 @@ export default {
           border-radius: 6px;
         }
       }
-      .component-item {
-        position: relative;
-        display: flex;
-        margin: 0 12px;
-        padding-left: 48px;
-        padding-right: 12px;
-        font-size: 14px;
-        line-height: 45px;
-        height: 45px;
-        justify-content: space-between;
-        cursor: pointer;
-        color: #868f9f;
-        border-radius: 6px;
-        .avatar {
-          position: absolute;
-          font-size: 20px;
-          top: 13px;
-          left: 12px;
-        }
-        .btn {
-          font-size: 20px;
-          &.hidden {
-            visibility: hidden;
-            cursor: none;
-          }
-        }
-        .btn + .btn {
-          margin-left: 8px;
-        }
-        &.selected {
-          background: #2f6bff;
-          color: #fff;
-        }
-      }
+
       .mat {
         display: flex;
         justify-content: space-between;
@@ -1481,6 +1437,9 @@ export default {
       font-weight: bold;
       font-size: 18px;
       color: #3a4763;
+      input {
+        border: none;
+      }
     }
     &.is-required {
       > .el-form-item__label {
