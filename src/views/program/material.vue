@@ -236,7 +236,6 @@
               :action="config.url + config.uploadFile"
               ref="upload"
               list-type="picture-card"
-              :limit="1"
               :file-list="form.file"
               :show-file-list="false"
               :on-change="onUpload"
@@ -660,7 +659,6 @@ export default {
     },
   },
   async mounted() {
-    console.log(this.$root.windowHeight);
     const [materialTypes, auditTypes] = await Promise.all([
       MaterialApi.getMaterialTypes(),
       MaterialApi.getAuditTypes(),
@@ -684,8 +682,8 @@ export default {
     beforeUpload(file) {
       const type = file.type.includes("video")
         ? "视频"
-        : file.type.includes("音频")
-        ? "audio"
+        : file.type.includes("audio")
+        ? "音频"
         : file.type.includes("image")
         ? "图片"
         : file.type === "text/html"
