@@ -1,54 +1,63 @@
 <template>
-  <el-menu
-    :collapse="collapsed"
-    collapse-transition
-    router
-    :default-active="$route.path"
-    unique-opened
-    class="el-menu-vertical-demo"
-    background-color="#171F46"
-    text-color="#fff"
-    active-text-color="#2F6BFF"
-  >
-    <div class="logobox">
-      <svg
-        class="icon svgi"
-        aria-hidden="true"
-        @click="$emit('toggleCollapse')"
-      >
-        <use xlink:href="#iconzhedie"></use>
-      </svg>
-      <img
-        class="logoimg"
-        v-if="!collapsed"
-        :src="website.logo ? website.logo : '../../common/images/logo.png'"
-        alt=""
-      />
-    </div>
-    <el-submenu
-      v-for="menu in menus"
-      :key="menu.code"
-      :index="menu.textCH"
-      class="submenu"
+  <div>
+    <el-menu
+      :collapse="collapsed"
+      collapse-transition
+      router
+      :default-active="$route.path"
+      unique-opened
+      class="el-menu-vertical-demo"
+      background-color="#171F46"
+      text-color="#fff"
+      active-text-color="#2F6BFF"
     >
-      <template slot="title">
-        <svg class="icon svgi" aria-hidden="true">
-          <use :xlink:href="menu.icon"></use>
-        </svg>
-        <span slot="title">{{ menu.textCH }}</span>
-      </template>
-      <el-menu-item-group>
-        <el-menu-item
-          v-for="chmenu in menu.child"
-          :index="chmenu.href"
-          :key="chmenu.code"
-          @click="menuClick({ ...chmenu, parent: menu.textCH })"
+      <div class="logobox">
+        <svg
+          class="icon svgi"
+          aria-hidden="true"
+          @click="$emit('toggleCollapse')"
         >
-          <span slot="title">{{ chmenu.textCH }}</span>
-        </el-menu-item>
-      </el-menu-item-group>
-    </el-submenu>
-  </el-menu>
+          <use xlink:href="#iconzhedie"></use>
+        </svg>
+        <img
+          class="logoimg"
+          v-if="!collapsed"
+          :src="website.logo ? website.logo : '../../common/images/logo.png'"
+          alt=""
+        />
+      </div>
+      <router-link class="submenu el-submenu" to="/index/home">
+        <div class="router-link-title">
+          <svg class="icon svgi" aria-hidden="true">
+            <use xlink:href="#iconshouye"></use></svg
+          >首页
+        </div>
+      </router-link>
+      <el-submenu
+        v-for="menu in menus"
+        :key="menu.code"
+        :index="menu.textCH"
+        class="submenu"
+      >
+        <template slot="title">
+          <svg class="icon svgi" aria-hidden="true">
+            <use :xlink:href="menu.icon"></use>
+          </svg>
+          <span slot="title">{{ menu.textCH }}</span>
+        </template>
+        <el-menu-item-group>
+          <el-menu-item
+            v-for="chmenu in menu.child"
+            :index="chmenu.href"
+            :key="chmenu.code"
+            @click="menuClick({ ...chmenu, parent: menu.textCH })"
+          >
+            <span slot="title">{{ chmenu.textCH }}</span>
+          </el-menu-item>
+        </el-menu-item-group>
+      </el-submenu>
+    </el-menu>
+  </div>
 </template>
 
 <script>
@@ -117,11 +126,16 @@ export default {
     font-weight: bold;
   }
   .submenu {
+    &:hover {
+      background-color: #1f2d3d !important;
+    }
     .el-menu-bg {
       background-color: #1f2d3d !important;
     }
-    &.is-active {
-      .el-submenu__title {
+    &.is-active,
+    &.router-link-exact-active {
+      .el-submenu__title,
+      .router-link-title {
         position: relative;
         background-image: url(./submenu-active-bg.svg);
         background-position-x: 8px;
@@ -134,7 +148,8 @@ export default {
         }
       }
     }
-    .el-submenu__title {
+    .el-submenu__title,
+    .router-link-title {
       padding-left: 24px !important;
       i {
         color: #868f9f;
@@ -142,6 +157,19 @@ export default {
           font-size: 14px;
         }
       }
+    }
+    .router-link-title {
+      height: 56px;
+      line-height: 56px;
+      font-size: 14px;
+      color: #fff;
+      padding: 0 20px;
+      list-style: none;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+      box-sizing: border-box;
+      white-space: nowrap;
     }
     .el-menu-item {
       min-width: 256px !important;
@@ -159,8 +187,7 @@ export default {
   }
   .el-submenu .svgi {
     vertical-align: middle;
-    margin-right: 17px;
-    width: 24px;
+    margin-right: 24px;
     text-align: center;
     font-size: 20px;
     color: #868f9f;
