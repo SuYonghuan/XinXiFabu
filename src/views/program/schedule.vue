@@ -33,13 +33,6 @@
           <el-button
             size="small"
             type="primary"
-            v-if="canI.publishschedule"
-            @click="showPublishForm = true"
-            >日程发布</el-button
-          >
-          <el-button
-            size="small"
-            type="primary"
             v-if="canI.addschedule"
             @click="handleAdd"
             >新建日程</el-button
@@ -148,7 +141,7 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="300px;"
+        width="350px;"
         key="operating"
         label="操作"
       >
@@ -205,6 +198,18 @@
               >删除</el-button
             >
           </el-popconfirm>
+          <el-button
+            size="mini"
+            type="primary"
+            style="margin-left: 10px;"
+            v-if="canI.publishschedule"
+            @click="
+              scheduleToPublish = scope.row;
+              showPublishForm = true;
+            "
+            :disabled="scope.row.statusCode != 1"
+            >发布</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -262,6 +267,7 @@
         :showForm="showPublishForm"
         @closeForm="showPublishForm = false"
         :resolutions="resolutions"
+        :schedule="scheduleToPublish"
         @published="handlePublished"
       ></publish-form>
     </el-dialog>
@@ -309,6 +315,7 @@ export default {
       showAddForm: false,
       showDetailForm: false,
       showPublishForm: false,
+      scheduleToPublish: null,
     };
   },
   computed: {
