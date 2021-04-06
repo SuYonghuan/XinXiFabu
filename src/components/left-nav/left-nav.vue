@@ -71,7 +71,7 @@ export default {
   props: ["collapsed"],
   methods: {
     menuClick(item) {
-      setCookie(JSON.stringify({ code: item.code }), "presentMenu", 1);
+      setCookie(JSON.stringify(item), "presentMenu", 1);
       this.setPresentMenu(item);
     },
     ...mapMutations({
