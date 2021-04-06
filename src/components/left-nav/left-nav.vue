@@ -27,7 +27,10 @@
         />
       </div>
       <router-link class="submenu el-submenu" to="/index/home">
-        <div class="router-link-title">
+        <div
+          class="router-link-title"
+          @click="menuClick({ textCH: '首页', parent: '首页' })"
+        >
           <svg class="icon svgi" aria-hidden="true">
             <use xlink:href="#iconshouye"></use></svg
           >首页
