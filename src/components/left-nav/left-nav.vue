@@ -1,66 +1,64 @@
 <template>
-  <div>
-    <el-menu
-      :collapse="collapsed"
-      collapse-transition
-      router
-      :default-active="$route.path"
-      unique-opened
-      class="el-menu-vertical-demo"
-      background-color="#171F46"
-      text-color="#fff"
-      active-text-color="#2F6BFF"
-    >
-      <div class="logobox">
-        <svg
-          class="icon svgi"
-          aria-hidden="true"
-          @click="$emit('toggleCollapse')"
-        >
-          <use xlink:href="#iconzhedie"></use>
-        </svg>
-        <img
-          class="logoimg"
-          v-if="!collapsed"
-          :src="website.logo ? website.logo : '../../common/images/logo.png'"
-          alt=""
-        />
-      </div>
-      <router-link class="submenu el-submenu" to="/index/home">
-        <div
-          class="router-link-title"
-          @click="menuClick({ textCH: '首页', parent: '首页' })"
-        >
-          <svg class="icon svgi" aria-hidden="true">
-            <use xlink:href="#iconshouye"></use></svg
-          >首页
-        </div>
-      </router-link>
-      <el-submenu
-        v-for="menu in menus"
-        :key="menu.code"
-        :index="menu.textCH"
-        class="submenu"
+  <el-menu
+    :collapse="collapsed"
+    collapse-transition
+    router
+    :default-active="$route.path"
+    unique-opened
+    class="el-menu-vertical-demo"
+    background-color="#171F46"
+    text-color="#fff"
+    active-text-color="#2F6BFF"
+  >
+    <div class="logobox">
+      <svg
+        class="icon svgi"
+        aria-hidden="true"
+        @click="$emit('toggleCollapse')"
       >
-        <template slot="title">
-          <svg class="icon svgi" aria-hidden="true">
-            <use :xlink:href="menu.icon"></use>
-          </svg>
-          <span slot="title">{{ menu.textCH }}</span>
-        </template>
-        <el-menu-item-group>
-          <el-menu-item
-            v-for="chmenu in menu.child"
-            :index="chmenu.href"
-            :key="chmenu.code"
-            @click="menuClick({ ...chmenu, parent: menu.textCH })"
-          >
-            <span slot="title">{{ chmenu.textCH }}</span>
-          </el-menu-item>
-        </el-menu-item-group>
-      </el-submenu>
-    </el-menu>
-  </div>
+        <use xlink:href="#iconzhedie"></use>
+      </svg>
+      <img
+        class="logoimg"
+        v-if="!collapsed"
+        :src="website.logo ? website.logo : '../../common/images/logo.png'"
+        alt=""
+      />
+    </div>
+    <router-link class="submenu el-submenu" to="/index/home">
+      <div
+        class="router-link-title"
+        @click="menuClick({ textCH: '首页', parent: '首页' })"
+      >
+        <svg class="icon svgi" aria-hidden="true">
+          <use xlink:href="#iconshouye"></use></svg
+        >首页
+      </div>
+    </router-link>
+    <el-submenu
+      v-for="menu in menus"
+      :key="menu.code"
+      :index="menu.textCH"
+      class="submenu"
+    >
+      <template slot="title">
+        <svg class="icon svgi" aria-hidden="true">
+          <use :xlink:href="menu.icon"></use>
+        </svg>
+        <span slot="title">{{ menu.textCH }}</span>
+      </template>
+      <el-menu-item-group>
+        <el-menu-item
+          v-for="chmenu in menu.child"
+          :index="chmenu.href"
+          :key="chmenu.code"
+          @click="menuClick({ ...chmenu, parent: menu.textCH })"
+        >
+          <span slot="title">{{ chmenu.textCH }}</span>
+        </el-menu-item>
+      </el-menu-item-group>
+    </el-submenu>
+  </el-menu>
 </template>
 
 <script>
@@ -204,8 +202,10 @@ export default {
   width: 68px;
   height: 100%;
   .submenu {
-    &.is-active {
-      .el-submenu__title {
+    &.is-active,
+    &.router-link-exact-active {
+      .el-submenu__title,
+      .router-link-title {
         background-image: url(./active-bg-small.svg);
       }
     }

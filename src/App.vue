@@ -41,7 +41,7 @@ export default {
           !getCookie("autoauth") && this.GetUserInfo(userInfo);
           getCookie("presentMenu") &&
             this.setPresentMenu(JSON.parse(getCookie("presentMenu")));
-          this._getMenu(userInfo.nickName);
+          this._getMenu();
           return;
         }
       }
@@ -58,7 +58,7 @@ export default {
         }
       });
     },
-    _getMenu(nickName) {
+    _getMenu() {
       const param = {
         // "accountName": nickName
       };

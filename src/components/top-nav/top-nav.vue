@@ -41,7 +41,7 @@
       </el-dropdown-menu>
     </el-dropdown>
     <div class="stick"></div>
-
+    {{ user.nickName }}
     <el-dropdown
       trigger="click"
       v-show="!autoAuth"
@@ -194,6 +194,7 @@ export default {
   }
 }
 .stick {
+  position: relative;
   width: 101px;
   height: 80px;
   display: inline-block;
@@ -201,6 +202,7 @@ export default {
     position: absolute;
     content: "";
     left: 53px;
+    top: 30px;
     height: 20px;
     border-left: 1px solid #e6e7ec;
   }
