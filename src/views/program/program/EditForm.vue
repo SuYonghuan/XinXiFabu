@@ -88,7 +88,147 @@
                 zIndex: -1,
               }"
             ></v-image>
-            <v-rect
+            <template v-for="(component, i) in form.components">
+              <v-image
+                v-if="component.image"
+                :key="i"
+                :name="'name_' + i"
+                :config="{
+                  x: component.offsetX,
+                  y: component.offsetY,
+                  width: component.width,
+                  height: component.height,
+                  draggable: true,
+                  fill: component.color,
+
+                  strokeEnabled: false,
+                  zIndex: i,
+                  dragBoundFunc: (pos) => {
+                    return {
+                      x:
+                        pos.x < 0
+                          ? 0
+                          : pos.x > form.width - component.width
+                          ? form.width - component.width
+                          : pos.x,
+                      y:
+                        pos.y < 0
+                          ? 0
+                          : pos.y > form.height - component.height
+                          ? form.height - component.height
+                          : pos.y,
+                    };
+                  },
+                  image: component.image,
+                }"
+                @dragend="handleDragend"
+                @transformend="handleTransformEnd"
+              />
+              <template v-else-if="component.typeCode === 'text'">
+                <v-rect
+                  :key="i"
+                  :name="'name_' + i"
+                  :config="{
+                    x: component.offsetX,
+                    y: component.offsetY,
+                    width: component.width,
+                    height: component.height,
+                    draggable: true,
+                    strokeEnabled: false,
+                    zIndex: i,
+                    fill: component.backgroundColor,
+                    opacity: component.backgroundOpacity / 100,
+                    dragBoundFunc: (pos) => {
+                      return {
+                        x:
+                          pos.x < 0
+                            ? 0
+                            : pos.x > form.width - component.width
+                            ? form.width - component.width
+                            : pos.x,
+                        y:
+                          pos.y < 0
+                            ? 0
+                            : pos.y > form.height - component.height
+                            ? form.height - component.height
+                            : pos.y,
+                      };
+                    },
+                  }"
+                  @dragend="handleDragend"
+                  @transformend="handleTransformEnd"
+                ></v-rect>
+                <v-text
+                  :key="i + '_text'"
+                  :config="{
+                    x: component.offsetX,
+                    y: component.offsetY,
+                    width: component.width,
+                    height: component.height,
+                    strokeEnabled: false,
+                    fill: component.fontColor,
+                    listening: false,
+                    fontStyle:
+                      component.fontStyle === '正常'
+                        ? 'normal'
+                        : component.fontStyle === '加粗'
+                        ? 'bold'
+                        : component.fontStyle === '斜体'
+                        ? 'italic'
+                        : component.fontStyle === '加粗、斜体'
+                        ? 'bold italic'
+                        : 'normal',
+                    wrap: 'none',
+                    fontSize: component.fontSize,
+                    text: component.materials.length
+                      ? component.materials[0].text
+                      : `七月流火，九月授衣。一之日觱发，二之日栗烈。无衣无褐，何以卒岁。三之日于耜，四之日举趾。同我妇子，馌彼南亩，田畯至喜。七月流火，九月授衣。春日载阳，有鸣仓庚。女执懿筐，遵彼微行，爰求柔桑。春日迟迟，采蘩祁祁。女心伤悲，殆及公子同归。七月流火，八月萑苇。蚕月条桑，取彼斧斨，以伐远扬，猗彼女桑。七月鸣鵙，八月载绩。载玄载黄，我朱孔阳，为公子裳。四月秀葽，五月鸣蜩。八月其获，十月陨萚。一之日于貉，取彼狐狸，为公子裘。二之日其同，载缵武功，言私其豵，献豣于公。五月斯螽动股，六月莎鸡振羽，七月在野，八月在宇，九月在户，十月蟋蟀入我床下。穹窒熏鼠，塞向墐户。嗟我妇子，曰为改岁，入此室处。六月食郁及薁，七月亨葵及菽，八月剥枣，十月获稻，为此春酒，以介眉寿。七月食瓜，八月断壶，九月叔苴，采荼薪樗，食我农夫。九月筑场圃，十月纳禾稼。黍稷重穋，禾麻菽麦。嗟我农夫，我稼既同，上入执宫功。昼尔于茅，宵尔索綯。亟其乘屋，其始播百谷。二之日凿冰冲冲，三之日纳于凌阴。四之日其蚤，献羔祭韭。九月肃霜，十月涤场。朋酒斯飨，曰杀羔羊。跻彼公堂，称彼兕觥，万寿无疆。`,
+                  }"
+                ></v-text>
+              </template>
+              <v-rect
+                v-else
+                :key="i"
+                :name="'name_' + i"
+                :config="{
+                  x: component.offsetX,
+                  y: component.offsetY,
+                  width: component.width,
+                  height: component.height,
+                  draggable: true,
+                  strokeEnabled: false,
+                  zIndex: i,
+                  fill: component.color,
+                  dragBoundFunc: (pos) => {
+                    return {
+                      x:
+                        pos.x < 0
+                          ? 0
+                          : pos.x > form.width - component.width
+                          ? form.width - component.width
+                          : pos.x,
+                      y:
+                        pos.y < 0
+                          ? 0
+                          : pos.y > form.height - component.height
+                          ? form.height - component.height
+                          : pos.y,
+                    };
+                  },
+                }"
+                @dragend="handleDragend"
+                @transformend="handleTransformEnd"
+              >
+              </v-rect>
+            </template>
+            <!-- <component
+              :is="
+                component.typeCode === 'text'
+                  ? 'v-text'
+                  : component.image
+                  ? 'v-image'
+                  : 'v-rect'
+              "
               v-for="(component, i) in form.components"
               :key="i"
               :name="'name_' + i"
@@ -118,10 +258,32 @@
                         : pos.y,
                   };
                 },
+                ...(component.image ? { image: component.image } : {}),
+                ...(component.typeCode === 'text'
+                  ? {
+                      fill: component.fontColor,
+                      fontStyle:
+                        component.fontStyle === '正常'
+                          ? 'normal'
+                          : component.fontStyle === '加粗'
+                          ? 'bold'
+                          : component.fontStyle === '斜体'
+                          ? 'italic'
+                          : component.fontStyle === '加粗、斜体'
+                          ? 'bold italic'
+                          : 'normal',
+                      wrap: 'none',
+                      fontSize: component.fontSize,
+                      text: component.materials.length
+                        ? component.materials[0].text
+                        : `七月流火，九月授衣。一之日觱发，二之日栗烈。无衣无褐，何以卒岁。三之日于耜，四之日举趾。同我妇子，馌彼南亩，田畯至喜。七月流火，九月授衣。春日载阳，有鸣仓庚。女执懿筐，遵彼微行，爰求柔桑。春日迟迟，采蘩祁祁。女心伤悲，殆及公子同归。七月流火，八月萑苇。蚕月条桑，取彼斧斨，以伐远扬，猗彼女桑。七月鸣鵙，八月载绩。载玄载黄，我朱孔阳，为公子裳。四月秀葽，五月鸣蜩。八月其获，十月陨萚。一之日于貉，取彼狐狸，为公子裘。二之日其同，载缵武功，言私其豵，献豣于公。五月斯螽动股，六月莎鸡振羽，七月在野，八月在宇，九月在户，十月蟋蟀入我床下。穹窒熏鼠，塞向墐户。嗟我妇子，曰为改岁，入此室处。六月食郁及薁，七月亨葵及菽，八月剥枣，十月获稻，为此春酒，以介眉寿。七月食瓜，八月断壶，九月叔苴，采荼薪樗，食我农夫。九月筑场圃，十月纳禾稼。黍稷重穋，禾麻菽麦。嗟我农夫，我稼既同，上入执宫功。昼尔于茅，宵尔索綯。亟其乘屋，其始播百谷。二之日凿冰冲冲，三之日纳于凌阴。四之日其蚤，献羔祭韭。九月肃霜，十月涤场。朋酒斯飨，曰杀羔羊。跻彼公堂，称彼兕觥，万寿无疆。`,
+                    }
+                  : {}),
               }"
               @dragend="handleDragend"
               @transformend="handleTransformEnd"
-            ></v-rect>
+            >
+            </component> -->
 
             <v-transformer
               ref="transformer"
@@ -170,7 +332,7 @@
           <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
           <template v-if="!activeComponent">
             <el-form-item class="item" label="背景颜色" prop="backgroundColor">
-              <el-color-picker v-model="form.backgroundColor" show-alpha>
+              <el-color-picker v-model="form.backgroundColor">
               </el-color-picker>
             </el-form-item>
             <mat-list
@@ -328,10 +490,7 @@
             </template>
             <template v-else-if="activeComponent.typeCode === 'text'">
               <el-form-item class="item" label="背景色" prop="backgroundColor">
-                <el-color-picker
-                  v-model="activeComponent.backgroundColor"
-                  show-alpha
-                >
+                <el-color-picker v-model="activeComponent.backgroundColor">
                 </el-color-picker>
               </el-form-item>
               <el-form-item
@@ -349,7 +508,7 @@
                 label="字体颜色"
                 prop="backgroundColor"
               >
-                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                <el-color-picker v-model="activeComponent.fontColor">
                 </el-color-picker>
               </el-form-item>
               <el-form-item class="item" label="字体大小">
@@ -423,7 +582,7 @@
                 label="字体颜色"
                 prop="backgroundColor"
               >
-                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                <el-color-picker v-model="activeComponent.fontColor">
                 </el-color-picker>
               </el-form-item>
               <el-form-item class="item" label="字体大小">
@@ -437,10 +596,7 @@
                 >px
               </el-form-item>
               <el-form-item class="item" label="背景色" prop="backgroundColor">
-                <el-color-picker
-                  v-model="activeComponent.backgroundColor"
-                  show-alpha
-                >
+                <el-color-picker v-model="activeComponent.backgroundColor">
                 </el-color-picker>
               </el-form-item>
             </template>
@@ -450,7 +606,7 @@
                 label="字体颜色"
                 prop="backgroundColor"
               >
-                <el-color-picker v-model="activeComponent.fontColor" show-alpha>
+                <el-color-picker v-model="activeComponent.fontColor">
                 </el-color-picker>
               </el-form-item>
               <el-form-item class="item" label="字体大小">
@@ -464,10 +620,7 @@
                 >px
               </el-form-item>
               <el-form-item class="item" label="背景色" prop="backgroundColor">
-                <el-color-picker
-                  v-model="activeComponent.backgroundColor"
-                  show-alpha
-                >
+                <el-color-picker v-model="activeComponent.backgroundColor">
                 </el-color-picker>
               </el-form-item>
             </template>
@@ -601,6 +754,22 @@ const flatenComponent = ({ config, ...component }) => {
   if (!config) return { ...component };
   return { ...component, ...config };
 };
+const attachImage = (component) => {
+  if (
+    (component.typeCode === "image" || component.typeCode === "video") &&
+    component.materials &&
+    component.materials.length
+  ) {
+    const image = new Image();
+    const last = component.materials[component.materials.length - 1];
+    image.src =
+      last[component.typeCode === "video" ? "previewPath" : "fileUrl"];
+    image.onload = () => {
+      component.image = image;
+    };
+  }
+};
+
 export default {
   components: { MatList, draggable, ComponentList },
   props: ["showEditForm", "code"],
@@ -672,6 +841,7 @@ export default {
       previewMaterial: null,
       selectedShapeName: "",
       backgroundImage: null,
+      Image,
     };
   },
   computed: {
@@ -700,6 +870,7 @@ export default {
       if (!this.activeComponent) this.form.backgroundMaterial = material;
       else this.activeComponent.materials.push(material);
       this.setComponents();
+      attachImage(this.activeComponent);
       this.showSelectMaterial = false;
     },
     updateTransformer() {
@@ -839,10 +1010,10 @@ export default {
           component.materials = [];
           break;
         case "text":
-          component.backgroundColor = "#FFFFFF";
+          component.backgroundColor = null;
           component.backgroundOpacity = 100;
           component.fontColor = "#000000";
-          component.fontSize = 16;
+          component.fontSize = 24;
           component.fontStyle = "正常";
           component.animationSpeed = "中等";
           component.animation = "从左往右";
@@ -852,12 +1023,12 @@ export default {
           component.cityName = "";
           component.components = this.weatherComponents;
           component.fontColor = "#000000";
-          component.fontSize = 16;
+          component.fontSize = 24;
           component.backgroundColor = "#FFFFFF";
           break;
         case "clock":
           component.fontColor = "#000000";
-          component.fontSize = 16;
+          component.fontSize = 24;
           component.backgroundColor = "#FFFFFF";
           break;
         case "audio":
@@ -879,30 +1050,6 @@ export default {
         this.selectedShapeName = "name_" + (this.form.components.length - 1);
         this.updateTransformer();
       });
-    },
-    down(i) {
-      const tmp = this.form.components[i + 1];
-      this.form.components[i + 1] = this.form.components[i];
-      this.form.components[i] = tmp;
-      this.setComponents();
-    },
-    up(i) {
-      const tmp = this.form.components[i - 1];
-      this.form.components[i - 1] = this.form.components[i];
-      this.form.components[i] = tmp;
-      this.setComponents();
-    },
-    top(i) {
-      const component = this.form.components[i];
-      this.form.components.splice(i, 1);
-      this.form.components.unshift(component);
-      this.setComponents();
-    },
-    bottom(i) {
-      const component = this.form.components[i];
-      this.form.components.splice(i, 1);
-      this.form.components.push(component);
-      this.setComponents();
     },
     removeComponent(i) {
       this.$confirm("您确认要删除该组件?", "提示", {
@@ -933,7 +1080,7 @@ export default {
         backgroundMaterial: backgroundMaterial ? backgroundMaterial.code : null,
         components: components
           ? components
-              .map(({ color, ...component }) => component)
+              .map(({ color, image, ...component }) => component)
               .map((component) =>
                 Object.entries(component).reduce(
                   (acc, [k, v]) =>
@@ -979,6 +1126,7 @@ export default {
         this.form.components = this.form.components.map(flatenComponent);
         this.form.components.forEach((component) => {
           component.color = this.colors[this.colorIndex];
+          attachImage(component);
           this.colorIndex++;
         });
       } else {
@@ -1016,6 +1164,7 @@ export default {
       this.activeComponent.materials[i] = this.activeComponent.materials[j];
       this.activeComponent.materials[j] = tmp;
       this.activeComponent.materials = [...this.activeComponent.materials];
+      attachImage(this.activeComponent);
     },
   },
   watch: {
@@ -1184,6 +1333,7 @@ export default {
       overflow-x: hidden;
       height: calc(100vh - 80px);
       display: flex;
+      overflow: hidden;
       .r1 {
         flex: 0 0 188px;
         .component-item {
@@ -1226,6 +1376,8 @@ export default {
         flex: 0 0 308px;
         width: 308px;
         border-left: 1px solid #e6e7ec;
+        overflow-x: hidden;
+        overflow-y: auto;
       }
       h5 {
         display: flex;
@@ -1427,19 +1579,26 @@ export default {
       font-size: 14px;
       color: #868f9f;
     }
-    .input1 {
-      width: 200px;
-      height: 44px;
-      background: #ffffff;
+    .el-input-number {
+      line-height: 44px;
+      max-width: 160px;
+      input {
+        max-width: 160px;
+      }
+    }
+    input {
+      max-width: 180px;
       border: 1px solid #e6eaf0;
       box-sizing: border-box;
       border-radius: 6px;
       font-weight: bold;
-      font-size: 18px;
       color: #3a4763;
-      input {
-        border: none;
-      }
+      height: 44px;
+      font-size: 18px;
+      line-height: 44px;
+    }
+    .el-slider__runway {
+      width: 180px;
     }
     &.is-required {
       > .el-form-item__label {

@@ -90,6 +90,7 @@ h5 {
   color: #868f9f;
   .icon {
     font-size: 20px;
+    cursor: pointer;
   }
   .icon + .icon {
     margin-left: 16px;
