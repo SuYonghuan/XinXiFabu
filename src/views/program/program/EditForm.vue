@@ -983,8 +983,60 @@ export default {
       if (this.form.components.length >= 16)
         return this.$message({
           type: "warning",
-          message: "最多添加16个组件。",
+          message: "最多添加16个控件。",
         });
+      switch (typeCode) {
+        case "image":
+          if (
+            this.form.components.filter(({ typeCode }) => typeCode === "image")
+              .length >= 4
+          )
+            return this.$message({
+              type: "warning",
+              message: "一个节目只能有4个图片控件。",
+            });
+          break;
+        case "video":
+          if (
+            this.form.components.filter(({ typeCode }) => typeCode === "video")
+              .length >= 2
+          )
+            return this.$message({
+              type: "warning",
+              message: "一个节目只能由2个视频控件。",
+            });
+          break;
+        case "audio":
+          if (
+            this.form.components.filter(({ typeCode }) => typeCode === "audio")
+              .length >= 1
+          )
+            return this.$message({
+              type: "warning",
+              message: "一个节目只能有一个音频控件。",
+            });
+          if (
+            this.form.components.filter(({ typeCode }) => typeCode === "stream")
+              .length >= 1
+          )
+            return this.$message({
+              type: "warning",
+              message: "一个节目音频和流媒体不能共存。",
+            });
+          break;
+        case "stream":
+          if (
+            this.form.components.filter(({ typeCode }) => typeCode === "audio")
+              .length >= 1
+          )
+            return this.$message({
+              type: "warning",
+              message: "一个节目音频和流媒体不能共存。",
+            });
+          break;
+        default:
+          break;
+      }
       const component = {
         typeCode,
         zIndex: this.form.components.length,
