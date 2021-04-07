@@ -287,7 +287,7 @@
               :data="form.backgroundMaterial ? [form.backgroundMaterial] : []"
               @preview="preview"
               @remove="form.backgroundMaterial = null"
-              :showAdd="!form.backgroundMaterial"
+              :limit="1"
               @selectMat="openMaterialModal"
             ></mat-list>
           </template>
@@ -388,7 +388,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="true"
+                :limit="10"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -398,7 +398,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="true"
+                :limit="5"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -415,7 +415,7 @@
                 :data="activeComponent.materials"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="!activeComponent.materials.length"
+                :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -432,7 +432,7 @@
                 :data="activeComponent.materials"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="!activeComponent.materials.length"
+                :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -504,7 +504,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="true"
+                :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -578,7 +578,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="true"
+                :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -588,7 +588,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="preview"
                 @remove="removeMaterial"
-                :showAdd="!activeComponent.materials.length"
+                :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>

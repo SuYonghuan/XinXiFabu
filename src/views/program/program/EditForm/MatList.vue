@@ -2,10 +2,15 @@
   <div>
     <h5>
       素材列表
-      <el-button type="primary" @click="$emit('selectMat')" v-if="showAdd">
+      <el-button
+        type="primary"
+        @click="$emit('selectMat')"
+        :disabled="data.length >= limit"
+      >
         <svg class="icon" aria-hidden="true">
           <use xlink:href="#iconjia"></use></svg
-        >添加素材</el-button
+        >添加素材
+        <span class="bstd">{{ data.length }}/{{ limit }}</span></el-button
       >
     </h5>
     <div v-for="(mat, i) in data" :key="mat.code + '_' + i" class="mat">
@@ -40,7 +45,7 @@
 
 <script>
 export default {
-  props: ["data", "showAdd"],
+  props: ["data", "limit"],
 };
 </script>
 <style lang="scss" scoped>
@@ -58,7 +63,7 @@ h5 {
   color: #3a4763;
   border-top: 1px solid #e6e7ec;
   .el-button {
-    width: 140px;
+    width: 170px;
     height: 33px;
     line-height: 33px;
     font-weight: bold;
@@ -69,6 +74,9 @@ h5 {
       font-size: 20px;
       margin-right: 8px;
       vertical-align: middle;
+    }
+    .bstd {
+      margin-left: 8px;
     }
   }
 }

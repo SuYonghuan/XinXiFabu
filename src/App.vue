@@ -102,13 +102,16 @@ body,
 #app {
   height: 100%;
 }
-
+.bstd {
+  font-family: BrownStd;
+}
 #app {
   width: 100%;
   position: relative;
   color: #606266;
   font-size: 14px;
   line-height: 1.7;
+
   .el-breadcrumb {
     font-family: Source Han Sans CN;
     font-style: normal;
