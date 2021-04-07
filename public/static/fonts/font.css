@@ -1,0 +1,30 @@
+@font-face {
+  font-family: "BrownStd";
+  src: url("./BrownStd-Bold.ttf") format("truetype");
+  font-weight: bold;
+}
+@font-face {
+  font-family: "BrownStd";
+  src: url("./BrownStd-Light.woff.ttf") format("truetype");
+  font-weight: lighter;
+}
+@font-face {
+  font-family: "BrownStd";
+  src: url("./BrownStd-Regular.woff.ttf") format("truetype");
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Source Han Sans CN";
+  src: url("SourceHanSansCN-Normal_0.otf");
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Source Han Sans CN";
+  src: url("SourceHanSansCN-Bold_0.otf");
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Source Han Sans CN";
+  src: url("SourceHanSansCN-Light_0.otf");
+  font-weight: lighter;
+}
