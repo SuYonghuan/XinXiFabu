@@ -11,11 +11,25 @@
     </el-select>
 
     <el-tree
+      v-if="deviceQueryType === 'group'"
       :data="devices"
       default-expand-all
       show-checkbox
       @check="handleDeviceCheck"
     ></el-tree>
+    <el-transfer
+      v-else
+      filterable
+      :filter-method="filterMethod"
+      :titles="['所有设备', '已选设备']"
+      filter-placeholder="请输入设备名称"
+      v-model="selectedDevices"
+      :data="devices"
+    >
+      <span slot-scope="{ option }"
+        >{{ option.label }} <el-tag>{{ option.floorName }}</el-tag></span
+      >
+    </el-transfer>
     <div style="text-align: right;">
       <el-button @click="$emit('closeForm')">取 消</el-button>
       <el-button
@@ -37,10 +51,10 @@ export default {
       selectedDevices: [],
       pageIndex: 1,
       total: 0,
-      deviceQueryType: "floor",
+      deviceQueryType: "group",
       deviceQueryTypes: [
-        { v: "floor", k: "按楼层筛选" },
         { v: "group", k: "分组筛选" },
+        { v: "", k: "所有" },
       ],
     };
   },
@@ -61,6 +75,9 @@ export default {
   },
 
   methods: {
+    filterMethod(query, item) {
+      return item.label.indexOf(query) > -1;
+    },
     handleDeviceCheck(_, { checkedNodes }) {
       this.selectedDevices = checkedNodes.filter(({ children }) => !children);
     },
@@ -80,27 +97,37 @@ export default {
     },
     async getDevices() {
       const { deviceQueryType, resolution } = this;
+      this.devices = [];
+      this.selectedDevices = [];
       const { code, data, msg } = await ScheduleApi.getDeviceList({
         searchMode: deviceQueryType,
         resolution,
       });
       if (code == "200") {
-        this.devices = data.map(({ groupByName, devices }) => ({
-          label: groupByName,
-          children: devices.map((device) => ({
-            ...device,
-            label: device.devNum,
-          })),
-        }));
+        this.devices = !deviceQueryType
+          ? data.map(({ devNum, code, floorName }) => ({
+              label: devNum,
+              key: code,
+              floorName,
+            }))
+          : data.map(({ groupByName, devices }) => ({
+              label: groupByName,
+              children: devices.map((device) => ({
+                ...device,
+                label: device.devNum,
+              })),
+            }));
       } else {
         this.$message({ message: msg, type: "error" });
       }
     },
     async submit() {
-      const { selectedDevices, schedule } = this;
+      const { selectedDevices, schedule, deviceQueryType } = this;
       const { code, msg } = await ScheduleApi.publish({
         schedule: schedule.code,
-        devices: selectedDevices.map(({ code }) => code),
+        devices: deviceQueryType
+          ? selectedDevices.map(({ code }) => code)
+          : selectedDevices,
         confirm: false,
       });
       if (code === "200") {
