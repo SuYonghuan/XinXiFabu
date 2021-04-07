@@ -758,7 +758,7 @@ export default {
 
 .tip-div {
   position: absolute;
-  top: 275px;
+  top: 221px;
   left: 452px;
 }
 </style>
