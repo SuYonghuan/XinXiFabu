@@ -38,17 +38,29 @@
 
     <div class="main">
       <div class="left">
-        <div
-          class="btn"
-          :key="code"
-          v-for="code in componentTypeOrder"
-          @click="appendComponent(code)"
-        >
-          <svg class="icon" aria-hidden="true">
-            <use :xlink:href="logos[code]"></use>
-          </svg>
-          {{ componentTypes[code] }}
-        </div>
+        <template v-for="code in componentTypeOrder">
+          <el-popover
+            v-if="componentTypeTip[code]"
+            :key="code"
+            placement="right"
+            title="提示"
+            trigger="hover"
+            :content="componentTypeTip[code]"
+          >
+            <div class="btn" slot="reference" @click="appendComponent(code)">
+              <svg class="icon" aria-hidden="true">
+                <use :xlink:href="logos[code]"></use>
+              </svg>
+              {{ componentTypes[code] }}
+            </div>
+          </el-popover>
+          <div class="btn" :key="code" v-else @click="appendComponent(code)">
+            <svg class="icon" aria-hidden="true">
+              <use :xlink:href="logos[code]"></use>
+            </svg>
+            {{ componentTypes[code] }}
+          </div>
+        </template>
       </div>
       <el-col :span="14" class="middle canvas-wrapper">
         <v-stage
@@ -221,70 +233,6 @@
               >
               </v-rect>
             </template>
-            <!-- <component
-              :is="
-                component.typeCode === 'text'
-                  ? 'v-text'
-                  : component.image
-                  ? 'v-image'
-                  : 'v-rect'
-              "
-              v-for="(component, i) in form.components"
-              :key="i"
-              :name="'name_' + i"
-              :config="{
-                x: component.offsetX,
-                y: component.offsetY,
-                width: component.width,
-                height: component.height,
-                draggable: true,
-                fill: component.color,
-                shadowBlur: 10,
-                strokeEnabled: false,
-                zIndex: i,
-                dragBoundFunc: (pos) => {
-                  return {
-                    x:
-                      pos.x < 0
-                        ? 0
-                        : pos.x > form.width - component.width
-                        ? form.width - component.width
-                        : pos.x,
-                    y:
-                      pos.y < 0
-                        ? 0
-                        : pos.y > form.height - component.height
-                        ? form.height - component.height
-                        : pos.y,
-                  };
-                },
-                ...(component.image ? { image: component.image } : {}),
-                ...(component.typeCode === 'text'
-                  ? {
-                      fill: component.fontColor,
-                      fontStyle:
-                        component.fontStyle === '正常'
-                          ? 'normal'
-                          : component.fontStyle === '加粗'
-                          ? 'bold'
-                          : component.fontStyle === '斜体'
-                          ? 'italic'
-                          : component.fontStyle === '加粗、斜体'
-                          ? 'bold italic'
-                          : 'normal',
-                      wrap: 'none',
-                      fontSize: component.fontSize,
-                      text: component.materials.length
-                        ? component.materials[0].text
-                        : `七月流火，九月授衣。一之日觱发，二之日栗烈。无衣无褐，何以卒岁。三之日于耜，四之日举趾。同我妇子，馌彼南亩，田畯至喜。七月流火，九月授衣。春日载阳，有鸣仓庚。女执懿筐，遵彼微行，爰求柔桑。春日迟迟，采蘩祁祁。女心伤悲，殆及公子同归。七月流火，八月萑苇。蚕月条桑，取彼斧斨，以伐远扬，猗彼女桑。七月鸣鵙，八月载绩。载玄载黄，我朱孔阳，为公子裳。四月秀葽，五月鸣蜩。八月其获，十月陨萚。一之日于貉，取彼狐狸，为公子裘。二之日其同，载缵武功，言私其豵，献豣于公。五月斯螽动股，六月莎鸡振羽，七月在野，八月在宇，九月在户，十月蟋蟀入我床下。穹窒熏鼠，塞向墐户。嗟我妇子，曰为改岁，入此室处。六月食郁及薁，七月亨葵及菽，八月剥枣，十月获稻，为此春酒，以介眉寿。七月食瓜，八月断壶，九月叔苴，采荼薪樗，食我农夫。九月筑场圃，十月纳禾稼。黍稷重穋，禾麻菽麦。嗟我农夫，我稼既同，上入执宫功。昼尔于茅，宵尔索綯。亟其乘屋，其始播百谷。二之日凿冰冲冲，三之日纳于凌阴。四之日其蚤，献羔祭韭。九月肃霜，十月涤场。朋酒斯飨，曰杀羔羊。跻彼公堂，称彼兕觥，万寿无疆。`,
-                    }
-                  : {}),
-              }"
-              @dragend="handleDragend"
-              @transformend="handleTransformEnd"
-            >
-            </component> -->
-
             <v-transformer
               ref="transformer"
               :config="{
@@ -821,6 +769,12 @@ export default {
         "audio",
         "stream",
       ],
+      componentTypeTip: {
+        video: "一个节目只能由2个视频控件。",
+        image: "一个节目只能有4个图片控件。",
+        audio: "一个节目只能有一个音频控件，音频和流媒体不能共存。",
+        stream: "一个节目音频和流媒体不能共存。",
+      },
       weatherComponents: [
         "城市",
         "天气图标",
@@ -1351,6 +1305,7 @@ export default {
       background: #fff;
       text-align: center;
       padding-top: 8px;
+      user-select: none;
       .btn {
         position: relative;
         text-align: left;
@@ -1362,6 +1317,7 @@ export default {
         font-size: 14px;
         line-height: 56px;
         height: 56px;
+        cursor: pointer;
         &:active {
           background: #2f6bff;
           color: #fff;
