@@ -1,15 +1,17 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="应用名称">
-        <el-input v-model="search.Keywords" placeholder="应用名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="onSearch">查询</el-button>
-        <el-button @click="replaySearch">清空</el-button>
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <!--  搜索  -->
+      <el-form :inline="true" :model="search" class="demo-form-inline">
+        <el-form-item label="应用名称">
+          <el-input v-model="search.Keywords" placeholder="应用名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onSearch">查询</el-button>
+          <el-button @click="replaySearch">清空</el-button>
+        </el-form-item>
+      </el-form>
+    </template>
 
     <!--  表格  -->
     <el-table
@@ -62,16 +64,17 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
-
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col> </el-col>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
     <!--  发布  -->
     <el-dialog
       title="发布到设备"
@@ -98,7 +101,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
