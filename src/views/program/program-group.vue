@@ -354,7 +354,6 @@
 </template>
 
 <script>
-import pagination from "components/pagination/pagination";
 import transferViewProgram from "components/transfer-view-program/transfer-view-program";
 import transferViewProgram1 from "components/transfer-view-program1/transfer-view-program1";
 import transferView from "components/transfer-view/transfer-view";
@@ -812,7 +811,6 @@ export default {
     },
   },
   components: {
-    pagination,
     transferView,
     transferViewProgram,
     transferViewProgram1,

@@ -38,11 +38,6 @@
       :max-height="$root.tableMaxHeight + 'px'"
       ref="table"
     >
-      <el-table-column
-        key="selection"
-        type="selection"
-        width="55"
-      ></el-table-column>
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
         prop="name"
@@ -109,16 +104,7 @@
       </el-table-column>
     </el-table>
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
-      <el-col>
-        <el-button
-          size="small"
-          type="primary"
-          v-if="canI.auditschedule"
-          :disabled="!codes.length"
-          @click="bulkAudit"
-          >审核</el-button
-        >
-      </el-col>
+      <el-col> </el-col>
       <pagination
         :list="list"
         :page="pageIndex"
@@ -182,10 +168,8 @@
 </template>
 
 <script>
-import TablePage from "../../components/TablePage";
 import { GetRolePermissions } from "http/api/program";
 import { ScheduleApi, ProgramApi } from "../program/program.js";
-import pagination from "../../components/pagination/pagination";
 import { mapGetters } from "vuex";
 import { ERR_OK } from "http/config";
 import DetailForm from "../program/schedule/DetailForm";
@@ -346,7 +330,7 @@ export default {
     },
   },
 
-  components: { TablePage, pagination, DetailForm },
+  components: { DetailForm },
 };
 </script>
 

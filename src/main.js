@@ -5,7 +5,8 @@ import store from './store'
 import ElementUI from 'element-ui'
 import { get } from 'http/http'
 import VueKonva from 'vue-konva'
-
+import TablePage from './components/TablePage.vue'
+import pagination from './components/pagination/pagination.vue'
 import 'common/scss/index.scss'
 ElementUI.Dialog.props.closeOnClickModal = false
 ElementUI.Dialog.props.closeOnPressEscape = false
@@ -13,7 +14,8 @@ ElementUI.Breadcrumb.props.separatorClass.default = 'el-icon-arrow-right'
 Vue.use(ElementUI)
 Vue.use(VueKonva)
 Vue.config.productionTip = false
-
+Vue.component('TablePage', TablePage)
+Vue.component('pagination', pagination)
 //引入Excel
 import Blob from './vendor/Blob'
 // import Export2Excel from './vendor/Export2Excel.js'

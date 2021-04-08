@@ -358,7 +358,6 @@
 </template>
 
 <script>
-import pagination from "components/pagination/pagination";
 import {
   GetDeviceList,
   GetDeviceOptionsNew,
@@ -1035,9 +1034,7 @@ export default {
   computed: {
     ...mapGetters(["presentMenu"]),
   },
-  components: {
-    pagination,
-  },
+  components: {},
 };
 </script>
 

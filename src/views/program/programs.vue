@@ -75,8 +75,6 @@
 </template>
 
 <script>
-import TablePage from "../../components/TablePage";
-import pagination from "../../components/pagination/pagination";
 import { ProgramApi } from "./program.js";
 import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
@@ -180,7 +178,7 @@ export default {
       }
     },
   },
-  components: { TablePage, pagination, ProgramTable, AddForm, EditForm },
+  components: { ProgramTable, AddForm, EditForm },
 };
 </script>
 

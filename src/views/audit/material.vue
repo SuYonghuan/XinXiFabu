@@ -183,10 +183,8 @@
 </template>
 
 <script>
-import TablePage from "../../components/TablePage";
 import { GetRolePermissions } from "http/api/program";
 import { MaterialApi } from "../program/program.js";
-import pagination from "../../components/pagination/pagination";
 import { mapGetters } from "vuex";
 import { ERR_OK } from "http/config";
 
@@ -332,7 +330,7 @@ export default {
     },
   },
 
-  components: { TablePage, pagination },
+  components: {},
 };
 </script>
 

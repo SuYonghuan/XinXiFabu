@@ -78,7 +78,6 @@
 </template>
 
 <script>
-import pagination from "components/pagination/pagination";
 import { QueryLogPageList } from "http/api/system";
 import { ERR_OK } from "http/config";
 
@@ -159,9 +158,7 @@ export default {
       this.dialogVisible = false;
     },
   },
-  components: {
-    pagination,
-  },
+  components: {},
 };
 </script>
 

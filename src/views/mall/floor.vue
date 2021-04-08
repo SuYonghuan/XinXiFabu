@@ -137,7 +137,6 @@
 </template>
 
 <script>
-import pagination from "components/pagination/pagination";
 import transferView from "components/transfer-view/transfer-view";
 import { timeFormatting } from "common/js/mixins";
 import {
@@ -415,7 +414,6 @@ export default {
     ...mapGetters(["presentMenu", "user", "config"]),
   },
   components: {
-    pagination,
     transferView,
   },
 };
