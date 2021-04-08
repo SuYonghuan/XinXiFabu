@@ -39,30 +39,29 @@
     ></el-table-column>
     <el-table-column
       prop="operating"
-      width="220px;"
+      width="92px;"
       key="operating"
       label="操作"
     >
       <template slot-scope="scope">
         <el-button
           v-if="canI.editprogramme"
-          size="mini"
-          type="primary"
+          class="svg-button"
+          type="text"
           @click="$emit('editProgram', scope.row.code)"
-          >编辑</el-button
         >
-        <el-popconfirm
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconbianji"></use></svg
+        ></el-button>
+        <el-button
           v-if="canI.deleteprogramme"
-          style="margin-left: 10px;"
-          confirm-button-text="好的"
-          cancel-button-text="不用了"
-          icon="el-icon-info"
-          icon-color="red"
-          title="确定删除该节目吗？"
-          @confirm="$emit('deleteProgram', [scope.row.code])"
-        >
-          <el-button slot="reference" size="mini" type="danger">删除</el-button>
-        </el-popconfirm>
+          slot="reference"
+          class="svg-button"
+          type="text"
+          @click="deleteRow(scope.row.code)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
+        ></el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -71,6 +70,17 @@
 <script>
 export default {
   props: ["list", "canI", "dateFormatter"],
+  methods: {
+    deleteRow(code) {
+      this.$confirm("您确认要删除该节目?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        this.$emit("deleteProgram", [code]);
+      });
+    },
+  },
 };
 </script>
 

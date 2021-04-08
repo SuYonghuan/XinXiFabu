@@ -1024,11 +1024,4 @@ export default {
   max-width: 100%;
   max-height: 100%;
 }
-.svg-button {
-  font-size: 20px;
-  color: #868f9f;
-}
-.svg-button + .svg-button {
-  margin-left: 20px;
-}
 </style>

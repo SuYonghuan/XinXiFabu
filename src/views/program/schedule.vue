@@ -2,7 +2,7 @@
   <table-page>
     <template v-slot:header>
       <el-row class="gap" type="flex" justify="space-between">
-        <el-col>
+        <el-col style="display:flex;">
           <span class="meta1">日程名称</span>
           <el-input
             class="input1"

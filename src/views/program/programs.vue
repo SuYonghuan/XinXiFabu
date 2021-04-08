@@ -21,10 +21,12 @@
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button
-            size="small"
+            class="svg-suffix"
             type="primary"
             v-if="canI.addprogramme"
             @click="addProgram"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
             >新增</el-button
           >
         </div>

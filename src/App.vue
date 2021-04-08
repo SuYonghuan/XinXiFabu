@@ -111,7 +111,27 @@ body,
   color: #606266;
   font-size: 14px;
   line-height: 1.7;
-
+  .svg-button {
+    font-size: 20px;
+    color: #868f9f;
+  }
+  .svg-button + .svg-button {
+    margin-left: 20px;
+  }
+  .el-button {
+    &.svg-suffix {
+      padding: 0 32px;
+      height: 44px;
+      line-height: 44px;
+      font-weight: bold;
+      font-size: 14px;
+      border-radius: 6px;
+      svg {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+    }
+  }
   .el-breadcrumb {
     font-family: Source Han Sans CN;
     font-style: normal;
