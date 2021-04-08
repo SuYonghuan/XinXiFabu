@@ -1,5 +1,5 @@
 <template>
-  <table-page class="index schedule">
+  <table-page>
     <template v-slot:header>
       <el-row class="gap" type="flex" justify="space-between">
         <el-col>
