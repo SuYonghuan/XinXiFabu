@@ -113,7 +113,6 @@
     <div class="bottom-div">
       <!--  分页  -->
       <pagination
-        class="page-div"
         :list="tableData"
         :total="total"
         :page="currentPage"
@@ -995,9 +994,6 @@ export default {
 .bottom-div {
 }
 
-.page-div {
-  margin-top: 20px;
-}
 .bottom-button {
   float: right;
   margin-top: -40px;

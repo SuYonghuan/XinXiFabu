@@ -279,7 +279,6 @@
 
     <!--  分页  -->
     <pagination
-      class="page-div"
       :list="tableData"
       :total="total"
       :page="currentPage"
@@ -1041,10 +1040,6 @@ export default {
 <style scoped lang="scss">
 .demo-form-inline {
   margin-top: 40px;
-}
-
-.page-div {
-  margin-top: 20px;
 }
 
 .right-button {

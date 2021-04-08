@@ -41,7 +41,6 @@
         </el-table>
         <!--  分页  -->
         <pagination
-          class="page-div"
           :list="tableData"
           :total="total"
           :page="currentPage"
@@ -243,10 +242,6 @@ export default {
   .right-button {
     float: right;
   }
-}
-
-.page-div {
-  margin-top: 80px;
 }
 
 .time-tag {

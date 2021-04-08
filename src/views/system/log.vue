@@ -1,29 +1,34 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="时间">
-        <el-date-picker
-          v-model="search.time"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="yyyy-MM-dd"
-        >
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="关键字">
-        <el-input v-model="search.name" placeholder="请输入关键字"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="onSearch">查询</el-button>
-        <el-button @click="replaySearch">清空</el-button>
-      </el-form-item>
-    </el-form>
-
+  <table-page>
+    <template v-slot:header>
+      <!--  搜索  -->
+      <el-form :inline="true" :model="search" class="demo-form-inline">
+        <el-form-item label="时间">
+          <el-date-picker
+            v-model="search.time"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="yyyy-MM-dd"
+          >
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="关键字">
+          <el-input v-model="search.name" placeholder="请输入关键字"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onSearch">查询</el-button>
+          <el-button @click="replaySearch">清空</el-button>
+        </el-form-item>
+      </el-form>
+    </template>
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%" height="680px">
+    <el-table
+      :data="tableData"
+      style="width: 100%"
+      :max-height="$root.tableMaxHeight + 'px'"
+    >
       <el-table-column prop="moduleName" label="操作模块"></el-table-column>
       <el-table-column prop="type" label="操作类型"></el-table-column>
       <el-table-column prop="addTime" label="操作时间"></el-table-column>
@@ -38,16 +43,17 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      class="page-div"
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col> </el-col>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  查看  -->
     <el-dialog
@@ -74,7 +80,7 @@
         </el-form-item>
       </el-form>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
@@ -169,15 +175,9 @@ export default {
 </style>
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }
-}
-
-.page-div {
-  margin-top: 20px;
 }
 
 .scroll-div {
