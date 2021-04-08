@@ -149,38 +149,36 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="220px;"
+        width="132px;"
         key="operating"
         label="操作"
       >
         <template slot-scope="scope">
           <el-button
-            size="mini"
+            class="svg-button"
+            type="text"
             v-if="canI.editmaterial"
             @click="handleEdit(scope.row)"
-            >编辑</el-button
           >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconbianji"></use></svg
+          ></el-button>
           <el-button
-            size="mini"
-            type="success"
+            class="svg-button"
+            type="text"
             @click="preview(scope.row)"
             :disabled="!scope.row.fileUrl"
-            >查看</el-button
-          >
-          <el-popconfirm
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconyanjing"></use></svg
+          ></el-button>
+          <el-button
             v-if="canI.deletematerial"
-            style="margin-left: 10px;"
-            confirm-button-text="好的"
-            cancel-button-text="不用了"
-            icon="el-icon-info"
-            icon-color="red"
-            title="确定删除该素材吗？"
-            @confirm="handleDelete([scope.row.code])"
-          >
-            <el-button slot="reference" size="mini" type="danger"
-              >删除</el-button
-            >
-          </el-popconfirm>
+            class="svg-button"
+            @click="deleteRow(scope.row.code)"
+            type="text"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshanchu"></use></svg
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -677,6 +675,15 @@ export default {
   },
 
   methods: {
+    deleteRow(code) {
+      this.$confirm("您确认要删除该素材?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        this.handleDelete([code]);
+      });
+    },
     beforeUpload(file) {
       const type = file.type.includes("video")
         ? "视频"
@@ -1016,5 +1023,12 @@ export default {
 .object object {
   max-width: 100%;
   max-height: 100%;
+}
+.svg-button {
+  font-size: 20px;
+  color: #868f9f;
+}
+.svg-button + .svg-button {
+  margin-left: 20px;
 }
 </style>
