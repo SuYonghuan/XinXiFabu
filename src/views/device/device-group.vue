@@ -1,40 +1,35 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="组名称">
-        <el-input v-model="search.SearchKey" placeholder="组名称"></el-input>
-      </el-form-item>
-      <el-form-item label="屏幕属性">
-        <el-select v-model="search.ScreenInfoCode" placeholder="屏幕属性">
-          <el-option
-            v-for="item in searchDeviceList"
-            :label="item.sName"
-            :value="item.code"
+  <table-page>
+    <template v-slot:header>
+      <!--  搜索  -->
+      <el-form :inline="true" :model="search" class="demo-form-inline">
+        <el-form-item label="组名称">
+          <el-input v-model="search.SearchKey" placeholder="组名称"></el-input>
+        </el-form-item>
+        <el-form-item label="屏幕属性">
+          <el-select v-model="search.ScreenInfoCode" placeholder="屏幕属性">
+            <el-option
+              v-for="item in searchDeviceList"
+              :label="item.sName"
+              :value="item.code"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onSearch">查询</el-button>
+          <el-button @click="replaySearch">清空</el-button>
+        </el-form-item>
+        <el-form-item class="right-button">
+          <el-button
+            type="success"
+            @click="handleEditDevice({})"
+            v-if="pageMenu.adddevgroup"
+            >新增组</el-button
           >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="onSearch">查询</el-button>
-        <el-button @click="replaySearch">清空</el-button>
-      </el-form-item>
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEditDevice({})"
-          v-if="pageMenu.adddevgroup"
-          >新增组</el-button
-        >
-        <el-button
-          type="danger"
-          @click="batchDelete(tableChecked)"
-          v-if="pageMenu.deldevgroup"
-          >删除</el-button
-        >
-      </el-form-item>
-    </el-form>
-
+        </el-form-item>
+      </el-form>
+    </template>
     <!--  表格  -->
     <el-table
       :data="tableData"
@@ -123,14 +118,24 @@
       <i class="el-icon-info"></i>
     </el-tooltip>
 
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-    ></pagination>
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col
+        ><el-button
+          type="danger"
+          @click="batchDelete(tableChecked)"
+          v-if="pageMenu.deldevgroup"
+          >删除</el-button
+        >
+      </el-col>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  编辑新增  -->
     <el-dialog
@@ -275,7 +280,7 @@
         </el-table-column>
       </el-table>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
