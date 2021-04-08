@@ -14,7 +14,7 @@
     <!--  表格  -->
     <el-table
       :data="tableData"
-      height="620"
+      :max-height="$root.tableMaxHeight + 'px'"
       style="width: 100%;margin-top: 20px;"
     >
       <el-table-column prop="areaName" label="区域名称"></el-table-column>
@@ -267,8 +267,6 @@ export default {
 
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

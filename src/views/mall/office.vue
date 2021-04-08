@@ -483,8 +483,6 @@ export default {
 
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

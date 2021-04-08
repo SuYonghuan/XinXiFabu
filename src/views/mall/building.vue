@@ -15,7 +15,7 @@
     <el-table
       :data="tableData"
       style="width: 100%;margin-top: 20px;"
-      height="620"
+      :max-height="$root.tableMaxHeight + 'px'"
     >
       <el-table-column prop="name" label="楼栋名称"></el-table-column>
       <el-table-column label="操作">
@@ -274,8 +274,6 @@ export default {
 
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

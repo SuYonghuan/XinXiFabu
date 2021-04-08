@@ -12,7 +12,11 @@
     </el-form>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%" height="620">
+    <el-table
+      :data="tableData"
+      style="width: 100%"
+      :max-height="$root.tableMaxHeight + 'px'"
+    >
       <el-table-column prop="name" label="应用名称"></el-table-column>
       <el-table-column prop="filePath" label="ICON">
         <template slot-scope="scope">
@@ -283,8 +287,6 @@ export default {
 </style>
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

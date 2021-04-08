@@ -62,7 +62,7 @@
       @selection-change="handleDeletion"
       ref="table"
       @filter-change="filterTag"
-      height="620"
+      :max-height="$root.tableMaxHeight + 'px'"
       style="width: 100%"
     >
       <el-table-column align="center" type="selection" width="60">
@@ -826,8 +826,6 @@ export default {
 </style>
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

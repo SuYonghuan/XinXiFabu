@@ -93,7 +93,7 @@
     <!--  表格  -->
     <el-table
       :data="tableData"
-      height="620"
+      :max-height="$root.tableMaxHeight + 'px'"
       @selection-change="handleDeletion"
       ref="table"
       @filter-change="filterTag"
@@ -1279,8 +1279,6 @@ export default {
 </style>
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

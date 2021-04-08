@@ -4,7 +4,7 @@
     <el-table
       :data="tableData"
       style="width: 100%;margin-top: 20px;"
-      height="620"
+      :max-height="$root.tableMaxHeight + 'px'"
     >
       <el-table-column prop="devNum" label="设备名称"></el-table-column>
       <el-table-column prop="ip" label="IP地址"></el-table-column>
@@ -259,8 +259,6 @@ export default {
 </style>
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }

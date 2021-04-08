@@ -1,19 +1,24 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form class="demo-form-inline">
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEdit({})"
-          v-show="pageMenu.addappkey"
-          >新增</el-button
-        >
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <el-form class="demo-form-inline">
+        <el-form-item class="right-button">
+          <el-button
+            type="success"
+            @click="handleEdit({})"
+            v-show="pageMenu.addappkey"
+            >新增</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </template>
 
     <!--  表格  -->
-    <el-table :data="tableData" style="width: 100%;" height="620">
+    <el-table
+      :data="tableData"
+      style="width: 100%;"
+      :max-height="$root.tableMaxHeight + 'px'"
+    >
       <el-table-column type="index" label="序号"></el-table-column>
       <el-table-column prop="description" label="项目名称"></el-table-column>
       <el-table-column prop="operator" label="创建人"></el-table-column>
@@ -51,15 +56,17 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col> </el-col>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  发布  -->
     <el-dialog
@@ -141,7 +148,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
@@ -350,8 +357,6 @@ export default {
 
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }
