@@ -1,28 +1,24 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEdit({})"
-          v-if="pageMenu.addrole"
-          >新增角色</el-button
-        >
-        <el-button
-          type="danger"
-          @click="batchDelete(tableChecked)"
-          v-if="pageMenu.delrole"
-          >删除</el-button
-        >
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <!--  搜索  -->
+      <el-form :inline="true" :model="search" class="demo-form-inline">
+        <el-form-item class="right-button">
+          <el-button
+            type="success"
+            @click="handleEdit({})"
+            v-if="pageMenu.addrole"
+            >新增角色</el-button
+          >
+        </el-form-item>
+      </el-form></template
+    >
 
     <!--  表格  -->
     <el-table
       :data="tableData"
       @selection-change="handleDeletion"
-      height="680px"
+      :max-height="$root.tableMaxHeight + 'px'"
       style="width: 100%"
     >
       <el-table-column align="center" type="selection" width="60">
@@ -51,16 +47,25 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      class="page-div"
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col>
+        <el-button
+          type="danger"
+          @click="batchDelete(tableChecked)"
+          v-if="pageMenu.delrole"
+          >删除</el-button
+        ></el-col
+      >
+      <pagination
+        class="page-div"
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  新增  -->
     <el-dialog
@@ -118,7 +123,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
@@ -398,8 +403,6 @@ export default {
 
 <style scoped lang="scss">
 .demo-form-inline {
-  margin-top: 40px;
-
   .right-button {
     float: right;
   }
