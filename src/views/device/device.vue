@@ -1,71 +1,53 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="关键字">
-        <el-input
-          v-model="search.SearchKey"
-          style="width: 220px"
-          placeholder="根据IP、设备名称、备注搜索"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="屏幕属性">
-        <el-select v-model="search.ScreenCode" placeholder="屏幕属性">
-          <el-option
-            v-for="item in searchDeviceList"
-            :label="item.sName"
-            :value="item.code"
+  <table-page>
+    <template v-slot:header>
+      <el-form :inline="true" :model="search" class="demo-form-inline">
+        <el-form-item label="关键字">
+          <el-input
+            v-model="search.SearchKey"
+            style="width: 220px"
+            placeholder="根据IP、设备名称、备注搜索"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="屏幕属性">
+          <el-select v-model="search.ScreenCode" placeholder="屏幕属性">
+            <el-option
+              v-for="item in searchDeviceList"
+              :label="item.sName"
+              :value="item.code"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="楼栋/楼层">
+          <el-cascader
+            v-model="search.FloorCode"
+            :options="floorData"
+            :props="floorProps"
           >
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="楼栋/楼层">
-        <el-cascader
-          v-model="search.FloorCode"
-          :options="floorData"
-          :props="floorProps"
-        >
-        </el-cascader>
-      </el-form-item>
-      <!--<el-form-item label="设备状态">-->
-      <!--<el-select v-model="search.DevStatus" placeholder="设备状态">-->
-      <!--<el-option-->
-      <!--v-for="item in status"-->
-      <!--:label="item.label"-->
-      <!--:value="item.value">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--</el-form-item>-->
-      <!--<el-form-item label="前端状态">-->
-      <!--<el-select v-model="search.FontStatus" placeholder="前端状态">-->
-      <!--<el-option-->
-      <!--v-for="item in status"-->
-      <!--:label="item.label"-->
-      <!--:value="item.value">-->
-      <!--</el-option>-->
-      <!--</el-select>-->
-      <!--</el-form-item>-->
-      <el-form-item>
-        <el-button @click="onSearch">查询</el-button>
-        <el-button @click="replaySearch">清空</el-button>
-      </el-form-item>
-      <p class="right-button">
-        <el-button
-          type="success"
-          @click="handleDeviceExcel({})"
-          v-if="pageMenu.exportDevice"
-          >导出设备</el-button
-        >
-        <el-button
-          type="success"
-          @click="handleExcel({})"
-          v-if="pageMenu.devexport"
-          >导出设备节目</el-button
-        >
-        <el-button type="success" @click="refresh()">刷新</el-button>
-      </p>
-    </el-form>
-
+          </el-cascader>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="onSearch">查询</el-button>
+          <el-button @click="replaySearch">清空</el-button>
+        </el-form-item>
+        <p class="right-button">
+          <el-button
+            type="success"
+            @click="handleDeviceExcel({})"
+            v-if="pageMenu.exportDevice"
+            >导出设备</el-button
+          >
+          <el-button
+            type="success"
+            @click="handleExcel({})"
+            v-if="pageMenu.devexport"
+            >导出设备节目</el-button
+          >
+          <el-button type="success" @click="refresh()">刷新</el-button>
+        </p>
+      </el-form>
+    </template>
     <!--  表格  -->
     <el-table
       :data="tableData"
@@ -244,48 +226,48 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="bottom-button">
-      <el-button
-        size="small"
-        @click="shut(tableChecked, 1)"
-        v-if="pageMenu.devshutdown"
-        >关机</el-button
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col>
+        <el-button
+          size="small"
+          @click="shut(tableChecked, 1)"
+          v-if="pageMenu.devshutdown"
+          >关机</el-button
+        >
+        <el-button
+          size="small"
+          @click="reboot(tableChecked, 1)"
+          v-if="pageMenu.devrestart"
+          >重启</el-button
+        >
+        <el-button
+          size="small"
+          @click="handleEdit(tableChecked, 1)"
+          v-if="pageMenu.devsetshutdowntime"
+          >关机时间</el-button
+        >
+        <el-button
+          size="small"
+          @click="cleanShutTime(tableChecked, 1)"
+          v-if="pageMenu.devclearshutdowntime"
+          >清除关机时间
+        </el-button>
+        <el-button
+          size="small"
+          @click="batchDelete(tableChecked)"
+          v-if="pageMenu.devdel"
+          >删除</el-button
+        ></el-col
       >
-      <el-button
-        size="small"
-        @click="reboot(tableChecked, 1)"
-        v-if="pageMenu.devrestart"
-        >重启</el-button
-      >
-      <el-button
-        size="small"
-        @click="handleEdit(tableChecked, 1)"
-        v-if="pageMenu.devsetshutdowntime"
-        >关机时间</el-button
-      >
-      <el-button
-        size="small"
-        @click="cleanShutTime(tableChecked, 1)"
-        v-if="pageMenu.devclearshutdowntime"
-        >清除关机时间
-      </el-button>
-      <el-button
-        size="small"
-        @click="batchDelete(tableChecked)"
-        v-if="pageMenu.devdel"
-        >删除</el-button
-      >
-    </div>
-
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  关机时间  -->
     <el-dialog
@@ -353,7 +335,7 @@
     <div class="max-div" v-show="shotImg" @click="clickMaxImg">
       <img :src="shotImg" alt="" style="max-width: 1920px;max-height: 900px;" />
     </div>
-  </div>
+  </table-page>
 </template>
 
 <script>
