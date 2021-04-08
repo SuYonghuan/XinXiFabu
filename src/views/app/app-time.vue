@@ -1,5 +1,6 @@
 <template>
-  <div class="deptManager-content">
+  <table-page header-height="52px">
+    <template v-slot:header></template>
     <!--  表格  -->
     <el-table
       :data="tableData"
@@ -24,15 +25,17 @@
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col> </el-col>
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  发布  -->
     <el-dialog
@@ -81,7 +84,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
