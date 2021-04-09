@@ -5,10 +5,13 @@
       <el-form :inline="true" :model="search" class="demo-form-inline">
         <el-form-item class="right-button">
           <el-button
-            type="success"
-            @click="handleEdit({})"
+            class="svg-suffix"
+            type="primary"
             v-if="pageMenu.addrole"
-            >新增角色</el-button
+            @click="handleEdit({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
           >
         </el-form-item>
       </el-form></template
@@ -50,12 +53,15 @@
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
-          type="danger"
-          @click="batchDelete(tableChecked)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.delrole"
+          @click="batchDelete(tableChecked)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
           >删除</el-button
-        ></el-col
-      >
+        >
+      </el-col>
       <pagination
         :list="tableData"
         :total="total"
