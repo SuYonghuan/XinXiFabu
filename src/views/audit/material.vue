@@ -97,36 +97,42 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="220px;"
+        width="120px;"
         key="operating"
         label="操作"
       >
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="success"
+            class="svg-button"
+            type="text"
             @click="preview(scope.row)"
             :disabled="!scope.row.fileUrl"
-            >查看</el-button
           >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconyanjing"></use></svg
+          ></el-button>
           <el-button
-            size="mini"
-            type="primary"
+            class="svg-button"
+            type="text"
             @click="audit(scope.row)"
             v-if="canI.auditmaterial"
-            >审核</el-button
           >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshenhe"></use></svg
+          ></el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
-          size="small"
-          type="primary"
-          v-if="canI.auditmaterial"
+          class="svg-suffix s"
+          plain
           :disabled="!codes.length"
+          v-if="canI.auditmaterial"
           @click="bulkAudit"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshenhe"></use></svg
           >审核</el-button
         >
       </el-col>
