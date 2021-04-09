@@ -143,75 +143,86 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="350px;"
+        width="250px;"
         key="operating"
         label="操作"
       >
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="primary"
-            v-if="canI.editschedule"
-            @click="handleEdit(scope.row)"
-            :disabled="scope.row.deviceCount > 0"
-            >编辑</el-button
-          >
-          <el-button
-            size="mini"
-            type="success"
-            v-if="canI.getscheduleinfo"
-            @click="handleDetail(scope.row)"
-            >查看</el-button
-          >
+          <el-tooltip effect="light" content="编辑" placement="top">
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="canI.editschedule"
+                @click="handleEdit(scope.row)"
+                :disabled="scope.row.deviceCount > 0"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconbianji"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+          <el-tooltip effect="light" content="查看" placement="top">
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="canI.getscheduleinfo"
+                @click="handleDetail(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconyanjing"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
 
-          <el-popconfirm
-            v-if="canI.unpublishschedule"
-            style="margin-left: 10px;"
-            confirm-button-text="好的"
-            cancel-button-text="不用了"
-            icon="el-icon-info"
-            icon-color="red"
-            title="确定下架该日程吗？"
-            @confirm="handleUnpublish([scope.row.code])"
-          >
-            <el-button
-              slot="reference"
-              size="mini"
-              type="warning"
-              :disabled="!(scope.row.deviceCount > 0)"
-              >下架</el-button
-            >
-          </el-popconfirm>
-          <el-popconfirm
-            v-if="canI.deleteschedule"
-            style="margin-left: 10px;"
-            confirm-button-text="好的"
-            cancel-button-text="不用了"
-            icon="el-icon-info"
-            icon-color="red"
-            title="确定删除该日程吗？"
-            @confirm="handleDelete([scope.row.code])"
-          >
-            <el-button
-              slot="reference"
-              size="mini"
-              type="danger"
-              :disabled="scope.row.deviceCount > 0"
-              >删除</el-button
-            >
-          </el-popconfirm>
-          <el-button
-            size="mini"
-            type="primary"
-            style="margin-left: 10px;"
-            v-if="canI.publishschedule"
-            @click="
-              scheduleToPublish = scope.row;
-              showPublishForm = true;
-            "
-            :disabled="scope.row.statusCode != 1"
-            >发布</el-button
-          >
+          <el-tooltip effect="light" content="删除" placement="top">
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="canI.deleteschedule"
+                @click="singleDelete([scope.row.code])"
+                :disabled="scope.row.deviceCount > 0"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+
+          <el-tooltip effect="light" content="下架" placement="top">
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="canI.unpublishschedule"
+                @click="handleUnpublish([scope.row.code])"
+                :disabled="!(scope.row.deviceCount > 0)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconxiajia"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+
+          <el-tooltip effect="light" content="发布" placement="top">
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="canI.publishschedule"
+                @click="
+                  scheduleToPublish = scope.row;
+                  showPublishForm = true;
+                "
+                :disabled="scope.row.statusCode != 1"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconfabu"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -364,12 +375,34 @@ export default {
       this.showAddForm = false;
     },
     async handleUnpublish(codes) {
-      const { code, msg } = await ScheduleApi.unpublish({ codes });
-      this.$message({
-        type: code === "200" ? "success" : "error",
-        message: code === "200" ? "下架成功" : msg,
-      });
-      if (code === "200") this.getList();
+      try {
+        await this.$confirm("确定下架该日程吗？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        const { code, msg } = await ScheduleApi.unpublish({ codes });
+        this.$message({
+          type: code === "200" ? "success" : "error",
+          message: code === "200" ? "下架成功" : msg,
+        });
+        if (code === "200") this.getList();
+      } catch (error) {}
+    },
+    async singleDelete(codes) {
+      try {
+        await this.$confirm("确定删除该日程吗？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        const { code, msg } = await ScheduleApi.delete({ codes });
+        this.$message({
+          type: code === "200" ? "success" : "error",
+          message: code === "200" ? "删除成功" : msg,
+        });
+        if (code === "200") this.getList();
+      } catch (error) {}
     },
     async handleDelete(codes) {
       const { code, msg } = await ScheduleApi.delete({ codes });
@@ -458,6 +491,9 @@ export default {
 </script>
 
 <style scoped>
+.tooltip-wrapper + .tooltip-wrapper {
+  margin-left: 20px;
+}
 .gap {
   margin: 20px auto;
 }

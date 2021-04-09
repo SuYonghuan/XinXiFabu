@@ -114,6 +114,17 @@ body,
   .svg-button {
     font-size: 20px;
     color: #868f9f;
+    &.is-disabled {
+      color: #bbc1cc;
+      &:focus,
+      &:hover {
+        color: #bbc1cc;
+      }
+    }
+    &:focus,
+    &:hover {
+      color: #2f6bff;
+    }
   }
   .svg-button + .svg-button {
     margin-left: 20px;
