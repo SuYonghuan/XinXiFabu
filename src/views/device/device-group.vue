@@ -12,6 +12,7 @@
               v-for="item in searchDeviceList"
               :label="item.sName"
               :value="item.code"
+              :key="item.code"
             >
             </el-option>
           </el-select>
@@ -22,10 +23,13 @@
         </el-form-item>
         <el-form-item class="right-button">
           <el-button
-            type="success"
-            @click="handleEditDevice({})"
+            class="svg-suffix"
+            type="primary"
             v-if="pageMenu.adddevgroup"
-            >新增组</el-button
+            @click="handleEditDevice({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
           >
         </el-form-item>
       </el-form>
@@ -119,11 +123,14 @@
     </el-tooltip>
 
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
-      <el-col
-        ><el-button
-          type="danger"
-          @click="batchDelete(tableChecked)"
+      <el-col>
+        <el-button
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.deldevgroup"
+          @click="batchDelete(tableChecked)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
           >删除</el-button
         >
       </el-col>
@@ -170,6 +177,7 @@
               v-for="item in searchDeviceList"
               :label="item.sName"
               :value="item.code"
+              :key="item.code"
             >
             </el-option>
           </el-select>
