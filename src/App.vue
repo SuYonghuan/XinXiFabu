@@ -131,6 +131,9 @@ body,
         margin-right: 8px;
       }
       &.s {
+        + .s {
+          margin-left: 8px;
+        }
         &.is-disabled {
           color: #bbc1cc;
           &:focus,

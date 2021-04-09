@@ -15,6 +15,7 @@
               v-for="item in searchDeviceList"
               :label="item.sName"
               :value="item.code"
+              :key="item.code"
             >
             </el-option>
           </el-select>
@@ -28,8 +29,16 @@
           </el-cascader>
         </el-form-item>
         <el-form-item>
-          <el-button @click="onSearch">查询</el-button>
-          <el-button @click="replaySearch">清空</el-button>
+          <span class="btn1" @click="onSearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </span>
+          <span class="btn1" @click="replaySearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshanchu"></use>
+            </svg>
+          </span>
         </el-form-item>
         <p class="right-button">
           <el-button
@@ -50,8 +59,11 @@
               <use xlink:href="#icondaochudanwendang"></use></svg
             >导出设备节目</el-button
           >
-
-          <el-button type="success" @click="refresh()">刷新</el-button>
+          <span class="btn1" style="margin-left:8px;" @click="refresh()">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshuaxin"></use>
+            </svg>
+          </span>
         </p>
       </el-form>
     </template>
@@ -236,36 +248,51 @@
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
-          size="small"
-          @click="shut(tableChecked, 1)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.devshutdown"
+          @click="shut(tableChecked, 1)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconguanji"></use></svg
           >关机</el-button
         >
         <el-button
-          size="small"
-          @click="reboot(tableChecked, 1)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.devrestart"
+          @click="reboot(tableChecked, 1)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconzhongqi"></use></svg
           >重启</el-button
         >
         <el-button
-          size="small"
-          @click="handleEdit(tableChecked, 1)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.devsetshutdowntime"
+          @click="handleEdit(tableChecked, 1)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconguanjishijian"></use></svg
           >关机时间</el-button
         >
         <el-button
-          size="small"
-          @click="cleanShutTime(tableChecked, 1)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.devclearshutdowntime"
-          >清除关机时间
-        </el-button>
+          @click="cleanShutTime(tableChecked, 1)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconqingchuguanjishijian"></use></svg
+          >清除关机时间</el-button
+        >
         <el-button
-          size="small"
-          @click="batchDelete(tableChecked)"
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.devdel"
+          @click="batchDelete(tableChecked)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
           >删除</el-button
-        ></el-col
-      >
+        >
+      </el-col>
       <pagination
         :list="tableData"
         :total="total"
@@ -1032,6 +1059,7 @@ export default {
 
 .right-button {
   float: right;
+  display: flex;
 }
 
 .bottom-button {
