@@ -89,18 +89,20 @@
       <el-table-column prop="ip" label="IP"></el-table-column>
       <el-table-column prop="name" label="标签">
         <template slot-scope="scope">
-          <img
-            src="../../common/images/android.png"
-            v-show="scope.row.systemType == 'Android'"
-            width="25"
-            alt=""
-          />
-          <img
-            src="../../common/images/win.png"
-            v-show="scope.row.systemType == 'Windows'"
-            width="25"
-            alt=""
-          />
+          <svg
+            class="icon"
+            aria-hidden="true"
+            v-if="scope.row.systemType == 'Android'"
+          >
+            <use xlink:href="#iconanzhuo"></use>
+          </svg>
+          <svg
+            class="icon"
+            aria-hidden="true"
+            v-if="scope.row.systemType == 'Windows'"
+          >
+            <use xlink:href="#iconweiruan"></use>
+          </svg>
           <!--          <img src="../../common/images/map.png" v-show="scope.row.position" width="25" alt="">-->
           <el-popover
             placement="top-start"
@@ -118,12 +120,9 @@
                 @change="changScreenOper(scope.row)"
               ></el-switch>
             </p>
-            <img
-              slot="reference"
-              src="../../common/images/hand.png"
-              width="25"
-              alt=""
-            />
+            <svg slot="reference" class="icon" aria-hidden="true">
+              <use xlink:href="#iconchumo"></use>
+            </svg>
           </el-popover>
         </template>
       </el-table-column>

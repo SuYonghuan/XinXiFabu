@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "20897126",
+      "name": "微软",
+      "font_class": "weiruan",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "20897127",
+      "name": "安卓",
+      "font_class": "anzhuo",
+      "unicode": "e671",
+      "unicode_decimal": 58993
+    },
+    {
+      "icon_id": "20897128",
+      "name": "触摸",
+      "font_class": "chumo",
+      "unicode": "e672",
+      "unicode_decimal": 58994
+    },
+    {
       "icon_id": "20894054",
       "name": "差",
       "font_class": "cha",
