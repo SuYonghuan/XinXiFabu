@@ -143,8 +143,10 @@
         :filter-multiple="false"
       >
         <template slot-scope="scope">
-          <el-tag type="success" v-show="scope.row.deviceOnline">在线</el-tag>
-          <el-tag type="danger" v-show="!scope.row.deviceOnline">离线</el-tag>
+          <span
+            :class="['dot', scope.row.deviceOnline ? 'green' : 'red']"
+          ></span
+          >{{ scope.row.deviceOnline ? "在线" : "离线" }}
         </template>
       </el-table-column>
       <el-table-column
@@ -161,8 +163,12 @@
               <p>应用版本号：{{ scope.row.appVersion }}</p>
               <p>容器版本号：{{ scope.row.containerVersion }}</p>
             </div>
-            <el-tag type="success" v-if="scope.row.frontOnline">在线</el-tag>
-            <el-tag type="danger" v-if="!scope.row.frontOnline">离线</el-tag>
+            <span
+              ><span
+                :class="['dot', scope.row.frontOnline ? 'green' : 'red']"
+              ></span
+              >{{ scope.row.frontOnline ? "在线" : "离线" }}</span
+            >
           </el-tooltip>
         </template>
       </el-table-column>
@@ -174,28 +180,32 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250">
+      <el-table-column label="操作" width="132px">
         <template slot-scope="scope">
           <el-button
-            type="primary"
-            size="small"
-            @click="handleDetail(scope.row)"
+            class="svg-button"
+            type="text"
             v-if="pageMenu.devoper"
-            >管理</el-button
+            @click="handleDetail(scope.row)"
           >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshebeiguanli"></use></svg
+          ></el-button>
           <el-button
-            type="warning"
-            size="small"
-            @click="screenshot(scope.row, scope.$index)"
+            class="svg-button"
+            type="text"
             v-if="pageMenu.devicescreenshot"
-            :ref="'shotRef' + scope.$index"
-            :loading="false"
-            >截图
-          </el-button>
-          <el-dropdown style="margin-left: 15px">
-            <el-button type="primary" size="small">
-              更多<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
+            :loading="scope.row.loading"
+            @click="screenshot(scope.row, scope.$index)"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjieping"></use></svg
+          ></el-button>
+          <el-dropdown style="margin-left: 20px">
+            <el-button class="svg-button" type="text">
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icongengduo"></use></svg
+            ></el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item
                 ><p @click="reboot(scope.row)" v-if="pageMenu.devrestart">
@@ -514,9 +524,9 @@ export default {
         }
       });
     },
-    DeviceScreenshot(param) {
+    DeviceScreenshot(param, item) {
       DeviceScreenshot(param).then((res) => {
-        this.loadingStatus.loading = false;
+        item.loading = false;
         this.loadingStatus = null;
         if (res.code === ERR_OK) {
           this.shotImg = res.data;
@@ -1012,10 +1022,10 @@ export default {
       if (this.loadingStatus) {
         return this.$message.error("只能对一台设备截图，请稍等...");
       }
-      this.loadingStatus = this.$refs[`shotRef${row}`];
-      this.loadingStatus.loading = true;
+      this.loadingStatus = true;
+      item.loading = true;
       const param = { Code: item.code };
-      this.DeviceScreenshot(param);
+      this.DeviceScreenshot(param, item);
     },
     //关闭大图
     clickMaxImg() {
@@ -1054,6 +1064,21 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  &.red {
+    background: #ff4949;
+  }
+  &.green {
+    background: #12b362;
+  }
+}
+
 .demo-form-inline {
 }
 

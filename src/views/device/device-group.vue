@@ -377,6 +377,11 @@ export default {
         }
       });
     },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.currentPage = 1;
+      this.getList(this.pageSize, this.currentPage);
+    },
     GetDeviceOptionsNew() {
       GetDeviceOptionsNew({}).then((res) => {
         if (res.code === ERR_OK) {
