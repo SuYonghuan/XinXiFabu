@@ -10,7 +10,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="屏幕属性">
-          <el-select v-model="search.ScreenCode" placeholder="屏幕属性">
+          <el-select v-model="search.ScreenCode" placeholder="请选择">
             <el-option
               v-for="item in searchDeviceList"
               :label="item.sName"
@@ -33,17 +33,24 @@
         </el-form-item>
         <p class="right-button">
           <el-button
-            type="success"
-            @click="handleDeviceExcel({})"
+            class="svg-suffix"
+            type="primary"
             v-if="pageMenu.exportDevice"
+            @click="handleDeviceExcel({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#icondaochuzuwendang"></use></svg
             >导出设备</el-button
           >
           <el-button
-            type="success"
-            @click="handleExcel({})"
+            class="svg-suffix"
+            type="primary"
             v-if="pageMenu.devexport"
+            @click="handleExcel({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#icondaochudanwendang"></use></svg
             >导出设备节目</el-button
           >
+
           <el-button type="success" @click="refresh()">刷新</el-button>
         </p>
       </el-form>
