@@ -4,9 +4,12 @@
       <el-form class="demo-form-inline">
         <el-form-item class="right-button">
           <el-button
-            type="success"
+            class="svg-suffix"
+            type="primary"
+            v-if="pageMenu.addappkey"
             @click="handleEdit({})"
-            v-show="pageMenu.addappkey"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
             >新增</el-button
           >
         </el-form-item>
