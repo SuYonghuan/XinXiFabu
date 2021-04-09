@@ -185,8 +185,8 @@
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
-          size="small"
-          class="btn2"
+          class="svg-suffix s"
+          plain
           :disabled="!toDelCodes.length"
           v-if="canI.deletematerial"
           @click="bulkDelete"

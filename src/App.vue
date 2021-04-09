@@ -125,10 +125,26 @@ body,
       line-height: 44px;
       font-weight: bold;
       font-size: 14px;
-      border-radius: 6px;
+      border-radius: 8px;
       svg {
         font-size: 20px;
         margin-right: 8px;
+      }
+      &.s {
+        &.is-disabled {
+          color: #bbc1cc;
+          &:focus,
+          &:hover {
+            color: #bbc1cc;
+          }
+        }
+        &:focus,
+        &:hover {
+          color: #2f6bff;
+        }
+        padding: 0 16px;
+        color: #868f9f;
+        border: none;
       }
     }
   }

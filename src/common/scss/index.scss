@@ -2,17 +2,17 @@ $--color-primary: #2f6bff;
 $--color-success: #12b362;
 $--color-warning: #fda521;
 $--color-danger: #ff4949;
-$--color-text-primary: #172647;
+$--color-info: #868f9f;
+$--color-text-primary: #171f46;
 $--color-text-regular: #3a4763;
 $--color-text-secondary: #868f9f;
 $--color-text-placeholder: #bbc1cc;
-$--color-info: #868f9f;
 $--border-color-base: #ccd0d9;
 $--border-color-light: #dadfe6;
 $--border-color-lighter: #eceff6;
 $--border-color-extra-light: #f5f8fe;
 $--color-black: #091329;
-
+$--background-color-base: #f5f7fa;
 $--font-path: "~element-ui/lib/theme-chalk/fonts";
 
 @import "./reset.scss";

@@ -31,11 +31,13 @@
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button
-            size="small"
+            class="svg-suffix"
             type="primary"
             v-if="canI.addschedule"
             @click="handleAdd"
-            >新建日程</el-button
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
           >
         </div>
       </el-row>
@@ -216,8 +218,8 @@
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col>
         <el-button
-          size="small"
-          class="btn2"
+          class="svg-suffix s"
+          plain
           :disabled="!toDelCodes.length"
           v-if="canI.deleteschedule"
           @click="bulkDelete"
