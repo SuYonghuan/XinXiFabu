@@ -249,8 +249,10 @@
     </el-row>
     <el-dialog
       :title="editCode ? '编辑日程' : '新建日程'"
+      class="edit-schedule"
       append-to-body
       :visible.sync="showAddForm"
+      fullscreen
     >
       <add-form
         :playModes="playModes"
@@ -507,5 +509,17 @@ export default {
 }
 .dialog-footer {
   text-align: center;
+}
+</style>
+<style lang="scss">
+.edit-schedule {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
 }
 </style>

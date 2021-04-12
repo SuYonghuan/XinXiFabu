@@ -1,302 +1,354 @@
 <template>
-  <div class="schedule-add-form">
-    <el-form
-      label-width="120px"
-      v-if="form"
-      ref="form"
-      :model="form"
-      :rules="addRules"
-      :validate-on-rule-change="false"
-    >
-      <el-form-item label="日程名称" prop="name">
-        <el-input
-          placeholder="请输入日程名称"
-          :maxlength="200"
-          v-model="form.name"
-        >
-        </el-input>
-      </el-form-item>
-
-      <el-form-item label="日程描述" prop="desc">
-        <el-input
-          placeholder="请输入日程描述"
-          :maxlength="500"
-          v-model="form.desc"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item label="分辨率" prop="resolution">
-        <el-select
-          class="prefix"
-          v-model="form.resolution"
-          placeholder="请选择"
-          size="small"
-          style="width: 250px"
-          :clearable="true"
-          :disabled="isEdit"
-          @change="handleResolutionChange"
-        >
-          <el-option
-            v-for="data in resolutions"
-            :key="data.code"
-            :label="data.sName"
-            :value="data.sName"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="播放方式" prop="playMode">
-        <el-select
-          class="prefix"
-          v-model="form.playMode"
-          placeholder="请选择"
-          style="width: 250px"
-          :disabled="isEdit"
-          @change="handlePlayModeChange"
-        >
-          <el-option v-for="(k, v) in playModes" :key="k" :label="k" :value="v">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <template v-if="form && form.playMode !== 'carousel'">
-        <el-form-item label="节目" prop="programme" v-if="form.resolution">
-          <el-button
-            type="primary"
-            v-if="!form.programme"
-            @click="showSelectProgram = true"
-            >选择节目</el-button
+  <el-form
+    v-if="form"
+    ref="form"
+    :model="form"
+    :rules="addRules"
+    inline
+    :validate-on-rule-change="false"
+    class="saf"
+  >
+    <el-row class="header" type="flex" justify="space-between">
+      <el-col class="left">
+        <svg class="icon" aria-hidden="true">
+          <use xlink:href="#iconrichengguanli"></use>
+        </svg>
+        日程管理
+      </el-col>
+      <el-col class="middle">
+        <el-form-item prop="name">
+          <span slot="label" class="meta1">日程名称</span>
+          <el-input
+            class="input1"
+            placeholder="请输入日程名称"
+            :maxlength="200"
+            v-model="form.name"
           >
-          <div v-else>
-            {{ form.programme.name }}
-            <el-button
-              size="mini"
-              type="text"
-              class="updown"
-              icon="el-icon-delete-solid"
-              @click="form.programme = null"
-            ></el-button>
-          </div>
+          </el-input>
         </el-form-item>
-
-        <template v-if="form.playMode == 'day'">
-          <el-form-item label="时间段" prop="timeIntervals">
-            <el-time-picker
-              is-range
-              v-model="form.timeIntervals[0].range"
-              value-format="HH:mm:ss"
-              range-separator="至"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              placeholder="选择时间范围"
-              :disabled="isEdit"
-            >
-            </el-time-picker>
-          </el-form-item>
-        </template>
-        <template v-else-if="form.playMode == 'week'">
-          <el-form-item prop="timeIntervals" label="时间段"> </el-form-item>
-          <el-form-item
-            :label="['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]"
-            :key="interval.typeCode"
-            v-for="(interval, i) in form.timeIntervals"
-          >
-            <el-time-picker
-              is-range
-              :disabled="isEdit"
-              v-model="interval.range"
-              range-separator="至"
-              value-format="HH:mm:ss"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              placeholder="选择时间范围"
-            >
-            </el-time-picker>
-          </el-form-item>
-        </template>
-        <template v-else>
-          <el-form-item label="月">
-            <div class="months">
-              <div
-                :class="[
-                  'month',
-                  monthKeys[k].length ? 'orange' : '',
-                  month == k ? 'active' : '',
-                ]"
-                v-for="(v, k) in monthDates"
-                :key="k"
-                @click="
-                  month = k;
-                  handleMonthDateChange();
-                "
-              >
-                {{ k }}
-              </div>
-            </div>
-          </el-form-item>
-          <el-form-item label="日">
-            <div class="dates">
-              <div
-                :class="[
-                  'date',
-                  form.ranges[`${month}_${n}`] ? 'orange' : '',
-                  date == n ? 'active' : '',
-                ]"
-                v-for="n in monthDates[month]"
-                :key="n"
-                @click="
-                  date = n;
-                  handleMonthDateChange();
-                "
-              >
-                {{ n }}
-              </div>
-            </div>
-          </el-form-item>
-          <el-form-item label="时间段" prop="ranges">
-            <el-time-picker
-              is-range
-              :disabled="isEdit"
-              v-model="range"
-              value-format="HH:mm:ss"
-              range-separator="至"
-              start-placeholder="开始时间"
-              end-placeholder="结束时间"
-              placeholder="选择时间范围"
-              @change="setRange"
-            >
-            </el-time-picker>
-          </el-form-item>
-        </template>
-      </template>
-      <template v-if="form && form.playMode === 'carousel' && form.resolution">
-        <el-form-item prop="playList" label="播放列表">
-          <el-dropdown @command="addPlayList">
-            <el-button type="primary">
-              新增<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :disabled="hasNormalDataType" :command="1"
-                >普通模式</el-dropdown-item
-              >
-              <el-dropdown-item :command="2">插播模式</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </el-form-item>
-
-        <el-card
-          style="margin-top: 10px;"
-          v-for="(playList, i) in form.playList"
-          :key="i"
-        >
-          <div slot="header" class="clearfix">
-            <span
-              >播放列表{{ i + 1 }}
-              <el-tag>{{ dateTypes[playList.dateType] }}</el-tag></span
-            >
-
-            <el-button-group style="float: right; padding: 3px 0">
-              <el-button
-                type="text"
-                class="updown"
-                icon="el-icon-plus"
-                @click="
-                  currentPlayList = playList;
-                  showSelectProgram = true;
-                "
-              ></el-button>
-              <el-button
-                type="text"
-                class="updown"
-                icon="el-icon-delete"
-                :disabled="isEdit"
-                @click="handlePlayListDelete(i)"
-              ></el-button>
-            </el-button-group>
-          </div>
-          <el-date-picker
-            v-if="playList.dateType == 2"
-            v-model="playList.range"
+        <el-form-item prop="playMode">
+          <span slot="label" class="meta1">播放方式</span>
+          <el-select
+            class="input1"
+            v-model="form.playMode"
+            placeholder="请选择"
             :disabled="isEdit"
-            type="datetimerange"
-            value-format="yyyy-MM-ddTHH:mm:ss"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            align="right"
-            :clearable="false"
+            @change="handlePlayModeChange"
           >
-          </el-date-picker>
-          <el-table
-            :data="playList.programmes"
-            v-if="playList.programmes.length"
+            <el-option
+              v-for="(k, v) in playModes"
+              :key="k"
+              :label="k"
+              :value="v"
+            >
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="desc">
+          <span slot="label" class="meta1">日程描述</span>
+          <el-input
+            class="input1"
+            placeholder="请输入日程描述"
+            :maxlength="500"
+            v-model="form.desc"
           >
-            <el-table-column type="index" label="序号"></el-table-column>
-            <el-table-column label="节目" prop="name"></el-table-column>
-            <el-table-column label="操作" prop="op">
-              <template slot-scope="scope">
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="resolution">
+          <span slot="label" class="meta1">分辨率选择</span>
+          <el-select
+            class="input1"
+            v-model="form.resolution"
+            placeholder="请选择"
+            size="small"
+            :clearable="true"
+            :disabled="isEdit"
+            @change="handleResolutionChange"
+          >
+            <el-option
+              v-for="data in resolutions"
+              :key="data.code"
+              :label="data.sName"
+              :value="data.sName"
+            />
+          </el-select>
+        </el-form-item>
+      </el-col>
+      <el-col class="right">
+        <div style="flex: 1"></div>
+        <div class="btn success" @click="submit">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconchucun"></use>
+          </svg>
+          保存
+        </div>
+        <div class="btn primary" @click="$emit('closeAddForm')">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconcha"></use>
+          </svg>
+          关闭
+        </div>
+      </el-col>
+    </el-row>
+    <div class="main">
+      <div class="left">
+        <!-- <div class="program-header">
+          <el-input type="text" v-model="q" />
+          <div class="btn1">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
+        </div> -->
+      </div>
+      <div class="middle">
+        <el-row type="flex" justify="space-between" class="mid-header">
+          <el-col>
+            播放方式：<span class="value">
+              {{ playModes[form.playMode] }}</span
+            ></el-col
+          >
+          <el-button
+            class="svg-suffix"
+            type="primary"
+            v-if="form && form.playMode === 'carousel' && form.resolution"
+            @click="addPlayList"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
+          >
+        </el-row>
+        <template v-if="form && form.playMode !== 'carousel'">
+          <el-form-item label="节目" prop="programme" v-if="form.resolution">
+            <el-button
+              type="primary"
+              v-if="!form.programme"
+              @click="showSelectProgram = true"
+              >选择节目</el-button
+            >
+            <div v-else>
+              {{ form.programme.name }}
+              <el-button
+                size="mini"
+                type="text"
+                class="updown"
+                icon="el-icon-delete-solid"
+                @click="form.programme = null"
+              ></el-button>
+            </div>
+          </el-form-item>
+
+          <template v-if="form.playMode == 'day'">
+            <el-form-item label="时间段" prop="timeIntervals">
+              <el-time-picker
+                is-range
+                v-model="form.timeIntervals[0].range"
+                value-format="HH:mm:ss"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                placeholder="选择时间范围"
+                :disabled="isEdit"
+              >
+              </el-time-picker>
+            </el-form-item>
+          </template>
+          <template v-else-if="form.playMode == 'week'">
+            <el-form-item prop="timeIntervals" label="时间段"> </el-form-item>
+            <el-form-item
+              :label="
+                ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]
+              "
+              :key="interval.typeCode"
+              v-for="(interval, i) in form.timeIntervals"
+            >
+              <el-time-picker
+                is-range
+                :disabled="isEdit"
+                v-model="interval.range"
+                range-separator="至"
+                value-format="HH:mm:ss"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                placeholder="选择时间范围"
+              >
+              </el-time-picker>
+            </el-form-item>
+          </template>
+          <template v-else>
+            <el-form-item label="月">
+              <div class="months">
+                <div
+                  :class="[
+                    'month',
+                    monthKeys[k].length ? 'orange' : '',
+                    month == k ? 'active' : '',
+                  ]"
+                  v-for="(v, k) in monthDates"
+                  :key="k"
+                  @click="
+                    month = k;
+                    handleMonthDateChange();
+                  "
+                >
+                  {{ k }}
+                </div>
+              </div>
+            </el-form-item>
+            <el-form-item label="日">
+              <div class="dates">
+                <div
+                  :class="[
+                    'date',
+                    form.ranges[`${month}_${n}`] ? 'orange' : '',
+                    date == n ? 'active' : '',
+                  ]"
+                  v-for="n in monthDates[month]"
+                  :key="n"
+                  @click="
+                    date = n;
+                    handleMonthDateChange();
+                  "
+                >
+                  {{ n }}
+                </div>
+              </div>
+            </el-form-item>
+            <el-form-item label="时间段" prop="ranges">
+              <el-time-picker
+                is-range
+                :disabled="isEdit"
+                v-model="range"
+                value-format="HH:mm:ss"
+                range-separator="至"
+                start-placeholder="开始时间"
+                end-placeholder="结束时间"
+                placeholder="选择时间范围"
+                @change="setRange"
+              >
+              </el-time-picker>
+            </el-form-item>
+          </template>
+        </template>
+        <template
+          v-if="form && form.playMode === 'carousel' && form.resolution"
+        >
+          <el-form-item prop="playList"> </el-form-item>
+
+          <el-card
+            style="margin-top: 10px;"
+            v-for="(playList, i) in form.playList"
+            :key="i"
+          >
+            <div slot="header" class="clearfix">
+              <span
+                >播放列表{{ i + 1 }}
+                <el-tag>{{ dateTypes[playList.dateType] }}</el-tag></span
+              >
+
+              <el-button-group style="float: right; padding: 3px 0">
                 <el-button
-                  v-if="playList.programmes.length === 1"
-                  size="mini"
                   type="text"
                   class="updown"
-                  icon="el-icon-delete-solid"
-                  @click="removeProgram(playList, scope)"
+                  icon="el-icon-plus"
+                  @click="
+                    currentPlayList = playList;
+                    showSelectProgram = true;
+                  "
                 ></el-button>
-                <el-button-group v-else>
-                  <template v-if="scope.$index === 0">
-                    <el-button
-                      size="mini"
-                      type="text"
-                      class="updown"
-                      icon="el-icon-arrow-down"
-                      @click="down(playList, scope)"
-                    ></el-button>
-                  </template>
-                  <template
-                    v-else-if="scope.$index === playList.programmes.length - 1"
-                  >
-                    <el-button
-                      size="mini"
-                      type="text"
-                      class="updown"
-                      icon="el-icon-arrow-up"
-                      @click="up(playList, scope)"
-                    ></el-button>
-                  </template>
-                  <template v-else>
-                    <el-button
-                      size="mini"
-                      type="text"
-                      class="updown"
-                      icon="el-icon-arrow-up"
-                      @click="up(playList, scope)"
-                    ></el-button>
-                    <el-button
-                      size="mini"
-                      type="text"
-                      class="updown"
-                      icon="el-icon-arrow-down"
-                      @click="down(playList, scope)"
-                    ></el-button>
-                  </template>
+                <el-button
+                  type="text"
+                  class="updown"
+                  icon="el-icon-delete"
+                  :disabled="isEdit"
+                  @click="handlePlayListDelete(i)"
+                ></el-button>
+              </el-button-group>
+            </div>
+            <el-date-picker
+              v-if="playList.dateType == 2"
+              v-model="playList.range"
+              :disabled="isEdit"
+              type="datetimerange"
+              value-format="yyyy-MM-ddTHH:mm:ss"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              align="right"
+              :clearable="false"
+            >
+            </el-date-picker>
+            <el-table
+              :data="playList.programmes"
+              v-if="playList.programmes.length"
+            >
+              <el-table-column type="index" label="序号"></el-table-column>
+              <el-table-column label="节目" prop="name"></el-table-column>
+              <el-table-column label="操作" prop="op">
+                <template slot-scope="scope">
                   <el-button
+                    v-if="playList.programmes.length === 1"
                     size="mini"
                     type="text"
                     class="updown"
                     icon="el-icon-delete-solid"
-                    @click="removeComponent(scope.$index)"
+                    @click="removeProgram(playList, scope)"
                   ></el-button>
-                </el-button-group>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </template>
-    </el-form>
-    <div style="text-align: right;">
-      <el-button @click="$emit('closeAddForm')">取 消</el-button>
-      <el-button type="primary" @click="submit">确 定</el-button>
+                  <el-button-group v-else>
+                    <template v-if="scope.$index === 0">
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-down"
+                        @click="down(playList, scope)"
+                      ></el-button>
+                    </template>
+                    <template
+                      v-else-if="
+                        scope.$index === playList.programmes.length - 1
+                      "
+                    >
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-up"
+                        @click="up(playList, scope)"
+                      ></el-button>
+                    </template>
+                    <template v-else>
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-up"
+                        @click="up(playList, scope)"
+                      ></el-button>
+                      <el-button
+                        size="mini"
+                        type="text"
+                        class="updown"
+                        icon="el-icon-arrow-down"
+                        @click="down(playList, scope)"
+                      ></el-button>
+                    </template>
+                    <el-button
+                      size="mini"
+                      type="text"
+                      class="updown"
+                      icon="el-icon-delete-solid"
+                      @click="removeComponent(scope.$index)"
+                    ></el-button>
+                  </el-button-group>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </template>
+      </div>
     </div>
+
     <el-dialog
       title="节目列表"
       append-to-body
@@ -321,7 +373,7 @@
         >
       </div>
     </el-dialog>
-  </div>
+  </el-form>
 </template>
 
 <script>
@@ -372,6 +424,7 @@ export default {
         12: [],
       },
       range: null,
+      q: "",
     };
   },
   props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
@@ -586,13 +639,13 @@ export default {
         ...this.form,
       };
     },
-    addPlayList(dateType) {
+    addPlayList() {
       this.form = {
         ...this.form,
         playList: [
           ...this.form.playList,
           {
-            dateType,
+            dateType: 2,
             range: [
               getCurrentYmd() + " 00:00:00",
               getCurrentYmd() + " 23:59:59",
@@ -671,6 +724,7 @@ export default {
         11: [],
         12: [],
       };
+      this.q = "";
       if (!this.code) {
         this.form = {
           name: "",
@@ -678,7 +732,7 @@ export default {
           desc: "",
           programme: null,
           timeIntervals: [{ typeCode: 0, range: null }],
-          resolution: null,
+          resolution: this.resolutions[0].sName,
         };
       } else {
         const { code, data, msg } = await ScheduleApi.getDetail({
@@ -820,7 +874,189 @@ export default {
 </script>
 
 <style lang="scss">
-.schedule-add-form {
+.saf {
+  overflow: hidden;
+
+  .header {
+    height: 80px;
+    flex: 0 0 80px;
+    line-height: 80px;
+    border-bottom: 1px solid #dadfe6;
+    .left {
+      background: #ffffff;
+      position: relative;
+      padding-left: 80px;
+      flex: 0 0 352px;
+      font-family: Source Han Sans CN;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 18px;
+      color: #868f9f;
+      svg {
+        position: absolute;
+        left: 24px;
+        top: 24px;
+        font-size: 32px;
+        color: #2f6bff;
+      }
+    }
+
+    .middle {
+      background: #f6f6f6;
+      padding-left: 64px;
+      padding-right: 10px;
+      flex: 1;
+      display: flex;
+      .el-form-item__content {
+        vertical-align: middle;
+      }
+      .el-form-item {
+        flex: 1 1 25%;
+        display: flex;
+        margin: auto;
+      }
+      .meta1 {
+        font-family: Source Han Sans CN;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 12px;
+        color: #868f9f;
+        margin-right: 4px;
+      }
+      .input1 {
+        max-width: 200px;
+        input {
+          height: 44px;
+          max-width: 200px;
+          margin-right: 32px;
+          padding-left: 12px;
+          color: #3a4763;
+          font-weight: bold;
+          font-size: 14px;
+          border: 1px solid #e6eaf0;
+          box-sizing: border-box;
+          border-radius: 8px;
+        }
+      }
+    }
+    .right {
+      background: #f6f6f6;
+      flex: 0 0 248px;
+      display: flex;
+      padding: 18px 64px 18px 0;
+      .btn {
+        vertical-align: middle;
+        text-align: left;
+        position: relative;
+        display: inline-block;
+        width: 88px;
+        height: 44px;
+        line-height: 44px;
+        padding-left: 44px;
+        border: 1px solid #e6eaf0;
+        border-radius: 8px;
+        color: #868f9f;
+        cursor: pointer;
+        svg {
+          position: absolute;
+          top: 12.5px;
+          left: 16px;
+          font-weight: bold;
+          font-size: 20px;
+        }
+        &.success,
+        &.primary {
+          border: none;
+          color: #fff;
+        }
+        &.success {
+          background: #12b362;
+        }
+        &.primary {
+          background: #2f6bff;
+        }
+      }
+      .btn + .btn {
+        margin-left: 8px;
+      }
+    }
+  }
+  .main {
+    flex: 1;
+    display: flex;
+    .left {
+      flex: 0 0 352px;
+      height: calc(100vh - 80px);
+      background: #fff;
+      text-align: center;
+      padding-top: 8px;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      .program-header {
+        flex: 0 0 76px;
+        display: flex;
+        padding-left: 24px;
+        padding-top: 16px;
+        line-height: 44px;
+        .el-input {
+          width: 200px;
+        }
+        input {
+          width: 200px;
+          background: #fcfcfc;
+          border: 1px solid #e6eaf0;
+          box-sizing: border-box;
+          border-radius: 6px;
+          height: 44px;
+        }
+        .btn1 {
+          display: inline-block;
+          width: 44px;
+          height: 44px;
+          background: #ffffff;
+          border-radius: 8px;
+          border: 1px solid #e6eaf0;
+          margin-left: 8px;
+          text-align: center;
+          svg {
+            font-size: 20px;
+            color: #2f6bff;
+          }
+        }
+      }
+    }
+    .middle {
+      flex: 1;
+      height: calc(100vh - 80px);
+      padding: 0 64px;
+      position: relative;
+      background: #f6f6f6;
+      .mid-header {
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 80px;
+        color: #171f46;
+        .value {
+          font-size: 24px;
+        }
+        .svg-suffix {
+          padding: 0 32px;
+          height: 44px;
+          line-height: 44px;
+          font-weight: bold;
+          font-size: 14px;
+          border-radius: 8px;
+          margin: auto;
+          svg {
+            font-size: 20px;
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+  }
   .updown {
     width: 30px;
   }
