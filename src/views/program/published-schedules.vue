@@ -2,7 +2,7 @@
   <table-page class="index schedule">
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
-        <el-col>
+        <el-col style="display:flex;">
           <span class="meta1">日程名称</span>
           <el-input
             class="input1"

@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "20927083",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e673",
+      "unicode_decimal": 58995
+    },
+    {
+      "icon_id": "20927084",
+      "name": "清除",
+      "font_class": "qingchu",
+      "unicode": "e674",
+      "unicode_decimal": 58996
+    },
+    {
+      "icon_id": "20927085",
+      "name": "对",
+      "font_class": "dui",
+      "unicode": "e675",
+      "unicode_decimal": 58997
+    },
+    {
       "icon_id": "20897126",
       "name": "微软",
       "font_class": "weiruan",

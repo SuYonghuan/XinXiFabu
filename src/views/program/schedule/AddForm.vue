@@ -61,7 +61,6 @@
             v-model="form.resolution"
             placeholder="请选择"
             size="small"
-            :clearable="true"
             :disabled="isEdit"
             @change="handleResolutionChange"
           >
@@ -92,14 +91,74 @@
     </el-row>
     <div class="main">
       <div class="left">
-        <!-- <div class="program-header">
-          <el-input type="text" v-model="q" />
-          <div class="btn1">
+        <el-form-item class="program-header" prop="programme">
+          <el-input type="text" placeholder="搜索" v-model="q" />
+          <div class="btn1" @click="getPrograms">
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#iconsousuo"></use>
             </svg>
           </div>
-        </div> -->
+          <div
+            class="btn1"
+            @click="
+              q = '';
+              getPrograms();
+            "
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconqingchu"></use>
+            </svg>
+          </div>
+        </el-form-item>
+        <div class="programs">
+          <div
+            :class="[
+              'program',
+              form.playMode !== 'carousel' &&
+              form.programme &&
+              form.programme.code === prog.code
+                ? 'active'
+                : '',
+            ]"
+            v-for="prog in programs"
+            :key="prog.code"
+          >
+            <div class="left">
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconjiemubao"></use>
+              </svg>
+            </div>
+            <div class="r1">{{ prog.name }}</div>
+            <div class="r2">
+              {{ prog.addTime.substring(0, 10) }}
+              <span style="display:inline-block; width:24px;"></span>
+              时长
+              {{ prog.duration }}
+            </div>
+            <div
+              @click="handleProgram(prog)"
+              :class="
+                form.playMode === 'carousel'
+                  ? ['right']
+                  : [
+                      'right',
+                      's',
+                      form.programme && form.programme.code === prog.code
+                        ? 'active'
+                        : '',
+                    ]
+              "
+            >
+              <svg
+                class="icon"
+                v-if="form.playMode === 'carousel'"
+                aria-hidden="true"
+              >
+                <use xlink:href="#iconjia"></use>
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="middle">
         <el-row type="flex" justify="space-between" class="mid-header">
@@ -111,40 +170,21 @@
           <el-button
             class="svg-suffix"
             type="primary"
-            v-if="form && form.playMode === 'carousel' && form.resolution"
+            v-if="form.playMode === 'carousel'"
             @click="addPlayList"
             ><svg class="icon" aria-hidden="true">
               <use xlink:href="#iconjia"></use></svg
             >新增</el-button
           >
         </el-row>
-        <template v-if="form && form.playMode !== 'carousel'">
-          <el-form-item label="节目" prop="programme" v-if="form.resolution">
-            <el-button
-              type="primary"
-              v-if="!form.programme"
-              @click="showSelectProgram = true"
-              >选择节目</el-button
-            >
-            <div v-else>
-              {{ form.programme.name }}
-              <el-button
-                size="mini"
-                type="text"
-                class="updown"
-                icon="el-icon-delete-solid"
-                @click="form.programme = null"
-              ></el-button>
-            </div>
-          </el-form-item>
-
+        <template v-if="form.playMode !== 'carousel'">
           <template v-if="form.playMode == 'day'">
-            <el-form-item label="时间段" prop="timeIntervals">
+            <el-form-item class="duration" label="时间段" prop="timeIntervals">
               <el-time-picker
                 is-range
                 v-model="form.timeIntervals[0].range"
                 value-format="HH:mm:ss"
-                range-separator="至"
+                range-separator="-"
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
                 placeholder="选择时间范围"
@@ -152,6 +192,8 @@
               >
               </el-time-picker>
             </el-form-item>
+            <!-- <el-slider v-model="form.timeIntervals[0].range" range>
+              </el-slider> -->
           </template>
           <template v-else-if="form.playMode == 'week'">
             <el-form-item prop="timeIntervals" label="时间段"> </el-form-item>
@@ -166,7 +208,7 @@
                 is-range
                 :disabled="isEdit"
                 v-model="interval.range"
-                range-separator="至"
+                range-separator="-"
                 value-format="HH:mm:ss"
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
@@ -230,9 +272,7 @@
             </el-form-item>
           </template>
         </template>
-        <template
-          v-if="form && form.playMode === 'carousel' && form.resolution"
-        >
+        <template v-if="form.playMode === 'carousel'">
           <el-form-item prop="playList"> </el-form-item>
 
           <el-card
@@ -425,6 +465,7 @@ export default {
       },
       range: null,
       q: "",
+      programs: [],
     };
   },
   props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
@@ -654,6 +695,7 @@ export default {
           },
         ],
       };
+      this.currentPlayList = this.form.playList[this.form.playList.length - 1];
     },
     newTimeIntervalsByPlayMode(key) {
       return key === "day"
@@ -677,32 +719,27 @@ export default {
       }
       this.$refs.form && this.$refs.form.clearValidate();
     },
-    handleProgram() {
-      const program = this.selectedProgram;
+    handleProgram(program) {
       if (this.form.playMode === "carousel") {
         this.currentPlayList.programmes.push(program);
         this.setForm();
       } else {
         this.form.programme = program;
       }
-      this.showSelectProgram = false;
     },
     async openProgramModal() {
       await this.getPrograms();
       this.showSelectMaterial = true;
     },
     async getPrograms() {
-      const { pageIndex, q } = this;
+      const { q, form } = this;
       const { data, code, msg } = await ScheduleApi.getPrograms({
         name: q,
-        paging: 1,
-        pageIndex,
-        pageSize: 10,
+        resolution: form.resolution,
+        paging: 0,
       });
       if (code === "200") {
-        const { list, allCount } = data;
-        this.programs = list;
-        this.total = allCount;
+        this.programs = data;
       } else this.$message({ type: "error", message: msg });
     },
     async init() {
@@ -787,6 +824,7 @@ export default {
           }
         } else this.$message({ type: "error", message: msg });
       }
+      await this.getPrograms();
       if (this.$refs.ProgramPicker) this.$refs.ProgramPicker.reset();
     },
     form2Body() {
@@ -984,7 +1022,7 @@ export default {
   .main {
     flex: 1;
     display: flex;
-    .left {
+    > .left {
       flex: 0 0 352px;
       height: calc(100vh - 80px);
       background: #fff;
@@ -1000,6 +1038,7 @@ export default {
         padding-left: 24px;
         padding-top: 16px;
         line-height: 44px;
+        margin: 0;
         .el-input {
           width: 200px;
         }
@@ -1024,6 +1063,90 @@ export default {
             font-size: 20px;
             color: #2f6bff;
           }
+        }
+      }
+      .programs {
+        flex: 1;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 0 16px 4px 16px;
+
+        .program {
+          &:nth-child(2n + 1) {
+            background: #fafafa;
+          }
+          position: relative;
+          height: 60px;
+          border-radius: 8px;
+          padding: 10px 60px 0 68px;
+          &.active {
+            background: #e6eaf0;
+          }
+          > .left {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            left: 8px;
+            top: 8px;
+            background: #ffffff;
+            border: 1px solid #e6eaf0;
+            box-sizing: border-box;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 44px;
+            > svg {
+              font-size: 24px;
+              color: 868f9f;
+            }
+          }
+          > .right {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            right: 8px;
+            top: 8px;
+            background: #ffffff;
+            border: 1px solid #e6eaf0;
+            box-sizing: border-box;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 44px;
+            &.s {
+              width: 16px;
+              height: 16px;
+              top: 22px;
+              right: 22px;
+              background: #f5f8fe;
+              border: 1px solid #dadfe6;
+              box-sizing: border-box;
+              border-radius: 3px;
+              &.active {
+                background: #2f6bff;
+                border: 1px solid #2f6bff;
+              }
+            }
+
+            > svg {
+              font-size: 24px;
+              color: 868f9f;
+            }
+          }
+          > .r1 {
+            font-size: 14px;
+            line-height: 21px;
+            color: #3a4763;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          > .r2 {
+            font-size: 12px;
+            line-height: 23px;
+            color: #868f9f;
+          }
+        }
+        .program + .program {
+          margin-top: 8px;
         }
       }
     }
@@ -1054,6 +1177,10 @@ export default {
             margin-right: 8px;
           }
         }
+      }
+      .duration {
+        display: block;
+        width: 100%;
       }
     }
   }
