@@ -1344,7 +1344,7 @@ export default {
           top: 12.5px;
           left: 16px;
           font-weight: bold;
-          font-size: 14px;
+          font-size: 20px;
         }
         &.success,
         &.primary {
