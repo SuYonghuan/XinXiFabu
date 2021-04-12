@@ -29,7 +29,7 @@
         </div>
         <div class="btn primary" @click="$emit('close')">
           <svg class="icon" aria-hidden="true">
-            <use xlink:href="#iconFrame-1"></use>
+            <use xlink:href="#iconcha"></use>
           </svg>
           关闭
         </div>
@@ -469,7 +469,7 @@
                   :step="1"
                   step-strictly
                   :min="1"
-                  :max="1000"
+                  :max="100"
                 ></el-input-number
                 >px
               </el-form-item>

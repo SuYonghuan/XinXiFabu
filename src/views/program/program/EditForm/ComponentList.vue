@@ -65,7 +65,7 @@ export default {
   line-height: 45px;
   height: 45px;
   justify-content: space-between;
-  cursor: pointer;
+  cursor: move;
   color: #868f9f;
   border-radius: 6px;
   white-space: nowrap;
