@@ -6,6 +6,7 @@
     :value="range ? range.map(hmsTo100) : null"
     @input="
       (val) => {
+        if (!range && val[0] === 0 && val[1] === 86399) return;
         $emit('change', val.map(i00ToHms));
       }
     "

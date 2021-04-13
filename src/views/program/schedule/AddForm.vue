@@ -190,7 +190,6 @@
                 end-placeholder="结束时间"
                 placeholder="选择时间范围"
                 :clearable="false"
-                :disabled="isEdit"
               >
               </el-time-picker>
               <div class="btn1" @click="form.timeIntervals[0].range = null">
@@ -221,7 +220,6 @@
                 </span>
                 <el-time-picker
                   is-range
-                  :disabled="isEdit"
                   v-model="interval.range"
                   range-separator="-"
                   value-format="HH:mm:ss"
@@ -297,7 +295,6 @@
               >
               <el-time-picker
                 is-range
-                :disabled="isEdit"
                 v-model="range"
                 value-format="HH:mm:ss"
                 range-separator="-"
@@ -373,7 +370,6 @@
               <el-date-picker
                 v-if="playList.dateType == 2"
                 v-model="playList.range"
-                :disabled="isEdit"
                 type="datetimerange"
                 value-format="yyyy-MM-ddTHH:mm:ss"
                 range-separator="-"
@@ -478,30 +474,6 @@
       </div>
     </div>
 
-    <el-dialog
-      title="节目列表"
-      append-to-body
-      :visible.sync="showSelectProgram"
-    >
-      <program-picker
-        ref="ProgramPicker"
-        :resolution="form && form.resolution"
-        @change="
-          (program) => {
-            selectedProgram = program;
-          }
-        "
-      ></program-picker>
-      <div style="text-align: right;">
-        <el-button @click="showSelectProgram = false">取 消</el-button>
-        <el-button
-          type="primary"
-          :disabled="!selectedProgram"
-          @click="handleProgram"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
     <el-dialog title="复制到" append-to-body :visible.sync="showSelectWeekday">
       <copy-to-weekday
         :from="weekdayFrom"
@@ -524,7 +496,6 @@
 
 <script>
 import { ScheduleApi } from "../program.js";
-import ProgramPicker from "./ProgramPicker";
 import TimeSlider from "./TimeSlider";
 import CopyToWeekday from "./CopyToWeekday";
 import CopyToMonthDay from "./CopyToMonthDay";
@@ -534,7 +505,6 @@ const getCurrentYmd = () =>
     1}-${new Date().getDate()}`;
 export default {
   components: {
-    ProgramPicker,
     TimeSlider,
     CopyToWeekday,
     CopyToMonthDay,
@@ -547,8 +517,6 @@ export default {
         1: "普通模式",
         2: "插播模式",
       },
-      showSelectProgram: false,
-      selectedProgram: null,
       currentPlayList: null,
       month: 1,
       date: 1,

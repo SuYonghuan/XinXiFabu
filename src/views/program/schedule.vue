@@ -151,7 +151,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            content="编辑"
+            :content="scope.row.deviceCount > 0 ? '已发布日程无法编辑' : '编辑'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -189,7 +189,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            content="删除"
+            :content="scope.row.deviceCount > 0 ? '已发布日程无法删除' : '删除'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -209,7 +209,9 @@
           <el-tooltip
             transition="none"
             effect="light"
-            content="下架"
+            :content="
+              !(scope.row.deviceCount > 0) ? '已发布日程才能下架' : '下架'
+            "
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -229,7 +231,9 @@
           <el-tooltip
             transition="none"
             effect="light"
-            content="发布"
+            :content="
+              scope.row.statusCode != 1 ? '审核通过的日程才能发布' : '发布'
+            "
             placement="top"
           >
             <span class="tooltip-wrapper">
