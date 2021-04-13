@@ -171,6 +171,7 @@
             class="svg-suffix"
             type="primary"
             v-if="form.playMode === 'carousel'"
+            :disabled="form.playList.length >= 8"
             @click="addPlayList"
             ><svg class="icon" aria-hidden="true">
               <use xlink:href="#iconjia"></use></svg
