@@ -211,13 +211,13 @@
             >
             </el-form-item>
             <template v-for="(interval, i) in form.timeIntervals">
-              <el-form-item
-                class="duration"
-                :label="
-                  ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]
-                "
-                :key="interval.typeCode"
-              >
+              <el-form-item class="duration" :key="interval.typeCode">
+                <span slot="label">
+                  <span class="label-prefix">{{
+                    ["周一", "周二", "周三", "周四", "周五", "周六", "周日"][i]
+                  }}</span
+                  >时间段
+                </span>
                 <el-time-picker
                   is-range
                   :disabled="isEdit"
@@ -227,6 +227,7 @@
                   start-placeholder="开始时间"
                   end-placeholder="结束时间"
                   placeholder="选择时间范围"
+                  :clearable="false"
                 >
                 </el-time-picker>
                 <div
@@ -254,58 +255,90 @@
             </template>
           </template>
           <template v-else>
-            <el-form-item label="月">
-              <div class="months">
-                <div
-                  :class="[
-                    'month',
-                    monthKeys[k].length ? 'orange' : '',
-                    month == k ? 'active' : '',
-                  ]"
-                  v-for="(v, k) in monthDates"
-                  :key="k"
-                  @click="
-                    month = k;
-                    handleMonthDateChange();
-                  "
-                >
-                  {{ k }}
-                </div>
+            <div class="months">
+              <div
+                :class="[
+                  'month',
+                  monthKeys[k].length ? 'orange' : '',
+                  month == k ? 'active' : '',
+                ]"
+                v-for="(v, k) in monthDates"
+                :key="k"
+                @click="
+                  month = k;
+                  handleMonthDateChange();
+                "
+              >
+                {{ k }} <span>月</span>
               </div>
-            </el-form-item>
-            <el-form-item label="日">
-              <div class="dates">
-                <div
-                  :class="[
-                    'date',
-                    form.ranges[`${month}_${n}`] ? 'orange' : '',
-                    date == n ? 'active' : '',
-                  ]"
-                  v-for="n in monthDates[month]"
-                  :key="n"
-                  @click="
-                    date = n;
-                    handleMonthDateChange();
-                  "
-                >
-                  {{ n }}
-                </div>
+            </div>
+            <div class="dates">
+              <div
+                :class="[
+                  'date',
+                  form.ranges[`${month}_${n}`] ? 'orange' : '',
+                  date == n ? 'active' : '',
+                ]"
+                v-for="n in monthDates[month]"
+                :key="n"
+                @click="
+                  date = n;
+                  handleMonthDateChange();
+                "
+              >
+                {{ n }}
               </div>
-            </el-form-item>
-            <el-form-item label="时间段" prop="ranges">
+            </div>
+            <el-form-item class="duration" prop="ranges">
+              <span slot="label"
+                ><span class="label-prefix">{{ month }}月{{ date }}日</span
+                >时间段</span
+              >
               <el-time-picker
                 is-range
                 :disabled="isEdit"
                 v-model="range"
                 value-format="HH:mm:ss"
-                range-separator="至"
+                range-separator="-"
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
                 placeholder="选择时间范围"
+                :clearable="false"
                 @change="setRange"
               >
               </el-time-picker>
+              <!-- <div
+                  class="btn1"
+                  @click="
+                    weekdayFrom = weekdayMap[interval.typeCode];
+                    showSelectWeekday = true;
+                  "
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#iconfuzhi"></use>
+                  </svg>
+                </div> -->
+              <div
+                class="btn1"
+                @click="
+                  range = null;
+                  setRange(null);
+                "
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use>
+                </svg>
+              </div>
             </el-form-item>
+            <time-slider
+              :range="range"
+              @change="
+                (val) => {
+                  range = val;
+                  setRange(range);
+                }
+              "
+            />
           </template>
         </template>
         <template v-if="form.playMode === 'carousel'">
@@ -1251,6 +1284,11 @@ export default {
       }
       .duration {
         margin-bottom: 16px;
+        .label-prefix {
+          font-size: 18px;
+          color: #868f9f;
+          margin-right: 40px;
+        }
         .el-form-item__label {
           font-size: 14px;
           color: #868f9f;
@@ -1280,41 +1318,58 @@ export default {
   .months {
     display: flex;
     justify-content: space-between;
-    color: #fff;
+    color: #868f9f;
     cursor: pointer;
+    height: 120px;
+    line-height: 120px;
+    border: 1px solid #dadfe6;
+    border-radius: 8px;
+    font-size: 20px;
+    background: #ffffff;
+    overflow: hidden;
     .month {
-      background: #a6a6a6;
       flex: 1;
       text-align: center;
 
       &.orange {
-        background: lightcoral;
+        background: #fda521;
+        color: #fff;
       }
       &.active {
-        background: rgba(255, 195, 0, 1);
+        background: #2f6bff;
+        color: #fff;
       }
     }
     .month + .month {
-      margin-left: 1px;
+      border-left: 1px solid #dadfe6;
     }
   }
   .dates {
+    margin-top: 16px;
+    margin-bottom: 40px;
     display: flex;
     justify-content: space-between;
-    border: 1px solid #dbdbdb;
+    border: 1px solid #dadfe6;
     cursor: pointer;
+    height: 120px;
+    line-height: 120px;
+    background: #ffffff;
+    font-size: 24px;
+    color: #868f9f;
     .date {
       flex: 1;
       text-align: center;
       &.orange {
-        background: lightcoral;
+        background: #fda521;
+        color: #fff;
       }
       &.active {
-        background: rgba(255, 195, 0, 1);
+        background: #2f6bff;
+        color: #fff;
       }
     }
     .date + .date {
-      border-left: 1px solid #dbdbdb;
+      border-left: 1px solid #dadfe6;
     }
   }
 }
