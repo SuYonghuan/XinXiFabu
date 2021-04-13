@@ -188,34 +188,70 @@
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
                 placeholder="选择时间范围"
+                :clearable="false"
                 :disabled="isEdit"
               >
               </el-time-picker>
+              <div class="btn1" @click="form.timeIntervals[0].range = null">
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use>
+                </svg>
+              </div>
             </el-form-item>
-            <!-- <el-slider v-model="form.timeIntervals[0].range" range>
-              </el-slider> -->
+            <time-slider
+              :range="form.timeIntervals[0].range"
+              @change="(val) => (form.timeIntervals[0].range = val)"
+            />
           </template>
           <template v-else-if="form.playMode == 'week'">
-            <el-form-item prop="timeIntervals" label="时间段"> </el-form-item>
             <el-form-item
-              :label="
-                ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]
-              "
-              :key="interval.typeCode"
-              v-for="(interval, i) in form.timeIntervals"
+              class="ghost"
+              prop="timeIntervals"
+              style="display:block;"
             >
-              <el-time-picker
-                is-range
-                :disabled="isEdit"
-                v-model="interval.range"
-                range-separator="-"
-                value-format="HH:mm:ss"
-                start-placeholder="开始时间"
-                end-placeholder="结束时间"
-                placeholder="选择时间范围"
-              >
-              </el-time-picker>
             </el-form-item>
+            <template v-for="(interval, i) in form.timeIntervals">
+              <el-form-item
+                class="duration"
+                :label="
+                  ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][i]
+                "
+                :key="interval.typeCode"
+              >
+                <el-time-picker
+                  is-range
+                  :disabled="isEdit"
+                  v-model="interval.range"
+                  range-separator="-"
+                  value-format="HH:mm:ss"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  placeholder="选择时间范围"
+                >
+                </el-time-picker>
+                <div
+                  class="btn1"
+                  @click="
+                    weekdayFrom = weekdayMap[interval.typeCode];
+                    showSelectWeekday = true;
+                  "
+                >
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#iconfuzhi"></use>
+                  </svg>
+                </div>
+                <div class="btn1" @click="interval.range = null">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#iconshanchu"></use>
+                  </svg>
+                </div>
+              </el-form-item>
+              <time-slider
+                :key="'slider_' + interval.typeCode"
+                :range="interval.range"
+                @change="(val) => (interval.range = val)"
+              />
+            </template>
           </template>
           <template v-else>
             <el-form-item label="月">
@@ -413,16 +449,27 @@
         >
       </div>
     </el-dialog>
+    <el-dialog title="复制到" append-to-body :visible.sync="showSelectWeekday">
+      <copy-to-weekday
+        :from="weekdayFrom"
+        :visible="showSelectWeekday"
+        @close="showSelectWeekday = false"
+        @submit="handleCopyToWeekday"
+      ></copy-to-weekday>
+    </el-dialog>
   </el-form>
 </template>
 
 <script>
 import { ScheduleApi } from "../program.js";
 import ProgramPicker from "./ProgramPicker";
+import TimeSlider from "./TimeSlider";
+import CopyToWeekday from "./CopyToWeekday";
 const getCurrentYmd = () =>
   `${new Date().getFullYear()}-${new Date().getMonth() +
     1}-${new Date().getDate()}`;
 export default {
+  components: { ProgramPicker, TimeSlider, CopyToWeekday },
   data() {
     return {
       form: null,
@@ -466,6 +513,17 @@ export default {
       range: null,
       q: "",
       programs: [],
+      showSelectWeekday: false,
+      weekdayFrom: null,
+      weekdayMap: {
+        1: "周一",
+        2: "周二",
+        3: "周三",
+        4: "周四",
+        5: "周五",
+        6: "周六",
+        7: "周日",
+      },
     };
   },
   props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
@@ -560,7 +618,7 @@ export default {
                       (range) => range && range[0] && range[1]
                     )
                   )
-                    return callback(new Error("请选择某天的时间段"));
+                    return callback(new Error("请选择至少一天的时间段"));
                   const sameKV = Object.entries(value).find(
                     ([_, range]) =>
                       range && range[0] === range[1] && range[0] !== ""
@@ -615,6 +673,18 @@ export default {
     this.init();
   },
   methods: {
+    handleCopyToWeekday(checked) {
+      const range = this.form.timeIntervals.find(
+        ({ typeCode }) => this.weekdayMap[typeCode] === this.weekdayFrom
+      ).range;
+      this.form.timeIntervals.forEach((element) => {
+        if (checked.includes(this.weekdayMap[element.typeCode])) {
+          element.range = [...range];
+        }
+      });
+      this.showSelectWeekday = false;
+    },
+
     handleMonthDateChange() {
       if (this.date > this.monthDates[this.month]) {
         this.date = 1;
@@ -907,7 +977,6 @@ export default {
       }
     },
   },
-  components: { ProgramPicker },
 };
 </script>
 
@@ -1022,6 +1091,20 @@ export default {
   .main {
     flex: 1;
     display: flex;
+    .btn1 {
+      display: inline-block;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e6eaf0;
+      margin-left: 8px;
+      text-align: center;
+      svg {
+        font-size: 20px;
+        color: #2f6bff;
+      }
+    }
     > .left {
       flex: 0 0 352px;
       height: calc(100vh - 80px);
@@ -1049,20 +1132,6 @@ export default {
           box-sizing: border-box;
           border-radius: 6px;
           height: 44px;
-        }
-        .btn1 {
-          display: inline-block;
-          width: 44px;
-          height: 44px;
-          background: #ffffff;
-          border-radius: 8px;
-          border: 1px solid #e6eaf0;
-          margin-left: 8px;
-          text-align: center;
-          svg {
-            font-size: 20px;
-            color: #2f6bff;
-          }
         }
       }
       .programs {
@@ -1153,9 +1222,11 @@ export default {
     .middle {
       flex: 1;
       height: calc(100vh - 80px);
-      padding: 0 64px;
+      padding: 0 64px 64px 64px;
       position: relative;
       background: #f6f6f6;
+      overflow-x: hidden;
+      overflow-y: auto;
       .mid-header {
         font-weight: bold;
         font-size: 18px;
@@ -1179,8 +1250,27 @@ export default {
         }
       }
       .duration {
-        display: block;
-        width: 100%;
+        margin-bottom: 16px;
+        .el-form-item__label {
+          font-size: 14px;
+          color: #868f9f;
+        }
+        .el-input__inner {
+          width: 300px;
+          height: 44px;
+          line-height: 44px;
+          font-weight: bold;
+          font-size: 18px;
+        }
+      }
+      .ghost {
+        margin-bottom: 10px;
+        .el-form-item__content {
+          width: 200px;
+        }
+      }
+      .time-slider + .duration {
+        margin-top: 64px;
       }
     }
   }

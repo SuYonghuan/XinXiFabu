@@ -9,6 +9,7 @@
     </div>
     <el-dropdown trigger="click" style="width:20px" v-show="!autoAuth">
       <el-badge
+        class="notice-badge"
         style="width:20px;height:80px;"
         :value="noticeData.count"
         :hidden="noticeData.count < 1"
@@ -179,6 +180,13 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+.notice-badge {
+  .el-badge__content.is-fixed {
+    top: 30px;
+  }
+}
+</style>
 <style scoped lang="scss">
 .exit {
   position: relative;
