@@ -686,7 +686,6 @@
 <script>
 import MatList from "./EditForm/MatList";
 import { ProgramApi } from "../program.js";
-import draggable from "vuedraggable";
 import ComponentList from "./EditForm/ComponentList";
 import { svgs } from "./EditForm/svgs.js";
 
@@ -729,7 +728,7 @@ const flatenComponent = ({ config, ...component }) => {
 };
 
 export default {
-  components: { MatList, draggable, ComponentList },
+  components: { MatList, ComponentList },
   props: ["showEditForm", "code"],
   data() {
     return {

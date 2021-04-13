@@ -130,7 +130,7 @@
             </div>
             <div class="r1">{{ prog.name }}</div>
             <div class="r2">
-              {{ prog.addTime.substring(0, 10) }}
+              {{ prog.addTime ? prog.addTime.substring(0, 10) : "" }}
               <span style="display:inline-block; width:24px;"></span>
               时长
               {{ prog.duration }}
@@ -342,118 +342,137 @@
           </template>
         </template>
         <template v-if="form.playMode === 'carousel'">
-          <el-form-item prop="playList"> </el-form-item>
+          <el-form-item prop="playList" class="ghost"> </el-form-item>
 
-          <el-card
-            style="margin-top: 10px;"
+          <div
+            :class="['playlist', currentPlayList === playList ? 'active' : '']"
             v-for="(playList, i) in form.playList"
             :key="i"
+            @click="currentPlayList = playList"
           >
-            <div slot="header" class="clearfix">
-              <span
-                >播放列表{{ i + 1 }}
-                <el-tag>{{ dateTypes[playList.dateType] }}</el-tag></span
-              >
-
-              <el-button-group style="float: right; padding: 3px 0">
-                <el-button
-                  type="text"
-                  class="updown"
-                  icon="el-icon-plus"
-                  @click="
-                    currentPlayList = playList;
-                    showSelectProgram = true;
-                  "
-                ></el-button>
-                <el-button
-                  type="text"
-                  class="updown"
-                  icon="el-icon-delete"
-                  :disabled="isEdit"
-                  @click="handlePlayListDelete(i)"
-                ></el-button>
-              </el-button-group>
+            <div class="playlist-header">
+              播放列表{{ i + 1 }}
+              <div class="btn1" @click="handlePlayListDelete(i)">
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconguanbi"></use>
+                </svg>
+              </div>
             </div>
-            <el-date-picker
-              v-if="playList.dateType == 2"
-              v-model="playList.range"
-              :disabled="isEdit"
-              type="datetimerange"
-              value-format="yyyy-MM-ddTHH:mm:ss"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              align="right"
-              :clearable="false"
+            <div class="datetype">
+              <el-select v-model="playList.dateType">
+                <el-option
+                  v-for="(k, v) in dateTypes"
+                  :key="v"
+                  :label="k"
+                  :value="Number(v)"
+                >
+                </el-option>
+              </el-select>
+              <span class="meta" v-if="playList.dateType == 2">时间段</span>
+              <el-date-picker
+                v-if="playList.dateType == 2"
+                v-model="playList.range"
+                :disabled="isEdit"
+                type="datetimerange"
+                value-format="yyyy-MM-ddTHH:mm:ss"
+                range-separator="-"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right"
+                :clearable="false"
+              >
+              </el-date-picker>
+            </div>
+            <draggable
+              class="programs"
+              :list="playList.programmes"
+              :sort="true"
             >
-            </el-date-picker>
-            <el-table
-              :data="playList.programmes"
-              v-if="playList.programmes.length"
-            >
-              <el-table-column type="index" label="序号"></el-table-column>
-              <el-table-column label="节目" prop="name"></el-table-column>
-              <el-table-column label="操作" prop="op">
-                <template slot-scope="scope">
-                  <el-button
-                    v-if="playList.programmes.length === 1"
-                    size="mini"
-                    type="text"
-                    class="updown"
-                    icon="el-icon-delete-solid"
-                    @click="removeProgram(playList, scope)"
-                  ></el-button>
-                  <el-button-group v-else>
-                    <template v-if="scope.$index === 0">
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="down(playList, scope)"
-                      ></el-button>
-                    </template>
-                    <template
-                      v-else-if="
-                        scope.$index === playList.programmes.length - 1
-                      "
+              <div
+                :class="[
+                  'program',
+                  form.playMode !== 'carousel' &&
+                  form.programme &&
+                  form.programme.code === prog.code
+                    ? 'active'
+                    : '',
+                ]"
+                v-for="(prog, i) in playList.programmes"
+                :key="prog.code + i"
+              >
+                <div class="left">
+                  <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#iconjiemubao"></use>
+                  </svg>
+                </div>
+                <div class="r1">{{ prog.name }}</div>
+                <div class="r2">
+                  {{ prog.addTime ? prog.addTime.substring(0, 10) : "" }}
+                  <span style="display:inline-block; width:24px;"></span>
+                  时长
+                  {{ prog.duration }}
+                </div>
+                <div class="right-btns">
+                  <template>
+                    <svg
+                      class="icon"
+                      aria-hidden="true"
+                      v-if="playList.programmes.length === 1"
+                      @click="removeProgram(playList, i)"
                     >
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="up(playList, scope)"
-                      ></el-button>
-                    </template>
+                      <use xlink:href="#iconshanchu"></use>
+                    </svg>
+
                     <template v-else>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-up"
-                        @click="up(playList, scope)"
-                      ></el-button>
-                      <el-button
-                        size="mini"
-                        type="text"
-                        class="updown"
-                        icon="el-icon-arrow-down"
-                        @click="down(playList, scope)"
-                      ></el-button>
+                      <template v-if="i === 0">
+                        <svg
+                          class="icon"
+                          aria-hidden="true"
+                          @click="down(playList, i)"
+                        >
+                          <use xlink:href="#iconxia"></use>
+                        </svg>
+                      </template>
+                      <template
+                        v-else-if="i === playList.programmes.length - 1"
+                      >
+                        <svg
+                          class="icon"
+                          aria-hidden="true"
+                          @click="up(playList, i)"
+                        >
+                          <use xlink:href="#iconshang"></use>
+                        </svg>
+                      </template>
+                      <template v-else>
+                        <svg
+                          class="icon"
+                          aria-hidden="true"
+                          @click="up(playList, i)"
+                        >
+                          <use xlink:href="#iconshang"></use>
+                        </svg>
+                        <svg
+                          class="icon"
+                          aria-hidden="true"
+                          @click="down(playList, i)"
+                        >
+                          <use xlink:href="#iconxia"></use>
+                        </svg>
+                      </template>
+                      <svg
+                        class="icon"
+                        aria-hidden="true"
+                        @click="removeProgram(playList, i)"
+                      >
+                        <use xlink:href="#iconshanchu"></use>
+                      </svg>
                     </template>
-                    <el-button
-                      size="mini"
-                      type="text"
-                      class="updown"
-                      icon="el-icon-delete-solid"
-                      @click="removeComponent(scope.$index)"
-                    ></el-button>
-                  </el-button-group>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
+                  </template>
+                </div>
+              </div>
+            </draggable>
+          </div>
         </template>
       </div>
     </div>
@@ -508,11 +527,18 @@ import ProgramPicker from "./ProgramPicker";
 import TimeSlider from "./TimeSlider";
 import CopyToWeekday from "./CopyToWeekday";
 import CopyToMonthDay from "./CopyToMonthDay";
+import draggable from "vuedraggable";
 const getCurrentYmd = () =>
   `${new Date().getFullYear()}-${new Date().getMonth() +
     1}-${new Date().getDate()}`;
 export default {
-  components: { ProgramPicker, TimeSlider, CopyToWeekday, CopyToMonthDay },
+  components: {
+    ProgramPicker,
+    TimeSlider,
+    CopyToWeekday,
+    CopyToMonthDay,
+    draggable,
+  },
   data() {
     return {
       form: null,
@@ -768,21 +794,21 @@ export default {
       }
       this.form.ranges[key] = val;
     },
-    down(playList, { $index: i }) {
+    down(playList, i) {
       const { programmes } = playList;
       const tmp = programmes[i + 1];
       programmes[i + 1] = programmes[i];
       programmes[i] = tmp;
       playList.programmes = [...programmes];
     },
-    up(playList, { $index: i }) {
+    up(playList, i) {
       const { programmes } = playList;
       const tmp = programmes[i - 1];
       programmes[i - 1] = programmes[i];
       programmes[i] = tmp;
       playList.programmes = [...programmes];
     },
-    removeProgram({ programmes }, { $index: i }) {
+    removeProgram({ programmes }, i) {
       this.$confirm("您确认要删除该节目?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -871,8 +897,10 @@ export default {
     },
     handleProgram(program) {
       if (this.form.playMode === "carousel") {
-        this.currentPlayList.programmes.push(program);
-        this.setForm();
+        if (this.currentPlayList) {
+          this.currentPlayList.programmes.push(program);
+          this.setForm();
+        }
       } else {
         this.form.programme = program;
       }
@@ -971,6 +999,7 @@ export default {
                 ...(dateType == 2 ? { range: [beginTime, endTime] } : {}),
               })
             );
+            this.currentPlayList = this.form.playList[0];
           }
         } else this.$message({ type: "error", message: msg });
       }
@@ -1185,6 +1214,82 @@ export default {
         color: #2f6bff;
       }
     }
+    .programs {
+      .program {
+        position: relative;
+        height: 60px;
+        border-radius: 8px;
+        padding: 10px 60px 0 68px;
+        &.active {
+          background: #e6eaf0;
+        }
+        > .left {
+          position: absolute;
+          width: 44px;
+          height: 44px;
+          left: 8px;
+          top: 8px;
+          background: #ffffff;
+          border: 1px solid #e6eaf0;
+          box-sizing: border-box;
+          border-radius: 6px;
+          text-align: center;
+          line-height: 44px;
+          > svg {
+            font-size: 24px;
+            color: 868f9f;
+          }
+        }
+        > .right {
+          position: absolute;
+          width: 44px;
+          height: 44px;
+          right: 8px;
+          top: 8px;
+          background: #ffffff;
+          border: 1px solid #e6eaf0;
+          box-sizing: border-box;
+          border-radius: 6px;
+          text-align: center;
+          line-height: 44px;
+          &.s {
+            width: 16px;
+            height: 16px;
+            top: 22px;
+            right: 22px;
+            background: #f5f8fe;
+            border: 1px solid #dadfe6;
+            box-sizing: border-box;
+            border-radius: 3px;
+            &.active {
+              background: #2f6bff;
+              border: 1px solid #2f6bff;
+            }
+          }
+
+          > svg {
+            font-size: 24px;
+            color: 868f9f;
+          }
+        }
+        > .r1 {
+          font-size: 14px;
+          line-height: 21px;
+          color: #3a4763;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        > .r2 {
+          font-size: 12px;
+          line-height: 23px;
+          color: #868f9f;
+        }
+      }
+      .program + .program {
+        margin-top: 8px;
+      }
+    }
     > .left {
       flex: 0 0 352px;
       height: calc(100vh - 80px);
@@ -1224,78 +1329,6 @@ export default {
           &:nth-child(2n + 1) {
             background: #fafafa;
           }
-          position: relative;
-          height: 60px;
-          border-radius: 8px;
-          padding: 10px 60px 0 68px;
-          &.active {
-            background: #e6eaf0;
-          }
-          > .left {
-            position: absolute;
-            width: 44px;
-            height: 44px;
-            left: 8px;
-            top: 8px;
-            background: #ffffff;
-            border: 1px solid #e6eaf0;
-            box-sizing: border-box;
-            border-radius: 6px;
-            text-align: center;
-            line-height: 44px;
-            > svg {
-              font-size: 24px;
-              color: 868f9f;
-            }
-          }
-          > .right {
-            position: absolute;
-            width: 44px;
-            height: 44px;
-            right: 8px;
-            top: 8px;
-            background: #ffffff;
-            border: 1px solid #e6eaf0;
-            box-sizing: border-box;
-            border-radius: 6px;
-            text-align: center;
-            line-height: 44px;
-            &.s {
-              width: 16px;
-              height: 16px;
-              top: 22px;
-              right: 22px;
-              background: #f5f8fe;
-              border: 1px solid #dadfe6;
-              box-sizing: border-box;
-              border-radius: 3px;
-              &.active {
-                background: #2f6bff;
-                border: 1px solid #2f6bff;
-              }
-            }
-
-            > svg {
-              font-size: 24px;
-              color: 868f9f;
-            }
-          }
-          > .r1 {
-            font-size: 14px;
-            line-height: 21px;
-            color: #3a4763;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-          > .r2 {
-            font-size: 12px;
-            line-height: 23px;
-            color: #868f9f;
-          }
-        }
-        .program + .program {
-          margin-top: 8px;
         }
       }
     }
@@ -1356,6 +1389,86 @@ export default {
       }
       .time-slider + .duration {
         margin-top: 64px;
+      }
+      .playlist {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        padding-bottom: 8px;
+        &.active {
+          border: 2px solid #2f6bff;
+        }
+        .playlist-header {
+          position: relative;
+          font-weight: bold;
+          font-size: 18px;
+          line-height: 75px;
+          height: 75px;
+          color: #3a4763;
+          padding-left: 16px;
+          .btn1 {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            line-height: 44px;
+            border: 1px solid #e6eaf0;
+            svg {
+              color: #868f9f;
+            }
+          }
+        }
+        .datetype {
+          padding-left: 16px;
+          .el-select {
+            input {
+              border: 1px solid #e6eaf0;
+              height: 44px;
+              line-height: 44px;
+              padding-left: 12px;
+              width: 200px;
+              font-size: 14px;
+              color: #3a4763;
+            }
+          }
+          .meta {
+            margin-left: 32px;
+            margin-right: 16px;
+            font-size: 14px;
+            color: #868f9f;
+          }
+          .el-date-editor {
+            width: 495px;
+            font-size: 18px;
+            height: 44px;
+            line-height: 44px;
+            color: #3a4763;
+          }
+        }
+        .programs {
+          padding: 8px;
+          padding-top: 24px;
+          .program {
+            background: #fafafa;
+            .right-btns {
+              position: absolute;
+              top: 20px;
+              right: 20px;
+              line-height: 20px;
+              font-size: 20px;
+              text-align: right;
+              color: #868f9f;
+              svg {
+                font-size: 20px;
+              }
+              svg + svg {
+                margin-left: 8px;
+              }
+            }
+          }
+        }
+      }
+      .playlist + .playlist {
+        margin-top: 24px;
       }
     }
   }

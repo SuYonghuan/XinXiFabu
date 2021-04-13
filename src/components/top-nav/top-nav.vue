@@ -25,7 +25,7 @@
           <div class="notice-list">
             <div
               class="notice-item"
-              :key="item"
+              :key="item.code"
               v-for="item of noticeData.list"
             >
               <p class="notice-title">

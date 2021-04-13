@@ -9,7 +9,7 @@
       </svg>
       背景
     </div>
-    <draggable :list="list" @change="handleChange" :sort="true">
+    <draggable :list="list" :sort="true">
       <div
         v-for="(component, i) in list"
         :key="'a' + i"
@@ -46,11 +46,7 @@ import draggable from "vuedraggable";
 export default {
   props: ["list", "activeComponent", "logos", "componentTypes"],
   components: { draggable },
-  methods: {
-    handleChange(data) {
-      console.log(data);
-    },
-  },
+  methods: {},
 };
 </script>
 

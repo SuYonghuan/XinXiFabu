@@ -148,7 +148,12 @@
         label="操作"
       >
         <template slot-scope="scope">
-          <el-tooltip effect="light" content="编辑" placement="top">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="编辑"
+            placement="top"
+          >
             <span class="tooltip-wrapper">
               <el-button
                 class="svg-button"
@@ -162,7 +167,12 @@
               ></el-button>
             </span>
           </el-tooltip>
-          <el-tooltip effect="light" content="查看" placement="top">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="查看"
+            placement="top"
+          >
             <span class="tooltip-wrapper">
               <el-button
                 class="svg-button"
@@ -176,7 +186,12 @@
             </span>
           </el-tooltip>
 
-          <el-tooltip effect="light" content="删除" placement="top">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="删除"
+            placement="top"
+          >
             <span class="tooltip-wrapper">
               <el-button
                 class="svg-button"
@@ -191,7 +206,12 @@
             </span>
           </el-tooltip>
 
-          <el-tooltip effect="light" content="下架" placement="top">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="下架"
+            placement="top"
+          >
             <span class="tooltip-wrapper">
               <el-button
                 class="svg-button"
@@ -206,7 +226,12 @@
             </span>
           </el-tooltip>
 
-          <el-tooltip effect="light" content="发布" placement="top">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="发布"
+            placement="top"
+          >
             <span class="tooltip-wrapper">
               <el-button
                 class="svg-button"
