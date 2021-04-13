@@ -1,5 +1,5 @@
 <template>
-  <div style="text-align:center">
+  <div class="ctw">
     <el-checkbox-group v-model="checked" size="medium">
       <el-checkbox-button
         v-for="weekday in [
@@ -19,14 +19,13 @@
     <div style="margin-top:40px;">
       <el-button
         class="svg-suffix s"
-        plain
         type="success"
         @click="$emit('submit', checked)"
         ><svg class="icon" aria-hidden="true">
           <use xlink:href="#icondui"></use></svg
         >确认</el-button
       >
-      <el-button class="svg-suffix s" plain @click="$emit('close')"
+      <el-button class="svg-suffix s" type="primary" @click="$emit('close')"
         ><svg class="icon" aria-hidden="true">
           <use xlink:href="#iconguanbi"></use></svg
         >取消</el-button
@@ -54,4 +53,38 @@ export default {
 };
 </script>
 
-<style></style>
+<style lang="scss">
+.ctw {
+  text-align: center;
+  .el-button {
+    &.svg-suffix {
+      padding: 0 32px;
+      height: 44px;
+      line-height: 44px;
+      font-weight: bold;
+      font-size: 14px;
+      border-radius: 8px;
+      svg {
+        font-size: 20px;
+        margin-right: 8px;
+      }
+      &.s {
+        + .s {
+          margin-left: 8px;
+        }
+        &.is-disabled {
+          color: #bbc1cc;
+          &:focus,
+          &:hover {
+            color: #bbc1cc;
+          }
+        }
+
+        padding: 0 16px;
+        color: #fff;
+        border: none;
+      }
+    }
+  }
+}
+</style>
