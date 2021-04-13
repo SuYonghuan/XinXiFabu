@@ -307,17 +307,17 @@
                 @change="setRange"
               >
               </el-time-picker>
-              <!-- <div
-                  class="btn1"
-                  @click="
-                    weekdayFrom = weekdayMap[interval.typeCode];
-                    showSelectWeekday = true;
-                  "
-                >
-                  <svg class="icon" aria-hidden="true">
-                    <use xlink:href="#iconfuzhi"></use>
-                  </svg>
-                </div> -->
+              <div
+                class="btn1"
+                @click="
+                  monthDayFrom = month + '_' + date;
+                  showSelectMonthDay = true;
+                "
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconfuzhi"></use>
+                </svg>
+              </div>
               <div
                 class="btn1"
                 @click="
@@ -490,6 +490,15 @@
         @submit="handleCopyToWeekday"
       ></copy-to-weekday>
     </el-dialog>
+    <el-dialog title="复制到" append-to-body :visible.sync="showSelectMonthDay">
+      <copy-to-month-day
+        :monthDates="monthDates"
+        :from="monthDayFrom"
+        :visible="showSelectMonthDay"
+        @close="showSelectMonthDay = false"
+        @submit="handleCopyToMonthDay"
+      />
+    </el-dialog>
   </el-form>
 </template>
 
@@ -498,11 +507,12 @@ import { ScheduleApi } from "../program.js";
 import ProgramPicker from "./ProgramPicker";
 import TimeSlider from "./TimeSlider";
 import CopyToWeekday from "./CopyToWeekday";
+import CopyToMonthDay from "./CopyToMonthDay";
 const getCurrentYmd = () =>
   `${new Date().getFullYear()}-${new Date().getMonth() +
     1}-${new Date().getDate()}`;
 export default {
-  components: { ProgramPicker, TimeSlider, CopyToWeekday },
+  components: { ProgramPicker, TimeSlider, CopyToWeekday, CopyToMonthDay },
   data() {
     return {
       form: null,
@@ -557,6 +567,8 @@ export default {
         6: "周六",
         7: "周日",
       },
+      showSelectMonthDay: false,
+      monthDayFrom: null,
     };
   },
   props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
@@ -706,13 +718,32 @@ export default {
     this.init();
   },
   methods: {
+    handleCopyToMonthDay(monthDays) {
+      const range = this.range;
+      const val = !!range;
+      Object.entries(monthDays)
+        .filter(([_, selected]) => selected)
+        .forEach(([key]) => {
+          const [month] = key.split("_");
+          this.form.ranges[key] = range ? [...range] : null;
+          const keys = this.monthKeys[month];
+          if (!val) {
+            this.monthKeys[month] = this.monthKeys[month].filter(
+              (lkey) => lkey !== key
+            );
+          } else if (!keys.includes(key)) {
+            this.monthKeys[month] = [...keys, key];
+          }
+        });
+      this.showSelectMonthDay = false;
+    },
     handleCopyToWeekday(checked) {
       const range = this.form.timeIntervals.find(
         ({ typeCode }) => this.weekdayMap[typeCode] === this.weekdayFrom
       ).range;
       this.form.timeIntervals.forEach((element) => {
         if (checked.includes(this.weekdayMap[element.typeCode])) {
-          element.range = [...range];
+          element.range = range ? [...range] : null;
         }
       });
       this.showSelectWeekday = false;
