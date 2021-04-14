@@ -9,7 +9,7 @@
       <el-form-item label="节目名称" prop="name">
         <el-input
           placeholder="请输入节目名称"
-          :maxlength="200"
+          :maxlength="100"
           v-model="addForm.name"
         >
         </el-input>
