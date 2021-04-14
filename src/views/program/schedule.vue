@@ -151,7 +151,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            :content="scope.row.deviceCount > 0 ? '已发布日程无法编辑' : '编辑'"
+            :content="scope.row.editMsg ? scope.row.editMsg : '编辑'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -160,7 +160,7 @@
                 type="text"
                 v-if="canI.editschedule"
                 @click="handleEdit(scope.row)"
-                :disabled="scope.row.deviceCount > 0"
+                :disabled="!!scope.row.editMsg"
               >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconbianji"></use></svg
@@ -189,7 +189,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            :content="scope.row.deviceCount > 0 ? '已发布日程无法删除' : '删除'"
+            :content="scope.row.deleteMsg ? scope.row.deleteMsg : '删除'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -198,7 +198,7 @@
                 type="text"
                 v-if="canI.deleteschedule"
                 @click="singleDelete([scope.row.code])"
-                :disabled="scope.row.deviceCount > 0"
+                :disabled="!!scope.row.deleteMsg"
               >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconshanchu"></use></svg
@@ -209,9 +209,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            :content="
-              !(scope.row.deviceCount > 0) ? '已发布日程才能下架' : '下架'
-            "
+            :content="scope.row.unpublishMsg ? scope.row.unpublishMsg : '下架'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -220,7 +218,7 @@
                 type="text"
                 v-if="canI.unpublishschedule"
                 @click="handleUnpublish([scope.row.code])"
-                :disabled="!(scope.row.deviceCount > 0)"
+                :disabled="!!scope.row.unpublishMsg"
               >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconxiajia"></use></svg
@@ -231,9 +229,7 @@
           <el-tooltip
             transition="none"
             effect="light"
-            :content="
-              scope.row.statusCode != 1 ? '审核通过的日程才能发布' : '发布'
-            "
+            :content="scope.row.publishMsg ? scope.row.publishMsg : '发布'"
             placement="top"
           >
             <span class="tooltip-wrapper">
@@ -245,7 +241,7 @@
                   scheduleToPublish = scope.row;
                   showPublishForm = true;
                 "
-                :disabled="scope.row.statusCode != 1"
+                :disabled="!!scope.row.publishMsg"
               >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconfabu"></use></svg
@@ -284,6 +280,7 @@
       fullscreen
     >
       <add-form
+        :readonly="isPreview"
         :playModes="playModes"
         :showAddForm="showAddForm"
         :intervalTypes="intervalTypes"
@@ -358,6 +355,7 @@ export default {
       showDetailForm: false,
       showPublishForm: false,
       scheduleToPublish: null,
+      isPreview: false,
     };
   },
   computed: {
@@ -463,16 +461,19 @@ export default {
       this.progress = percent;
     },
     handleAdd() {
+      this.isPreview = false;
       this.editCode = null;
       this.showAddForm = true;
     },
     handleEdit(row) {
+      this.isPreview = false;
       this.editCode = row.code;
       this.showAddForm = true;
     },
     handleDetail(row) {
+      this.isPreview = true;
       this.editCode = row.code;
-      this.showDetailForm = true;
+      this.showAddForm = true;
     },
     reset() {
       this.name = "";

@@ -3,6 +3,7 @@
     class="time-slider"
     :show-tooltip="false"
     :max="86399"
+    :disabled="!!disabled"
     :value="range ? range.map(hmsTo100) : null"
     @input="
       (val) => {
@@ -17,7 +18,7 @@
 
 <script>
 export default {
-  props: ["range"],
+  props: ["range", "disabled"],
   methods: {
     i00ToHms(rest) {
       const hours = Math.floor(rest / 3600);

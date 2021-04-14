@@ -23,6 +23,7 @@
             placeholder="请输入日程名称"
             :maxlength="200"
             v-model="form.name"
+            :disabled="readonly"
           >
           </el-input>
         </el-form-item>
@@ -32,7 +33,7 @@
             class="input1"
             v-model="form.playMode"
             placeholder="请选择"
-            :disabled="isEdit"
+            :disabled="isEdit || readonly"
             @change="handlePlayModeChange"
           >
             <el-option
@@ -51,6 +52,7 @@
             placeholder="请输入日程描述"
             :maxlength="500"
             v-model="form.desc"
+            :disabled="readonly"
           >
           </el-input>
         </el-form-item>
@@ -61,7 +63,7 @@
             v-model="form.resolution"
             placeholder="请选择"
             size="small"
-            :disabled="isEdit"
+            :disabled="isEdit || readonly"
             @change="handleResolutionChange"
           >
             <el-option
@@ -75,7 +77,7 @@
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
-        <div class="btn success" @click="submit">
+        <div class="btn success" @click="submit" v-if="!readonly">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconchucun"></use>
           </svg>
@@ -90,7 +92,7 @@
       </el-col>
     </el-row>
     <div class="main">
-      <div class="left">
+      <div class="left" v-if="!readonly">
         <el-form-item class="program-header" prop="programme">
           <el-input type="text" placeholder="搜索" v-model="q" />
           <div class="btn1" @click="getPrograms">
@@ -170,7 +172,7 @@
           <el-button
             class="svg-suffix"
             type="primary"
-            v-if="form.playMode === 'carousel'"
+            v-if="form.playMode === 'carousel' && !readonly"
             :disabled="form.playList.length >= 8"
             @click="addPlayList"
             ><svg class="icon" aria-hidden="true">
@@ -190,9 +192,14 @@
                 end-placeholder="结束时间"
                 placeholder="选择时间范围"
                 :clearable="false"
+                :disabled="readonly"
               >
               </el-time-picker>
-              <div class="btn1" @click="form.timeIntervals[0].range = null">
+              <div
+                v-if="!readonly"
+                class="btn1"
+                @click="form.timeIntervals[0].range = null"
+              >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconshanchu"></use>
                 </svg>
@@ -200,6 +207,7 @@
             </el-form-item>
             <time-slider
               :range="form.timeIntervals[0].range"
+              :disabled="readonly"
               @change="(val) => (form.timeIntervals[0].range = val)"
             />
           </template>
@@ -227,9 +235,11 @@
                   end-placeholder="结束时间"
                   placeholder="选择时间范围"
                   :clearable="false"
+                  :disabled="readonly"
                 >
                 </el-time-picker>
                 <div
+                  v-if="!readonly"
                   class="btn1"
                   @click="
                     weekdayFrom = weekdayMap[interval.typeCode];
@@ -240,13 +250,18 @@
                     <use xlink:href="#iconfuzhi"></use>
                   </svg>
                 </div>
-                <div class="btn1" @click="interval.range = null">
+                <div
+                  v-if="!readonly"
+                  class="btn1"
+                  @click="interval.range = null"
+                >
                   <svg class="icon" aria-hidden="true">
                     <use xlink:href="#iconshanchu"></use>
                   </svg>
                 </div>
               </el-form-item>
               <time-slider
+                :disabled="readonly"
                 :key="'slider_' + interval.typeCode"
                 :range="interval.range"
                 @change="(val) => (interval.range = val)"
@@ -303,9 +318,11 @@
                 placeholder="选择时间范围"
                 :clearable="false"
                 @change="setRange"
+                :disabled="readonly"
               >
               </el-time-picker>
               <div
+                v-if="!readonly"
                 class="btn1"
                 @click="
                   monthDayFrom = month + '_' + date;
@@ -317,6 +334,7 @@
                 </svg>
               </div>
               <div
+                v-if="!readonly"
                 class="btn1"
                 @click="
                   range = null;
@@ -336,12 +354,12 @@
                   setRange(range);
                 }
               "
+              :disabled="readonly"
             />
           </template>
         </template>
         <template v-if="form.playMode === 'carousel'">
           <el-form-item prop="playList" class="ghost"> </el-form-item>
-
           <div
             :class="['playlist', currentPlayList === playList ? 'active' : '']"
             v-for="(playList, i) in form.playList"
@@ -350,14 +368,18 @@
           >
             <div class="playlist-header">
               播放列表{{ i + 1 }}
-              <div class="btn1" @click="handlePlayListDelete(i)">
+              <div
+                class="btn1"
+                v-if="!readonly"
+                @click="handlePlayListDelete(i)"
+              >
                 <svg class="icon" aria-hidden="true">
                   <use xlink:href="#iconguanbi"></use>
                 </svg>
               </div>
             </div>
             <div class="datetype">
-              <el-select v-model="playList.dateType">
+              <el-select v-model="playList.dateType" :disabled="readonly">
                 <el-option
                   v-for="(k, v) in dateTypes"
                   :key="v"
@@ -377,6 +399,7 @@
                 end-placeholder="结束日期"
                 align="right"
                 :clearable="false"
+                :disabled="readonly"
               >
               </el-date-picker>
             </div>
@@ -384,6 +407,7 @@
               class="programs"
               :list="playList.programmes"
               :sort="true"
+              :disabled="readonly"
             >
               <div
                 :class="[
@@ -409,7 +433,7 @@
                   时长
                   {{ prog.duration }}
                 </div>
-                <div class="right-btns">
+                <div class="right-btns" v-if="!readonly">
                   <template>
                     <svg
                       class="icon"
@@ -566,7 +590,14 @@ export default {
       monthDayFrom: null,
     };
   },
-  props: ["code", "playModes", "showAddForm", "intervalTypes", "resolutions"],
+  props: [
+    "code",
+    "playModes",
+    "showAddForm",
+    "intervalTypes",
+    "resolutions",
+    "readonly",
+  ],
   watch: {
     showAddForm(val) {
       if (val) {
