@@ -383,7 +383,7 @@
                   :step="1"
                   step-strictly
                   :min="1"
-                  :max="86400"
+                  :max="1000"
                 ></el-input-number
                 >秒
               </el-form-item>
