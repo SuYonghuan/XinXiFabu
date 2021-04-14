@@ -433,7 +433,11 @@
               ></mat-list>
             </template>
             <template v-else-if="activeComponent.typeCode === 'text'">
-              <el-form-item class="item" label="背景色" prop="backgroundColor">
+              <el-form-item
+                class="item"
+                label="背景颜色"
+                prop="backgroundColor"
+              >
                 <el-color-picker v-model="activeComponent.backgroundColor">
                 </el-color-picker>
               </el-form-item>
@@ -522,7 +526,11 @@
                 >
                 </el-color-picker>
               </el-form-item>
-              <el-form-item class="item" label="背景色" prop="backgroundColor">
+              <el-form-item
+                class="item"
+                label="背景颜色"
+                prop="backgroundColor"
+              >
                 <el-color-picker
                   v-model="activeComponent.backgroundColor"
                   @change="attachImage(activeComponent)"
@@ -556,7 +564,11 @@
                 </el-color-picker>
               </el-form-item>
 
-              <el-form-item class="item" label="背景色" prop="backgroundColor">
+              <el-form-item
+                class="item"
+                label="背景颜色"
+                prop="backgroundColor"
+              >
                 <el-color-picker
                   v-model="activeComponent.backgroundColor"
                   @change="attachImage(activeComponent)"
