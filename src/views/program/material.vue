@@ -1,5 +1,5 @@
 <template>
-  <table-page class="index">
+  <table-page class="matlist">
     <template v-slot:header>
       <el-row type="flex" justify="space-between">
         <el-col style="display: flex;">
@@ -206,6 +206,7 @@
     </el-row>
 
     <el-dialog
+      class="matmodal"
       :title="dialogTitle"
       :visible.sync="showForm"
       :close-on-click-modal="false"
@@ -230,24 +231,31 @@
           </el-form-item>
           <el-form-item label="素材选择" prop="file">
             <el-upload
-              class="uploadImg"
               :action="config.url + config.uploadFile"
               ref="upload"
-              list-type="picture-card"
+              class="uploader"
               :file-list="form.file"
-              :show-file-list="false"
               :on-change="onUpload"
-              @remove="form.file = []"
+              :on-remove="
+                () => {
+                  form.file = [];
+                }
+              "
               :on-progress="handleProgress"
               :before-upload="beforeUpload"
             >
-              <div class="object" v-if="form.file && form.file.length">
-                <object :data="form.file[0].url"> </object>
-              </div>
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              <el-button
+                v-if="!form.file || form.file.length === 0"
+                type="primary"
+                >点击上传</el-button
+              >
             </el-upload>
           </el-form-item>
-          <el-form-item label="审核方式" prop="auditType">
+          <el-form-item
+            label="审核方式"
+            style="line-height: 40px"
+            prop="auditType"
+          >
             <el-radio-group v-model="form.auditType">
               <el-radio
                 v-for="(name, code) in auditTypes"
@@ -807,13 +815,16 @@ export default {
           desc,
         };
       } else {
+        const path = fileUrl;
+        const fileName = path.split("\\").pop();
         this.form = {
           code,
           typeCode,
           name,
           file: [
             {
-              name: fileCode,
+              name: fileName,
+              code: fileCode,
               url: fileUrl,
             },
           ],
@@ -865,7 +876,7 @@ export default {
         const { name, file, auditType, desc, code } = this.form;
         const res = await (this.isEdit ? MaterialApi.put : MaterialApi.post)({
           name,
-          fileCode: file[0].name,
+          fileCode: file[0].code,
           auditType,
           desc,
           code,
@@ -946,10 +957,13 @@ export default {
       if (change.response) {
         const { data, msg, code } = change.response;
         if (code === ERR_OK) {
+          const path = data.filePath;
+          const name = path.split("\\").pop();
           this.form.file = [
             {
-              name: data.fileGuid,
-              url: this.config.url + data.filePath,
+              name,
+              code: data.fileGuid,
+              url: this.config.url + path,
             },
           ];
           this.progress = 100;
@@ -962,8 +976,6 @@ export default {
       this.$nextTick(() => {
         this.showModal = true;
       });
-
-      // window.open(row.fileUrl);
     },
 
     handleSelectionChange(data) {
@@ -1002,7 +1014,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .gap {
   margin: 20px auto;
 }
@@ -1023,5 +1035,14 @@ export default {
 .object object {
   max-width: 100%;
   max-height: 100%;
+}
+</style>
+<style lang="scss">
+.matmodal {
+  .uploader {
+    .el-upload-list {
+      margin-top: -12px;
+    }
+  }
 }
 </style>

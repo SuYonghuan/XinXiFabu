@@ -157,16 +157,22 @@
         ></object>
       </template>
     </el-dialog>
-    <el-dialog title="日程详情" append-to-body :visible.sync="showDetailForm">
-      <detail-form
+    <el-dialog
+      class="audit-schedule"
+      fullscreen
+      append-to-body
+      :visible.sync="showDetailForm"
+    >
+      <add-form
         :playModes="playModes"
-        :showForm="showDetailForm"
+        :showAddForm="showDetailForm"
         :intervalTypes="intervalTypes"
         :resolutions="resolutions"
         :code="editCode"
+        :readonly="true"
         api="getAuditDetail"
-        @closeForm="showDetailForm = false"
-      ></detail-form>
+        @closeAddForm="showDetailForm = false"
+      ></add-form>
     </el-dialog>
   </table-page>
 </template>
@@ -176,7 +182,7 @@ import { GetRolePermissions } from "http/api/program";
 import { ScheduleApi, ProgramApi } from "../program/program.js";
 import { mapGetters } from "vuex";
 import { ERR_OK } from "http/config";
-import DetailForm from "../program/schedule/DetailForm";
+import AddForm from "../program/schedule/AddForm";
 
 export default {
   data() {
@@ -334,7 +340,7 @@ export default {
     },
   },
 
-  components: { DetailForm },
+  components: { AddForm },
 };
 </script>
 
@@ -344,5 +350,17 @@ export default {
 }
 .prefix {
   margin-right: 10px;
+}
+</style>
+<style lang="scss">
+.audit-schedule {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
 }
 </style>

@@ -92,7 +92,7 @@
       </el-col>
     </el-row>
     <div class="main">
-      <div class="left" v-if="!readonly">
+      <div class="left">
         <el-form-item class="program-header" prop="programme">
           <el-input type="text" placeholder="搜索" v-model="q" />
           <div class="btn1" @click="getPrograms">
@@ -138,7 +138,8 @@
               {{ prog.duration }}
             </div>
             <div
-              @click="handleProgram(prog)"
+              v-if="!(form.playMode === 'carousel' && readonly)"
+              @click="!readonly && handleProgram(prog)"
               :class="
                 form.playMode === 'carousel'
                   ? ['right']
@@ -597,6 +598,7 @@ export default {
     "intervalTypes",
     "resolutions",
     "readonly",
+    "api",
   ],
   watch: {
     showAddForm(val) {
@@ -950,7 +952,9 @@ export default {
           resolution: this.resolutions[0].sName,
         };
       } else {
-        const { code, data, msg } = await ScheduleApi.getDetail({
+        const { code, data, msg } = await ScheduleApi[
+          this.api ? this.api : "getDetail"
+        ]({
           code: this.code,
         });
         if (code == "200") {

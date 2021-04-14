@@ -291,18 +291,7 @@
         @saved="postSave"
       ></add-form>
     </el-dialog>
-    <el-dialog title="日程详情" append-to-body :visible.sync="showDetailForm">
-      <detail-form
-        :playModes="playModes"
-        :showForm="showDetailForm"
-        :intervalTypes="intervalTypes"
-        :resolutions="resolutions"
-        :code="editCode"
-        api="getDetail"
-        @showForm="showDetailForm = false"
-        @closeForm="showDetailForm = false"
-      ></detail-form>
-    </el-dialog>
+
     <el-dialog title="日程发布" append-to-body :visible.sync="showPublishForm">
       <publish-form
         :showForm="showPublishForm"
@@ -321,7 +310,6 @@ import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import AddForm from "./schedule/AddForm";
-import DetailForm from "./schedule/DetailForm";
 import PublishForm from "./schedule/PublishForm";
 import ScheduleDevices from "./schedule/ScheduleDevices";
 
@@ -352,7 +340,6 @@ export default {
       },
       toDelCodes: [],
       showAddForm: false,
-      showDetailForm: false,
       showPublishForm: false,
       scheduleToPublish: null,
       isPreview: false,
@@ -515,7 +502,6 @@ export default {
 
   components: {
     AddForm,
-    DetailForm,
     PublishForm,
     ScheduleDevices,
   },
