@@ -424,14 +424,6 @@
               ></mat-list>
             </template>
             <template v-else-if="activeComponent.typeCode === 'html'">
-              <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
-                <el-time-picker
-                  v-model="activeComponent.refreshPeriod"
-                  value-format="HH:mm:ss"
-                  placeholder="选择刷新时间"
-                >
-                </el-time-picker>
-              </el-form-item>
               <mat-list
                 :data="activeComponent.materials"
                 @preview="preview"
@@ -1073,7 +1065,6 @@ export default {
           component.materials = [];
           break;
         case "html":
-          component.refreshPeriod = "00:00:00";
           component.materials = [];
           break;
         case "text":
