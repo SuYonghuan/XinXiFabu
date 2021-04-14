@@ -635,22 +635,23 @@
         <li
           v-for="material in materials"
           :key="material.code"
-          @click="addMaterial(material)"
+          @click.prevent="showSelectMaterial && addMaterial(material)"
         >
           <div class="item">
-            <object
-              v-if="currentMaterialType === 'video'"
-              :data="material.previewPath"
-            ></object>
-            <object
-              v-else-if="material.fileUrl"
-              :data="material.fileUrl"
-            ></object>
             <img
-              v-else-if="activeComponent"
-              :src="logos[activeComponent.typeCode]"
+              v-if="currentMaterialType === 'video'"
+              :src="material.previewPath"
               alt=""
             />
+            <img
+              v-else-if="currentMaterialType === 'image'"
+              :src="material.fileUrl"
+              alt=""
+            />
+            <svg v-else-if="activeComponent" class="icon" aria-hidden="true">
+              <use :xlink:href="logos[activeComponent.typeCode]"></use>
+            </svg>
+
             <p v-if="material.resolution" class="meta">
               {{ material.resolution }}
             </p>
@@ -889,10 +890,10 @@ export default {
       });
     },
     addMaterial(material) {
+      this.showSelectMaterial = false;
       if (!this.activeComponent) this.form.backgroundMaterial = material;
       else this.activeComponent.materials.push(material);
       this.attachImage(this.activeComponent);
-      this.showSelectMaterial = false;
     },
     updateTransformer() {
       // here we need to manually attach or detach Transformer node
@@ -1629,9 +1630,8 @@ export default {
   max-width: 100%;
   max-height: 100%;
 }
-.res-dialog-list li video {
-  max-width: 100%;
-  max-height: 100%;
+.res-dialog-list li svg {
+  font-size: 80px;
 }
 .res-dialog-list li p {
   margin: 0;
