@@ -830,19 +830,21 @@ export default {
     attachImage(component) {
       if (
         component &&
-        (component.typeCode === "image" || component.typeCode === "video") &&
-        component.materials &&
-        component.materials.length
+        (component.typeCode === "image" || component.typeCode === "video")
       ) {
-        const image = new Image();
-        image.id = new Date().getTime();
-        const last = component.materials[component.materials.length - 1];
-        image.onload = () => {
-          component.image = image;
-          this.setComponents();
-        };
-        image.src =
-          last[component.typeCode === "video" ? "previewPath" : "fileUrl"];
+        if (component.materials && component.materials.length) {
+          const image = new Image();
+          image.id = new Date().getTime();
+          const last = component.materials[component.materials.length - 1];
+          image.onload = () => {
+            component.image = image;
+            this.setComponents();
+          };
+          image.src =
+            last[component.typeCode === "video" ? "previewPath" : "fileUrl"];
+        } else {
+          delete component.image;
+        }
       }
       if (
         component &&
@@ -1232,6 +1234,7 @@ export default {
     },
     removeMaterial(i) {
       this.activeComponent.materials.splice(i, 1);
+      this.attachImage(this.activeComponent);
     },
     swap(i, j) {
       const tmp = this.activeComponent.materials[i];

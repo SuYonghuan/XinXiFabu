@@ -35,7 +35,7 @@
         <svg class="icon" aria-hidden="true" @click="$emit('preview', mat)">
           <use xlink:href="#iconyanjing"></use>
         </svg>
-        <svg class="icon" aria-hidden="true" @click="$emit('remove', mat)">
+        <svg class="icon" aria-hidden="true" @click="$emit('remove', i)">
           <use xlink:href="#iconshanchu"></use>
         </svg>
       </div>
