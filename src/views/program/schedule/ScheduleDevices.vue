@@ -46,7 +46,12 @@ export default {
         pageSize: 10,
       });
       if (code == "200") {
-        const { list, allCount } = data;
+        const { list, allCount, allPage } = data;
+        if (pageIndex > allPage) {
+          this.total = allCount;
+          this.pageIndex = allPage;
+          return this.getList();
+        }
         this.list = list;
         this.total = allCount;
       } else {

@@ -121,7 +121,7 @@ export default {
       name: "",
       publisher: "",
       list: [],
-      pageIndex: 0,
+      pageIndex: 1,
       pageSize: 10,
       total: 0,
       canI: {},
@@ -163,7 +163,7 @@ export default {
     reset() {
       this.name = "";
       this.publisher = "";
-      this.pageIndex = 0;
+      this.pageIndex = 1;
       this.list = [];
       this.total = 0;
     },
@@ -185,7 +185,12 @@ export default {
         pageSize,
       });
       if (code == "200") {
-        const { list, allCount } = data;
+        const { list, allCount, allPage } = data;
+        if (pageIndex > allPage) {
+          this.total = allCount;
+          this.pageIndex = allPage;
+          return this.getList();
+        }
         this.list = list;
         this.total = allCount;
       } else {

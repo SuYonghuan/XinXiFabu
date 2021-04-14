@@ -797,7 +797,7 @@ export default {
       showSelectMaterial: false,
       materials: [],
       q: "",
-      pageIndex: 0,
+      pageIndex: 1,
       total: 0,
       showPreview: false,
       previewMaterial: null,

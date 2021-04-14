@@ -90,7 +90,7 @@ export default {
     return {
       name: "",
       list: [],
-      pageIndex: 0,
+      pageIndex: 1,
       pageSize: 10,
       total: 0,
       canI: {},
@@ -172,7 +172,12 @@ export default {
         pageSize,
       });
       if (code == "200") {
-        const { list, allCount } = data;
+        const { list, allCount, allPage } = data;
+        if (pageIndex > allPage) {
+          this.total = allCount;
+          this.pageIndex = allPage;
+          return this.getList();
+        }
         this.list = list;
         this.total = allCount;
       } else {

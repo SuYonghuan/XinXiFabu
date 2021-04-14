@@ -200,7 +200,7 @@ export default {
       name: "",
       creator: "",
       list: [],
-      pageIndex: 0,
+      pageIndex: 1,
       pageSize: 10,
       total: 0,
       statusCode: null,
@@ -327,7 +327,12 @@ export default {
         pageSize,
       });
       if (code == "200") {
-        const { list, allCount } = data;
+        const { list, allCount, allPage } = data;
+        if (pageIndex > allPage) {
+          this.total = allCount;
+          this.pageIndex = allPage;
+          return this.getList();
+        }
         this.list = list;
         this.total = allCount;
       } else {
