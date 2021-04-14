@@ -14,7 +14,12 @@
       >
     </h5>
     <div v-for="(mat, i) in data" :key="mat.code + '_' + i" class="mat">
-      <div class="ellipsis">{{ mat.name }}</div>
+      <div :class="['ellipsis', mat.duration ? 'double' : '']">
+        {{ mat.name }}
+        <div class="duration" v-if="mat.duration">
+          {{ formatter(mat.duration) }}
+        </div>
+      </div>
       <div class="btns">
         <svg
           v-if="i !== 0"
@@ -46,6 +51,11 @@
 <script>
 export default {
   props: ["data", "limit"],
+  methods: {
+    formatter(ms) {
+      return new Date(ms).toISOString().substr(11, 8);
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -85,6 +95,13 @@ h5 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  .duration {
+    font-size: 12px;
+    font-family: BrownStd;
+  }
+  &.double {
+    line-height: 22px;
+  }
 }
 .mat {
   display: flex;
@@ -107,5 +124,8 @@ h5 {
   &:active {
     background: #f2f5fa;
   }
+}
+.mat + .mat {
+  margin-top: 8px;
 }
 </style>
