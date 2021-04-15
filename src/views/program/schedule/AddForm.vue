@@ -50,7 +50,7 @@
           <el-input
             class="input1"
             placeholder="请输入日程描述"
-            :maxlength="500"
+            :maxlength="200"
             v-model="form.desc"
             :disabled="readonly"
           >
@@ -1321,6 +1321,9 @@ export default {
           box-sizing: border-box;
           border-radius: 6px;
           height: 44px;
+        }
+        .el-form-item__error {
+          margin-top: -18px;
         }
       }
       .programs {

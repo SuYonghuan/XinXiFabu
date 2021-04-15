@@ -325,17 +325,18 @@ export default {
     color: #3a4763;
     .green {
       position: absolute;
-      top: 0;
+      top: -2px;
       left: 0;
       z-index: 1;
       border-top: 2px solid #12b362;
+      transition: all 1s linear;
     }
     .key {
       z-index: 2;
       position: absolute;
       width: 20px;
       height: 20px;
-      top: -10px;
+      top: -11px;
       background: #ffffff;
       border-radius: 50%;
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
