@@ -47,7 +47,7 @@ export default {
       });
       if (code == "200") {
         const { list, allCount, allPage } = data;
-        if (pageIndex > allPage) {
+        if (this.pageIndex > allPage) {
           this.total = allCount;
           this.pageIndex = allPage;
           return this.getList();

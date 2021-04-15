@@ -15,7 +15,7 @@
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
-        <div class="btn">
+        <div class="btn" @click="preview">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconyanjing"></use>
           </svg>
@@ -289,7 +289,7 @@
             </el-form-item>
             <mat-list
               :data="form.backgroundMaterial ? [form.backgroundMaterial] : []"
-              @preview="preview"
+              @preview="previewMat"
               @remove="form.backgroundMaterial = null"
               :limit="1"
               @selectMat="openMaterialModal"
@@ -390,7 +390,7 @@
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="10"
                 @selectMat="openMaterialModal"
@@ -400,7 +400,7 @@
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="5"
                 @selectMat="openMaterialModal"
@@ -417,7 +417,7 @@
               </el-form-item>
               <mat-list
                 :data="activeComponent.materials"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="1"
                 @selectMat="openMaterialModal"
@@ -426,7 +426,7 @@
             <template v-else-if="activeComponent.typeCode === 'html'">
               <mat-list
                 :data="activeComponent.materials"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="1"
                 @selectMat="openMaterialModal"
@@ -502,7 +502,7 @@
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="1"
                 @selectMat="openMaterialModal"
@@ -593,7 +593,7 @@
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="1"
                 @selectMat="openMaterialModal"
@@ -603,7 +603,7 @@
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
-                @preview="preview"
+                @preview="previewMat"
                 @remove="removeMaterial"
                 :limit="1"
                 @selectMat="openMaterialModal"
@@ -672,7 +672,7 @@
     <el-dialog
       :title="previewMaterial && previewMaterial.name"
       append-to-body
-      :visible.sync="showPreview"
+      :visible.sync="showMaterialPreview"
     >
       <template v-if="previewMaterial">
         <object
@@ -685,6 +685,24 @@
         ></object>
       </template>
     </el-dialog>
+    <el-dialog
+      fullscreen
+      append-to-body
+      :program="form"
+      class="preview-program"
+      :visible.sync="showPreview"
+    >
+      <preview-program
+        :key="previewKey"
+        @refresh="(key) => (previewKey = key)"
+        @close="
+          showPreview = false;
+          previewKey = null;
+        "
+        v-if="showPreview"
+        :program="form"
+      ></preview-program>
+    </el-dialog>
   </div>
 </template>
 
@@ -693,7 +711,7 @@ import MatList from "./EditForm/MatList";
 import { ProgramApi } from "../program.js";
 import ComponentList from "./EditForm/ComponentList";
 import { svgs } from "./EditForm/svgs.js";
-
+import PreviewProgram from "./PreviewProgram";
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
@@ -733,7 +751,7 @@ const flatenComponent = ({ config, ...component }) => {
 };
 
 export default {
-  components: { MatList, ComponentList },
+  components: { MatList, ComponentList, PreviewProgram },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -799,11 +817,13 @@ export default {
       q: "",
       pageIndex: 1,
       total: 0,
-      showPreview: false,
+      showMaterialPreview: false,
       previewMaterial: null,
       selectedShapeName: "",
       backgroundImage: null,
       Image,
+      showPreview: false,
+      previewKey: null,
     };
   },
   computed: {
@@ -1229,9 +1249,9 @@ export default {
         this.total = allCount;
       } else this.$message({ type: "error", message: msg });
     },
-    preview(material) {
+    previewMat(material) {
       this.previewMaterial = material;
-      this.showPreview = true;
+      this.showMaterialPreview = true;
     },
     removeMaterial(i) {
       this.activeComponent.materials.splice(i, 1);
@@ -1243,6 +1263,10 @@ export default {
       this.activeComponent.materials[j] = tmp;
       this.activeComponent.materials = [...this.activeComponent.materials];
       this.attachImage(this.activeComponent);
+    },
+    preview() {
+      console.log("showPreview");
+      this.showPreview = true;
     },
   },
   watch: {
@@ -1657,6 +1681,18 @@ export default {
 }
 </style>
 <style lang="scss">
+.preview-program {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: #ececec;
+  }
+}
+
 .konvajs-content {
   flex-shrink: 0;
   border: 1px solid #ddd;
