@@ -1,70 +1,93 @@
 <template>
-  <div class="deptManager-content">
-    <!--  搜索  -->
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="店铺名称">
-        <el-input
-          v-model="search.Name"
-          placeholder="店铺名称、店铺编号"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="楼栋">
-        <el-select
-          v-model="search.BuildingCode"
-          placeholder="请选择"
-          @change="changeBuilding1()"
-        >
-          <el-option
-            v-for="item in buildingList"
-            :label="item.name"
-            :value="item.code"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="楼层">
-        <el-select v-model="search.FloorCode" placeholder="请选择">
-          <el-option
-            v-for="item in floorList"
-            :label="item.name"
-            :value="item.floorCode"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="业态">
-        <el-select v-model="search.ShopFormatCode" placeholder="请选择">
-          <el-option
-            v-for="item in formatList"
-            :label="item.name"
-            :value="item.code"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="onSearch">查询</el-button>
-        <el-button @click="replaySearch">清空</el-button>
-      </el-form-item>
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEdit({})"
-          v-if="pageMenu.addShop"
-          >新增店铺</el-button
-        >
-        <el-button
-          type="primary"
-          @click="handleSysData()"
-          v-if="pageMenu.syndata"
-          :loading="loadingStatus"
-          >同步数据</el-button
-        >
-        <el-button
-          type="success"
-          @click="handleExcel()"
-          v-if="pageMenu.exportShop"
-          >导出数据</el-button
-        >
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <el-row class="gap" type="flex" justify="space-between">
+        <el-col style="display:flex;">
+          <span class="meta1">店铺名称</span>
+          <el-input
+            class="input1"
+            v-model="search.Name"
+            placeholder="店铺名称、店铺编号"
+            size="small"
+            :clearable="true"
+            @keyup.enter.native="onSearch"
+          >
+          </el-input>
+          <span class="meta1">楼栋</span>
+          <el-select
+            class="input1"
+            size="small"
+            v-model="search.BuildingCode"
+            placeholder="请选择"
+            @change="changeBuilding1()"
+          >
+            <el-option
+              v-for="item in buildingList"
+              :label="item.name"
+              :value="item.code"
+            ></el-option>
+          </el-select>
+          <span class="meta1">楼层</span>
+          <el-select
+            class="input1"
+            size="small"
+            v-model="search.FloorCode"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in floorList"
+              :label="item.name"
+              :value="item.floorCode"
+            ></el-option>
+          </el-select>
+          <span class="meta1">业态</span>
+          <el-select
+            class="input1"
+            size="small"
+            v-model="search.ShopFormatCode"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in formatList"
+              :label="item.name"
+              :value="item.code"
+            ></el-option>
+          </el-select>
+
+          <div class="btn1" @click="onSearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
+          <div class="btn1" @click="replaySearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconqingchu"></use>
+            </svg>
+          </div>
+        </el-col>
+        <div style="width: 400px;display:flex;justify-content: flex-end;">
+          <el-button
+            class="svg-suffix"
+            type="primary"
+            v-if="pageMenu.addShop"
+            @click="handleEdit({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
+          >
+          <span
+            class="btn1"
+            v-if="pageMenu.syndata"
+            style="margin-left:8px;"
+            @click="handleSysData()"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshuaxin"></use>
+            </svg>
+          </span>
+        </div>
+      </el-row>
+    </template>
 
     <!--  表格  -->
     <el-table
@@ -114,24 +137,24 @@
       </el-table-column>
     </el-table>
 
-    <div class="bottom-div">
-      <!--  分页  -->
-      <pagination
-        :list="tableData"
-        :total="total"
-        :page="currentPage"
-        :pageSize="pageSize"
-        @handleCurrentChange="handleCurrentChange"
-        @handleSizeChange="handleSizeChange"
-      ></pagination>
-      <div class="bottom-button">
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col>
         <el-button
-          type="success"
-          @click="handleExcelExport()"
+          class="svg-suffix s"
+          plain
+          v-if="pageMenu.exportShop"
+          @click="handleExcel()"
+          >导出数据</el-button
+        >
+        <el-button
+          class="svg-suffix s"
+          plain
           v-if="pageMenu.exporttemplate"
+          @click="handleExcelExport()"
           >导出模板</el-button
         >
         <el-upload
+          style="display:inline-block;margin-left: 8px;"
           ref="upload"
           :action="config.mallYunUrl + '/api/FileManage/UpLoadFilesSec'"
           :show-file-list="false"
@@ -141,12 +164,14 @@
         >
           <el-button
             slot="trigger"
-            type="success"
+            class="svg-suffix s"
+            plain
             v-if="pageMenu.importshopdata"
             >导入店铺</el-button
           >
         </el-upload>
         <el-upload
+          style="display:inline-block;margin-left: 8px;"
           ref="upload"
           :action="config.fileUrl + '/Api/MallFileManage/UpLoadLogoFiles'"
           :show-file-list="false"
@@ -157,13 +182,23 @@
         >
           <el-button
             slot="trigger"
-            type="success"
+            class="svg-suffix s"
+            plain
             v-if="pageMenu.UpLoadLogoFiles"
             >导入店铺LOGO</el-button
           >
         </el-upload>
-      </div>
-    </div>
+      </el-col>
+      <!--  分页  -->
+      <pagination
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </el-row>
 
     <!--  新增  -->
     <el-dialog
@@ -362,7 +397,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
@@ -955,7 +990,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.gap {
+  margin: 20px auto;
+}
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;

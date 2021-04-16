@@ -371,6 +371,12 @@ body,
       height: 24px;
       color: #2f6bff;
     }
+    &:hover {
+      background: #eaf0ff;
+    }
+    &:active {
+      border: 1px solid #2f6bff;
+    }
   }
   .btn1 + .btn1 {
     margin-left: 8px;
