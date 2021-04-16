@@ -826,6 +826,7 @@ export default {
         type: "warning",
       }).then(() => {
         this.form.playList.splice(i, 1);
+        if (!this.form.playList.length) this.currentPlayList = null;
         this.$message({
           type: "success",
           message: "删除成功!",
@@ -899,10 +900,16 @@ export default {
     },
     handleProgram(program) {
       if (this.form.playMode === "carousel") {
-        if (this.currentPlayList) {
-          this.currentPlayList.programmes.push(program);
-          this.setForm();
+        if (!this.currentPlayList) {
+          this.addPlayList();
         }
+        if (this.currentPlayList.programmes.length >= 8)
+          return this.$message({
+            type: "error",
+            message: "一个播放列表最多添加8个节目",
+          });
+        this.currentPlayList.programmes.push(program);
+        this.setForm();
       } else {
         this.form.programme = program;
       }
