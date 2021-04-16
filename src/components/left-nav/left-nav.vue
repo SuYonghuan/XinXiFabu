@@ -107,6 +107,8 @@ export default {
   background: #171f46;
   padding-left: 24px;
   line-height: 80px;
+  overflow: hidden;
+  border-bottom: 1px solid #e6e7ec;
   .svgi {
     vertical-align: middle;
     margin-right: 17px;
@@ -173,7 +175,6 @@ export default {
       white-space: nowrap;
     }
     .el-menu-item {
-      min-width: 256px !important;
       box-sizing: border-box;
       background: #141a3e !important;
       z-index: 10;

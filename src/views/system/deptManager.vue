@@ -2,15 +2,30 @@
   <table-page>
     <template v-slot:header>
       <!--  搜索  -->
-      <el-form :inline="true" :model="search" class="demo-form-inline">
-        <el-form-item label="部门名称">
-          <el-input v-model="search.name" placeholder="部门名称"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button @click="onSearch">查询</el-button>
-          <el-button @click="replaySearch">清空</el-button>
-        </el-form-item>
-        <el-form-item class="right-button">
+      <el-row class="gap" type="flex" justify="space-between">
+        <el-col style="display:flex;">
+          <span class="meta1">部门名称</span>
+          <el-input
+            class="input1"
+            v-model="search.name"
+            placeholder="部门名称"
+            size="small"
+            :clearable="true"
+            @keyup.enter.native="onSearch"
+          >
+          </el-input>
+          <div class="btn1" @click="onSearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
+          <div class="btn1" @click="replaySearch">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconqingchu"></use>
+            </svg>
+          </div>
+        </el-col>
+        <div style="width: 400px;display:flex;justify-content: flex-end;">
           <el-button
             class="svg-suffix"
             type="primary"
@@ -20,8 +35,8 @@
               <use xlink:href="#iconjia"></use></svg
             >新增</el-button
           >
-        </el-form-item>
-      </el-form>
+        </div>
+      </el-row>
     </template>
     <!--  表格  -->
     <el-table
