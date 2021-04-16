@@ -93,6 +93,7 @@
           :style="{
             fontSize:
               (component.config ? component.config : component).fontSize + 'px',
+            color: (component.config ? component.config : component).fontColor,
             lineHeight: 1,
             fontWeight: (component.config
               ? component.config
@@ -159,6 +160,7 @@
         <iframe
           :key="i"
           :id="i"
+          scrolling="no"
           class="component"
           v-else-if="
             (component.typeCode === 'html' || component.typeCode === 'url') &&
@@ -179,6 +181,17 @@
           }"
           frameborder="0"
         ></iframe>
+        <audio
+          :key="i"
+          v-else-if="
+            component.typeCode === 'audio' &&
+              component.materials &&
+              component.materials.length
+          "
+          :src="component.materials[handle[i]].fileUrl"
+          autoplay
+          loop
+        ></audio>
       </template>
     </div>
     <div
@@ -222,7 +235,7 @@ export default {
     },
   },
   mounted() {
-    const duration = this.program.duration
+    let duration = this.program.duration
       ? this.program.duration
           .split(":")
           .reduce(
@@ -230,6 +243,7 @@ export default {
             0
           )
       : 60;
+    if (!duration) duration = 60;
     this.duration = duration;
 
     this.intervals.push(
@@ -400,6 +414,10 @@ export default {
       &::after {
         content: "123123";
       }
+    }
+    iframe {
+      overflow: hidden;
+      pointer-events: none;
     }
   }
 }

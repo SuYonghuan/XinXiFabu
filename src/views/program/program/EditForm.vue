@@ -15,12 +15,12 @@
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
-        <!-- <div class="btn" @click="preview">
+        <div class="btn" @click="preview">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconyanjing"></use>
           </svg>
           预览
-        </div> -->
+        </div>
         <div class="btn success" @click="submit">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconchucun"></use>
