@@ -105,8 +105,9 @@
           <el-button
             class="svg-button"
             type="text"
-            @click="preview(scope.row)"
-            :disabled="!scope.row.fileUrl"
+            @click="
+              scope.row.fileUrl ? preview(scope.row) : openDetail(scope.row)
+            "
           >
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#iconyanjing"></use></svg
@@ -174,6 +175,206 @@
       </div>
     </el-dialog>
     <el-dialog
+      class="matmodal"
+      title="素材详情"
+      :visible.sync="showDetail"
+      append-to-body
+    >
+      <el-form
+        v-if="detail"
+        label-width="120px"
+        class="form"
+        disabled
+        ref="form"
+      >
+        <template v-if="isIpc">
+          <el-form-item label="素材类型" prop="typeCode">
+            <el-select
+              class="prefix"
+              v-model="detail.typeCode"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="item in [
+                  { code: '在线网页', name: '在线网页' },
+                  { code: 'ipc', name: '网络摄像机' },
+                  { code: '流媒体', name: '流媒体服务器' },
+                ]"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="素材名称" prop="name">
+            <el-input
+              v-model="detail.name"
+              :maxlength="50"
+              placeholder="请输入素材名称"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="IP类型" prop="ipType">
+            <el-select
+              class="prefix"
+              v-model="detail.ipType"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="item in [
+                  { code: 'IPV4', name: 'IPV4' },
+                  { code: 'IPV6', name: 'IPV6' },
+                ]"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="IP地址" prop="ipAddress">
+            <el-input
+              v-model="detail.ipAddress"
+              maxlength="250"
+              placeholder="请输入IP地址"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="端口号" prop="port">
+            <el-input
+              type="number"
+              v-model="detail.port"
+              :maxlength="5"
+              placeholder="请输入端口号"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="通道号" prop="channel">
+            <el-input
+              v-model="detail.channel"
+              :maxlength="3"
+              placeholder="请输入通道号"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="用户名" prop="userName">
+            <el-input
+              v-model="detail.userName"
+              :maxlength="50"
+              placeholder="请输入用户名"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input
+              v-model="detail.password"
+              :maxlength="50"
+              placeholder="请输入密码"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="传输协议" prop="protocol">
+            <el-select
+              class="prefix"
+              v-model="detail.protocol"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="(name, code) in protocols"
+                :key="code"
+                :label="name + '(' + code + ')'"
+                :value="code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="码率类型" prop="bitRateType">
+            <el-select
+              class="prefix"
+              v-model="detail.bitRateType"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="(name, code) in bitRateTypes"
+                :key="code"
+                :label="name"
+                :value="code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="素材描述" prop="desc">
+            <el-input
+              type="textarea"
+              :rows="4"
+              placeholder="请输入素材描述"
+              :maxlength="200"
+              v-model="form.desc"
+            >
+            </el-input>
+          </el-form-item>
+        </template>
+        <template v-else>
+          <el-form-item label="素材类型" prop="typeCode">
+            <el-select
+              class="prefix"
+              v-model="detail.typeCode"
+              placeholder="请选择"
+              size="small"
+              style="width: 250px"
+            >
+              <el-option
+                v-for="item in [
+                  { code: '在线网页', name: '在线网页' },
+                  { code: 'ipc', name: '网络摄像机' },
+                  { code: '流媒体', name: '流媒体服务器' },
+                ]"
+                :key="item.code"
+                :label="item.name"
+                :value="item.code"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="素材名称" prop="name">
+            <el-input
+              v-model="detail.name"
+              :maxlength="50"
+              placeholder="请输入素材名称"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="url" prop="url">
+            <el-input
+              v-model="detail.url"
+              maxlength="250"
+              placeholder="请输入url"
+              autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="素材描述" prop="desc">
+            <el-input
+              type="textarea"
+              :rows="4"
+              placeholder="请输入素材描述"
+              :maxlength="200"
+              v-model="detail.desc"
+            >
+            </el-input>
+          </el-form-item>
+        </template>
+      </el-form>
+    </el-dialog>
+    <el-dialog
       :title="modalMat && modalMat.name"
       append-to-body
       :visible.sync="showModal"
@@ -206,8 +407,8 @@ export default {
       statusCode: null,
       canI: {},
       showForm: false,
+      showDetail: false,
       isStaticForm: false,
-      form: {},
       progress: 0,
       materialTypes: {},
       auditTypes: {},
@@ -215,6 +416,13 @@ export default {
         0: "待审核",
         1: "审核通过",
         2: "不通过",
+      },
+      protocols: {
+        TCP: "传输控制协议",
+        RTMP: "实时流协议",
+        UDP: "数据报协议",
+        HTTP: "超文本传输协议",
+        RTP: "实时传输协议",
       },
       showModal: false,
       modalMat: null,
@@ -235,10 +443,14 @@ export default {
           { required: true, message: "请输入审批意见", trigger: "blur" },
         ],
       },
+      detail: null,
     };
   },
   computed: {
     ...mapGetters(["presentMenu", "config"]),
+    isIpc() {
+      return this.detail && this.detail.typeCode === "ipc";
+    },
   },
   async mounted() {
     const [materialTypes, auditTypes] = await Promise.all([
@@ -262,6 +474,10 @@ export default {
     } else this.$message({ message: msg, type: "error" });
   },
   methods: {
+    openDetail(row) {
+      this.detail = row;
+      this.showDetail = true;
+    },
     async submit() {
       const isValid = await new Promise((resolve) =>
         this.$refs.form.validate(resolve)
