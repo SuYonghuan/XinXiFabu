@@ -1,52 +1,74 @@
 <template>
-  <div class="deptManager-content">
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEdit({})"
-          v-if="pageMenu.addbuild"
-          >新增楼栋</el-button
-        >
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <el-button
+        style="float: right"
+        class="svg-suffix"
+        type="primary"
+        v-if="pageMenu.addbuild"
+        @click="handleEdit({})"
+        ><svg class="icon" aria-hidden="true">
+          <use xlink:href="#iconjia"></use></svg
+        >新增</el-button
+      >
+    </template>
 
     <!--  表格  -->
-    <el-table
-      :data="tableData"
-      style="width: 100%;margin-top: 20px;"
-      :max-height="$root.tableMaxHeight + 'px'"
-    >
+    <el-table :data="tableData" :max-height="$root.tableMaxHeight + 'px'">
       <el-table-column prop="name" label="楼栋名称"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="120px">
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            size="small"
-            @click="handleEdit(scope.row)"
-            v-if="pageMenu.editbuild"
-            >编辑</el-button
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="编辑"
+            placement="top"
           >
-          <el-button
-            type="danger"
-            size="small"
-            @click="handleDelete(scope.row)"
-            v-if="pageMenu.delbuild"
-            >删除</el-button
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="pageMenu.editbuild"
+                @click="handleEdit(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconbianji"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="删除"
+            placement="top"
           >
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="pageMenu.delbuild"
+                @click="handleDelete(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
 
-    <!--  分页  -->
-    <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+    <div type="flex" style="margin-top: 16px;">
+      <pagination
+        style="float:right"
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </div>
 
     <!--  发布  -->
     <el-dialog
@@ -81,7 +103,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>

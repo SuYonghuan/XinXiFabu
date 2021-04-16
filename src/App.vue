@@ -111,6 +111,9 @@ body,
   color: #606266;
   font-size: 14px;
   line-height: 1.7;
+  .tooltip-wrapper + .tooltip-wrapper {
+    margin-left: 20px;
+  }
   .svg-button {
     font-size: 20px;
     color: #868f9f;

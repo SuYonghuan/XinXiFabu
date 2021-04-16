@@ -514,9 +514,6 @@ export default {
 </script>
 
 <style scoped>
-.tooltip-wrapper + .tooltip-wrapper {
-  margin-left: 20px;
-}
 .gap {
   margin: 20px auto;
 }
