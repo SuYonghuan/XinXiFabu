@@ -424,6 +424,10 @@ export default {
         HTTP: "超文本传输协议",
         RTP: "实时传输协议",
       },
+      bitRateTypes: {
+        main: "主码流",
+        sub: "副码流",
+      },
       showModal: false,
       modalMat: null,
       codes: [],
