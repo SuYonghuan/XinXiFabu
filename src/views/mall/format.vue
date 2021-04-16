@@ -1,28 +1,23 @@
 <template>
-  <div class="deptManager-content">
-    <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item class="right-button">
-        <el-button
-          type="success"
-          @click="handleEdit({})"
-          v-if="pageMenu.addformat"
-          >新增业态</el-button
-        >
-        <el-button
-          type="danger"
-          @click="batchDelete(tableChecked)"
-          v-if="pageMenu.delformat"
-          >删除</el-button
-        >
-      </el-form-item>
-    </el-form>
+  <table-page>
+    <template v-slot:header>
+      <el-button
+        style="float: right"
+        class="svg-suffix"
+        type="primary"
+        v-if="pageMenu.addformat"
+        @click="handleEdit({})"
+        ><svg class="icon" aria-hidden="true">
+          <use xlink:href="#iconjia"></use></svg
+        >新增</el-button
+      >
+    </template>
 
     <!--  表格  -->
     <el-table
       :data="tableData"
       @selection-change="handleDeletion"
-      style="width: 100%;margin-top: 20px;"
-      height="680px"
+      :max-height="$root.tableMaxHeight + 'px'"
     >
       <el-table-column
         align="center"
@@ -73,28 +68,61 @@
           timestampToTime(scope.row.addTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作"  width="120px">
         <template slot-scope="scope">
-          <el-button
-            type="primary"
-            size="small"
-            @click="handleEdit(scope.row)"
-            v-if="pageMenu.editformat"
-            >编辑
-          </el-button>
-          <el-button
-            type="danger"
-            size="small"
-            @click="handleDelete(scope.row)"
-            v-if="pageMenu.delformat"
-            >删除
-          </el-button>
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="编辑"
+            placement="top"
+          >
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="pageMenu.editformat"
+                @click="handleEdit(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconbianji"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="删除"
+            placement="top"
+          >
+            <span class="tooltip-wrapper">
+              <el-button
+                class="svg-button"
+                type="text"
+                v-if="pageMenu.delformat"
+                @click="handleDelete(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
-
-    <!--  分页  -->
-    <pagination
+    <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+      <el-col>
+        <el-button
+          class="svg-suffix s"
+          plain
+          v-if="pageMenu.delformat"
+          @click="batchDelete(tableChecked)"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshanchu"></use></svg
+          >删除</el-button
+        ></el-col
+      >
+      <!--  分页  -->
+      <pagination
       :list="tableData"
       :total="total"
       :page="currentPage"
@@ -102,6 +130,9 @@
       @handleCurrentChange="handleCurrentChange"
       @handleSizeChange="handleSizeChange"
     ></pagination>
+    </el-row>
+    <el-dialog
+
 
     <!--  图片放大  -->
     <div class="max-img" v-show="maxImg" @click="maxDiv">
@@ -222,7 +253,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
