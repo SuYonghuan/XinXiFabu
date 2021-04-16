@@ -1,86 +1,109 @@
 <template>
-  <div class="deptManager-content">
-    <el-tabs
-      type="border-card"
-      style="margin-top: 20px"
-      @tab-click="tabClick"
-      v-model="buildingCode"
-    >
-      <el-tab-pane
-        v-for="item of buildingData"
-        :label="item.name"
-        :name="item.code"
-      >
-        <el-form :inline="true" :model="search" class="demo-form-inline">
-          <el-form-item class="right-button">
-            <el-button
-              type="success"
-              @click="handleEdit({})"
-              v-if="pageMenu.addfloor"
-              >新增楼层</el-button
+  <table-page>
+    <template v-slot:header>
+      <el-row class="gap" type="flex" justify="space-between">
+        <el-col style="display:flex;">
+          <span class="meta1">楼栋</span>
+          <el-radio-group v-model="buildingCode" @change="tabClick">
+            <el-radio-button
+              :label="item.code"
+              :key="item.code"
+              v-for="item of buildingData"
+              >{{ item.name }}</el-radio-button
             >
-          </el-form-item>
-        </el-form>
+          </el-radio-group>
+        </el-col>
+        <div style="width: 400px; text-align: right">
+          <el-button
+            class="svg-suffix"
+            type="primary"
+            v-if="pageMenu.addfloor"
+            @click="handleEdit({})"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconjia"></use></svg
+            >新增</el-button
+          >
+        </div>
+      </el-row>
+    </template>
 
-        <!--  表格  -->
-        <el-table
-          :data="tableData"
-          style="width: 100%;margin-top: 20px;"
-          height="560px"
-        >
-          <el-table-column prop="name" label="楼层名称"></el-table-column>
-          <el-table-column prop="addTime" label="添加时间">
-            <template slot-scope="scope">{{
-              timestampToTime(scope.row.addTime)
-            }}</template>
-          </el-table-column>
-          <el-table-column prop="name" label="地图">
-            <template slot-scope="scope">
-              <img
-                :src="scope.row.map"
-                style="height: 30px"
-                @click="clickImg(scope.row.map)"
-                alt=""
-              />
-            </template>
-          </el-table-column>
-          <el-table-column prop="name" label="排序">
-            <template slot-scope="scope">
-              <i class="sort-i el-icon-top" @click="sort(scope.row, 1)"></i>
-              <i class="sort-i el-icon-bottom" @click="sort(scope.row, 2)"></i>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
+    <!--  表格  -->
+    <el-table :data="tableData" :max-height="$root.tableMaxHeight + 'px'">
+      <el-table-column prop="name" label="楼层名称"></el-table-column>
+      <el-table-column prop="addTime" label="添加时间">
+        <template slot-scope="scope">{{
+          timestampToTime(scope.row.addTime)
+        }}</template>
+      </el-table-column>
+      <el-table-column prop="name" label="地图">
+        <template slot-scope="scope">
+          <img
+            :src="scope.row.map"
+            style="height: 30px"
+            @click="clickImg(scope.row.map)"
+            alt=""
+          />
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="排序">
+        <template slot-scope="scope">
+          <i class="sort-i el-icon-top" @click="sort(scope.row, 1)"></i>
+          <i class="sort-i el-icon-bottom" @click="sort(scope.row, 2)"></i>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="120px">
+        <template slot-scope="scope">
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="编辑"
+            placement="top"
+          >
+            <span class="tooltip-wrapper">
               <el-button
-                type="primary"
-                size="small"
-                @click="handleEdit(scope.row)"
+                class="svg-button"
+                type="text"
                 v-if="pageMenu.editfloor"
-                >编辑
-              </el-button>
+                @click="handleEdit(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconbianji"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+          <el-tooltip
+            transition="none"
+            effect="light"
+            content="删除"
+            placement="top"
+          >
+            <span class="tooltip-wrapper">
               <el-button
-                type="danger"
-                size="small"
-                @click="handleDelete(scope.row)"
+                class="svg-button"
+                type="text"
                 v-if="pageMenu.delfloor"
-                >删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+                @click="handleDelete(scope.row)"
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconshanchu"></use></svg
+              ></el-button>
+            </span>
+          </el-tooltip>
+        </template>
+      </el-table-column>
+    </el-table>
 
-        <!--  分页  -->
-        <pagination
-          :list="tableData"
-          :total="total"
-          :page="currentPage"
-          :pageSize="pageSize"
-          @handleCurrentChange="handleCurrentChange"
-          @handleSizeChange="handleSizeChange"
-        ></pagination>
-      </el-tab-pane>
-    </el-tabs>
+    <div style="margin-top: 16px;">
+      <pagination
+        style="float:right"
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
+    </div>
 
     <!--  图片放大  -->
     <div class="max-img" v-show="maxImg" @click="maxDiv">
@@ -132,7 +155,7 @@
         >
       </span>
     </el-dialog>
-  </div>
+  </table-page>
 </template>
 
 <script>
@@ -174,6 +197,7 @@ export default {
       maxImg: "",
       buildingCode: "",
       pageMenu: {},
+      loading: false,
     };
   },
   created() {
@@ -360,7 +384,7 @@ export default {
     },
     //切换tab卡
     tabClick(e) {
-      this.buildingCode = e.name;
+      console.log(this.buildingCode);
       this.getList(this.pageSize, this.currentPage);
     },
     //放大图片
