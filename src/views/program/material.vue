@@ -235,6 +235,7 @@
               ref="upload"
               class="uploader"
               :file-list="form.file"
+              :disabled="isEdit"
               :on-change="onUpload"
               :on-remove="
                 () => {
@@ -256,7 +257,10 @@
             style="line-height: 40px"
             prop="auditType"
           >
-            <el-radio-group v-model="form.auditType">
+            <el-radio-group
+              v-model="form.auditType"
+              :disabled="isEdit && form.statusCode !== 2"
+            >
               <el-radio
                 v-for="(name, code) in auditTypes"
                 :key="code"
@@ -788,6 +792,7 @@ export default {
         password,
         protocol,
         bitRateType,
+        statusCode,
       } = row;
       if (["流媒体", "在线网页"].includes(typeCode)) {
         this.isStaticForm = false;
@@ -821,6 +826,7 @@ export default {
           code,
           typeCode,
           name,
+          statusCode,
           file: [
             {
               name: fileName,
