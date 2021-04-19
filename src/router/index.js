@@ -159,6 +159,11 @@ const routes = [
         component: () => import('views/mall/office'),
       },
       {
+        path: '/mall/map',
+        name: '地图编辑器',
+        component: () => import('views/mall/map'),
+      },
+      {
         path: '/statistics/newest-statistics',
         name: '素材上新',
         component: () => import('views/statistics/newest-statistics'),

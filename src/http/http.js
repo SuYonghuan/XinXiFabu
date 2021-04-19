@@ -92,6 +92,21 @@ export const cPost = url => async params => {
   return res;
 };
 
+export const cPostForYun = url => async params => {
+  const timestamp = timeStamp();
+  const res = await post(
+    `${store.state.config.mallYunUrl}${url}?token=${encodeURIComponent(
+      encrypt(url + timestamp)
+    )}&time=${timestamp}`,
+    params
+  );
+  console.group('%curl:' + url, 'background:#282c34;color:#7cc370;');
+  console.info('params:', params ? JSON.parse(JSON.stringify(params)) : null,)
+  console.info('response:', res ? JSON.parse(JSON.stringify(res)) : res)
+  console.groupEnd();
+  return res;
+};
+
 //封装get方法
 export function get(url, params) {
   let jwtToken = getCookie("userInfo") ? JSON.parse(getCookie("userInfo")).jwtToken : ''
