@@ -72,6 +72,7 @@
               component.materials.length
           "
           autoplay
+          playsinline
           :src="component.materials[handle[i]].fileUrl"
           @ended="handleEnded($event, component, i)"
           :style="{

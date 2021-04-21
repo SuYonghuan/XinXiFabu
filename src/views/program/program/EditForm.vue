@@ -15,12 +15,12 @@
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
-        <!-- <div class="btn" @click="preview">
+        <div class="btn" @click="preview">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconyanjing"></use>
           </svg>
           预览
-        </div> -->
+        </div>
         <div class="btn success" @click="submit">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconchucun"></use>
@@ -675,13 +675,26 @@
       :visible.sync="showMaterialPreview"
     >
       <template v-if="previewMaterial">
+        <video
+          v-if="currentMaterialType === 'video'"
+          style="width:100%;min-height:500px;"
+          controls
+          :src="previewMaterial.fileUrl"
+        ></video>
+        <img
+          v-else-if="currentMaterialType === 'image'"
+          style="width:100%;min-height:500px;"
+          :src="previewMaterial.fileUrl"
+        />
+        <audio
+          v-else-if="currentMaterialType === 'audio'"
+          controls
+          :src="previewMaterial.fileUrl"
+        ></audio>
         <object
-          style="width: 100%; min-height: 500px"
-          :data="
-            previewMaterial.fileUrl
-              ? previewMaterial.fileUrl
-              : previewMaterial.url
-          "
+          v-else
+          style="width:100%;min-height:500px;"
+          :data="previewMaterial.fileUrl"
         ></object>
       </template>
     </el-dialog>
