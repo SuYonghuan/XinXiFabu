@@ -837,6 +837,7 @@ export default {
       if (this.form.playMode === "carousel") {
         this.form.playList = [];
       } else this.form.programme = null;
+      this.getPrograms();
     },
     setForm() {
       this.form = {
@@ -913,10 +914,6 @@ export default {
       } else {
         this.form.programme = program;
       }
-    },
-    async openProgramModal() {
-      await this.getPrograms();
-      this.showSelectMaterial = true;
     },
     async getPrograms() {
       const { q, form } = this;
