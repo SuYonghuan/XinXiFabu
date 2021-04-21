@@ -652,12 +652,8 @@ export default {
                     ({ dateType }) => dateType == 2
                   );
                   if (!durationPlayLists.length) return callback();
-                  if (
-                    !durationPlayLists.find(
-                      ({ range }) => range && range[0] && range[1]
-                    )
-                  )
-                    return callback(new Error("请选择时间段"));
+                  if (durationPlayLists.find(({ range }) => !range))
+                    return callback(new Error("请选择插播模式时间段"));
                   if (
                     durationPlayLists.find(
                       ({ range }) =>
@@ -851,10 +847,7 @@ export default {
           ...this.form.playList,
           {
             dateType: 2,
-            range: [
-              getCurrentYmd() + " 00:00:00",
-              getCurrentYmd() + " 23:59:59",
-            ],
+            range: null,
             programmes: [],
           },
         ],
