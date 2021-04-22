@@ -242,7 +242,6 @@
                   form.file = [];
                 }
               "
-              :on-progress="handleProgress"
               :before-upload="beforeUpload"
             >
               <el-button
@@ -278,13 +277,6 @@
               v-model="form.desc"
             >
             </el-input>
-          </el-form-item>
-          <el-form-item label="上传进度">
-            <el-progress
-              style="margin-top: 12.5px"
-              :percentage="progress"
-              status="success"
-            ></el-progress>
           </el-form-item>
         </template>
         <template v-else-if="isIpc">
@@ -534,7 +526,6 @@ export default {
       showForm: false,
       isStaticForm: false,
       form: {},
-      progress: 0,
       materialTypes: {},
       typeCode: null,
       auditTypes: {},
@@ -771,9 +762,6 @@ export default {
       [time] = time.split(".");
       return `${date} ${time}`;
     },
-    handleProgress({ percent }) {
-      this.progress = percent;
-    },
     handleEdit(row) {
       const {
         code,
@@ -838,7 +826,6 @@ export default {
           desc,
         };
         this.isStaticForm = true;
-        this.progress = 0;
       }
 
       this.$nextTick(() => {
@@ -854,7 +841,6 @@ export default {
         desc: "",
       };
       this.isStaticForm = true;
-      this.progress = 0;
       this.$nextTick(() => {
         if (this.$refs.form) this.$refs.form.clearValidate();
         this.showForm = true;
@@ -972,7 +958,6 @@ export default {
               url: this.config.url + path,
             },
           ];
-          this.progress = 100;
           this.$refs.form && this.$refs.form.validateField(["file"]);
         } else this.$message({ message: msg, type: "error" });
       }
