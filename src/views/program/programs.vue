@@ -134,6 +134,8 @@ export default {
       this.$message.success(res.msg);
       this.getList();
       this.showAddForm = false;
+      const programCode = res.data;
+      this.editProgram(programCode);
     },
     async deleteProgram(codes) {
       const { code, msg } = await ProgramApi.delete({ codes });
