@@ -722,6 +722,16 @@
       :visible.sync="showMaterialPreview"
     >
       <template v-if="previewMaterial">
+        <el-alert
+          v-if="currentMaterialType === 'video'"
+          :closable="false"
+          type="info"
+        >
+          <div slot="title">
+            如视频无法播放可点击下载
+            <a :href="previewMaterial.fileUrl" target="_blank" download>下载</a>
+          </div>
+        </el-alert>
         <video
           v-if="currentMaterialType === 'video'"
           style="width:100%;min-height:500px;"

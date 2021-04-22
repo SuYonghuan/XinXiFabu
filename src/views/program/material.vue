@@ -480,6 +480,16 @@
       :visible.sync="showModal"
     >
       <template v-if="modalMat">
+        <el-alert
+          v-if="modalMat.typeCode === '视频'"
+          :closable="false"
+          type="info"
+        >
+          <div slot="title">
+            如视频无法播放可点击下载
+            <a :href="modalMat.fileUrl" target="_blank" download>下载</a>
+          </div>
+        </el-alert>
         <video
           v-if="modalMat.typeCode === '视频'"
           style="width:100%;min-height:500px;"
