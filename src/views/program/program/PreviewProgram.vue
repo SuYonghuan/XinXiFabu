@@ -290,17 +290,12 @@ export default {
       video.load();
       const promise = video.play();
       if (promise) {
-        promise
-          .then(() => {
-            video.style["object-fit"] = "fill";
-          })
-          .catch(() => {
-            video.poster = videoPlaceHolder;
-            video.style["object-fit"] = "contain";
-            setTimeout(() => {
-              this.handleEnded(e, component, i);
-            }, mat.duration);
-          });
+        promise.catch(() => {
+          video.poster = videoPlaceHolder;
+          setTimeout(() => {
+            this.handleEnded(e, component, i);
+          }, mat.duration);
+        });
       }
     },
     svgs,
@@ -411,10 +406,7 @@ export default {
       position: absolute;
     }
     video {
-      object-fit: fill;
-      &::after {
-        content: "123123";
-      }
+      object-fit: contain;
     }
     iframe {
       overflow: hidden;

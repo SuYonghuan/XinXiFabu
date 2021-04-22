@@ -101,8 +101,55 @@
               }"
             ></v-image>
             <template v-for="(component, i) in form.components">
+              <template
+                v-if="component.image && component.typeCode === 'video'"
+              >
+                <v-rect
+                  :key="i"
+                  :name="'name_' + i"
+                  :config="{
+                    x: component.offsetX,
+                    y: component.offsetY,
+                    width: component.width,
+                    height: component.height,
+                    draggable: true,
+                    strokeEnabled: false,
+                    zIndex: i,
+                    dragBoundFunc: (pos) => {
+                      return {
+                        x:
+                          pos.x < 0
+                            ? 0
+                            : pos.x > form.width - component.width
+                            ? form.width - component.width
+                            : pos.x,
+                        y:
+                          pos.y < 0
+                            ? 0
+                            : pos.y > form.height - component.height
+                            ? form.height - component.height
+                            : pos.y,
+                      };
+                    },
+                  }"
+                  @dragend="handleDragend"
+                  @transformend="handleTransformEnd"
+                ></v-rect>
+                <v-image
+                  :key="i + '_video'"
+                  :config="{
+                    ...getVideoImageProp(component.image, component),
+                    strokeEnabled: false,
+                    listening: false,
+                    zIndex: i + 0.5,
+                    image: component.image,
+                  }"
+                  @dragend="handleDragend"
+                  @transformend="handleTransformEnd"
+                />
+              </template>
               <v-image
-                v-if="component.image"
+                v-else-if="component.image"
                 :key="i + '_' + component.image.id"
                 :name="'name_' + i"
                 :config="{
@@ -1005,6 +1052,32 @@ export default {
       target.scaleX(1);
       target.scaleY(1);
       this.setComponents();
+    },
+    getVideoImageProp(image, component) {
+      const width = component.width;
+      const height = component.height;
+      const aspectRatio = width / height;
+
+      let newWidth;
+      let newHeight;
+
+      const imageRatio = image.width / image.height;
+
+      if (aspectRatio >= imageRatio) {
+        newHeight = height;
+        newWidth = height * imageRatio;
+      } else {
+        newWidth = width;
+        newHeight = width / imageRatio;
+      }
+      let x = (width - newWidth) / 2 + component.offsetX;
+      let y = (height - newHeight) / 2 + component.offsetY;
+      return {
+        x,
+        y,
+        width: newWidth,
+        height: newHeight,
+      };
     },
     handleDragend({
       target: {
