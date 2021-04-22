@@ -404,6 +404,16 @@
                   :step="1"
                   :controls="false"
                   step-strictly
+                  @change="
+                    () => {
+                      if (activeComponent.typeCode === 'text') {
+                        activeComponent.fontSize = Math.min(
+                          activeComponent.height,
+                          activeComponent.fontSize
+                        );
+                      }
+                    }
+                  "
                 ></el-input-number>
               </el-form-item>
             </div>
@@ -512,7 +522,7 @@
                   :step="1"
                   step-strictly
                   :min="1"
-                  :max="100"
+                  :max="activeComponent.height"
                 ></el-input-number
                 >px
               </el-form-item>
@@ -1061,6 +1071,8 @@ export default {
       });
       target.scaleX(1);
       target.scaleY(1);
+      if (component.typeCode === "text")
+        component.fontSize = Math.min(component.height, component.fontSize);
       this.setComponents();
     },
     getVideoImageProp(image, component) {
