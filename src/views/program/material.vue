@@ -258,7 +258,15 @@
           >
             <el-radio-group
               v-model="form.auditType"
-              :disabled="isEdit && form.statusCode !== 2"
+              :disabled="
+                !isEdit
+                  ? false
+                  : form.statusCode == 1 || form.statusCode == 0
+                  ? true
+                  : form.auditType === 'manual'
+                  ? true
+                  : false
+              "
             >
               <el-radio
                 v-for="(name, code) in auditTypes"
@@ -698,17 +706,19 @@ export default {
       });
     },
     beforeUpload(file) {
-      const type = file.type.includes("video")
-        ? "视频"
-        : file.type.includes("audio")
-        ? "音频"
-        : file.type.includes("image")
-        ? "图片"
-        : file.type === "text/html"
-        ? "html"
-        : file.type === "text/plain"
-        ? "文本"
-        : null;
+      const type =
+        (file.name && file.name.toLowerCase().endsWith(".flv")) ||
+        file.type.includes("video")
+          ? "视频"
+          : file.type.includes("audio")
+          ? "音频"
+          : file.type.includes("image")
+          ? "图片"
+          : file.type === "text/html"
+          ? "html"
+          : file.type === "text/plain"
+          ? "文本"
+          : null;
       if (!type) {
         this.$message.error("文件类型不支持");
         return false;
