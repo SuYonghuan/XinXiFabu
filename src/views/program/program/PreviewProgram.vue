@@ -75,6 +75,7 @@
           playsinline
           :src="component.materials[handle[i]].fileUrl"
           @ended="handleEnded($event, component, i)"
+          @error="handleError($event, component, i)"
           :style="{
             top: component.offsetY + 'px',
             left: component.offsetX + 'px',
@@ -280,6 +281,15 @@ export default {
   },
 
   methods: {
+    handleError(e, component, i) {
+      const video = e.target;
+      const mat = component.materials[this.handle[i]];
+      video.pause();
+      video.poster = videoPlaceHolder;
+      setTimeout(() => {
+        this.handleEnded(e, component, i);
+      }, mat.duration);
+    },
     handleEnded(e, component, i) {
       const video = e.target;
       video.pause();
