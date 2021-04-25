@@ -84,13 +84,13 @@
         </template>
       </el-table-column>
       <el-table-column prop="founderName" label="创建用户"></el-table-column>
-      <el-table-column prop="addTime" label="创建时间">
+      <el-table-column prop="addTime" width="160px" label="创建时间">
         <template slot-scope="scope">
           {{ timestampToTime(scope.row.addTime) }}
         </template>
       </el-table-column>
       <el-table-column prop="updateUserName" label="更新用户"></el-table-column>
-      <el-table-column prop="updateTime" label="更新时间">
+      <el-table-column prop="updateTime" width="160px" label="更新时间">
         <template slot-scope="scope">
           {{ timestampToTime(scope.row.updateTime) }}
         </template>
