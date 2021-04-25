@@ -1332,6 +1332,9 @@ export default {
         .program {
           &:nth-child(2n + 1) {
             background: #fafafa;
+            &.active {
+              background: #e6eaf0;
+            }
           }
         }
       }
