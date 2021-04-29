@@ -7,7 +7,7 @@
           <el-input
             class="input1 big"
             v-model="name"
-            placeholder="请输入节目名称"
+            placeholder="关键字搜索"
             size="small"
             :clearable="true"
             @keyup.enter.native="getList"

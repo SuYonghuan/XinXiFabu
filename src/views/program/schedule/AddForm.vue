@@ -94,7 +94,7 @@
     <div class="main">
       <div class="left">
         <el-form-item class="program-header" prop="programme">
-          <el-input type="text" placeholder="搜索" v-model="q" />
+          <el-input type="text" placeholder="关键字搜索" v-model="q" />
           <div class="btn1" @click="getPrograms">
             <svg class="icon" aria-hidden="true">
               <use xlink:href="#iconsousuo"></use>
