@@ -123,11 +123,12 @@ export default {
     },
     async submit() {
       const { selectedDevices, schedule, deviceQueryType } = this;
+      const devices = deviceQueryType
+        ? selectedDevices.map(({ code }) => code)
+        : selectedDevices;
       const { code, msg } = await ScheduleApi.publish({
         schedule: schedule.code,
-        devices: deviceQueryType
-          ? selectedDevices.map(({ code }) => code)
-          : selectedDevices,
+        devices,
         confirm: false,
       });
       if (code === "200") {
@@ -140,10 +141,9 @@ export default {
             cancelButtonText: "取消",
             type: "warning",
           });
-
           const { code: code1, msg: msg1 } = await ScheduleApi.publish({
             schedule: schedule.code,
-            devices: selectedDevices.map(({ code }) => code),
+            devices,
             confirm: true,
           });
           if (code1 === "200") {
