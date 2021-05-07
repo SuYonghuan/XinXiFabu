@@ -35,6 +35,12 @@ export class ProgramApi {
         ProgramApi.componentTypes = data
         return data;
     };
+    static async getSubComponentTypes() {
+        if (ProgramApi.subComponentTypes) return ProgramApi.subComponentTypes
+        const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "SignControl" })
+        ProgramApi.subComponentTypes = data
+        return data;
+    };
     static getMaterials = cPost('/Api/Programme/ComponentMaterials');
 }
 

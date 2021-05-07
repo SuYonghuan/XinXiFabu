@@ -38,7 +38,11 @@
 
     <div class="main">
       <div class="left">
-        <template v-for="code in componentTypeOrder">
+        <template
+          v-for="code in componentTypes
+            ? componentTypeOrder.filter((code) => componentTypes[code])
+            : []"
+        >
           <el-popover
             v-if="componentTypeTip[code]"
             :key="code"
@@ -74,209 +78,56 @@
           @touchstart="handleStageMouseDown"
         >
           <v-layer>
-            <v-rect
-              name="backgroundColor"
-              :config="{
-                x: 0,
-                y: 0,
-                width: form.width,
-                height: form.height,
-                draggable: false,
-                fill: form.backgroundColor,
-                strokeEnabled: false,
-                zIndex: -2,
-              }"
-            ></v-rect>
-            <v-image
+            <background-color :form="form"></background-color>
+            <background-image
               v-if="backgroundImage"
-              :config="{
-                x: 0,
-                y: 0,
-                width: form.width,
-                height: form.height,
-                draggable: false,
-                image: backgroundImage,
-                strokeEnabled: false,
-                zIndex: -1,
-              }"
-            ></v-image>
+              :form="form"
+              :backgroundImage="backgroundImage"
+            ></background-image>
             <template v-for="(component, i) in form.components">
               <template
                 v-if="component.image && component.typeCode === 'video'"
               >
-                <v-rect
+                <container-rect
+                  :form="form"
+                  :i="i"
                   :key="i"
-                  :name="'name_' + i"
-                  :config="{
-                    x: component.offsetX,
-                    y: component.offsetY,
-                    width: component.width,
-                    height: component.height,
-                    draggable: true,
-                    strokeEnabled: false,
-                    zIndex: i,
-                    dragBoundFunc: (pos) => {
-                      return {
-                        x:
-                          pos.x < 0
-                            ? 0
-                            : pos.x > form.width - component.width
-                            ? form.width - component.width
-                            : pos.x,
-                        y:
-                          pos.y < 0
-                            ? 0
-                            : pos.y > form.height - component.height
-                            ? form.height - component.height
-                            : pos.y,
-                      };
-                    },
-                  }"
                   @dragend="handleDragend"
                   @transformend="handleTransformEnd"
-                ></v-rect>
-                <v-image
-                  :key="i + '_video'"
-                  :config="{
-                    ...getVideoImageProp(component.image, component),
-                    strokeEnabled: false,
-                    listening: false,
-                    zIndex: i + 0.5,
-                    image: component.image,
-                  }"
-                  @dragend="handleDragend"
-                  @transformend="handleTransformEnd"
-                />
+                ></container-rect>
+                <inner-image
+                  :form="form"
+                  :i="i"
+                  :key="i + '_innerImage'"
+                ></inner-image>
               </template>
-              <v-image
+              <image-component
                 v-else-if="component.image"
+                :form="form"
+                :i="i"
                 :key="i + '_' + component.image.id"
-                :name="'name_' + i"
-                :config="{
-                  x: component.offsetX,
-                  y: component.offsetY,
-                  width: component.width,
-                  height: component.height,
-                  draggable: true,
-                  strokeEnabled: false,
-                  zIndex: i,
-                  dragBoundFunc: (pos) => {
-                    return {
-                      x:
-                        pos.x < 0
-                          ? 0
-                          : pos.x > form.width - component.width
-                          ? form.width - component.width
-                          : pos.x,
-                      y:
-                        pos.y < 0
-                          ? 0
-                          : pos.y > form.height - component.height
-                          ? form.height - component.height
-                          : pos.y,
-                    };
-                  },
-                  image: component.image,
-                }"
                 @dragend="handleDragend"
                 @transformend="handleTransformEnd"
-              />
+              ></image-component>
               <template v-else-if="component.typeCode === 'text'">
-                <v-rect
+                <container-rect
+                  :form="form"
+                  :i="i"
                   :key="i"
-                  :name="'name_' + i"
-                  :config="{
-                    x: component.offsetX,
-                    y: component.offsetY,
-                    width: component.width,
-                    height: component.height,
-                    draggable: true,
-                    strokeEnabled: false,
-                    zIndex: i,
-                    fill: component.backgroundColor,
-                    opacity: component.backgroundOpacity / 100,
-                    dragBoundFunc: (pos) => {
-                      return {
-                        x:
-                          pos.x < 0
-                            ? 0
-                            : pos.x > form.width - component.width
-                            ? form.width - component.width
-                            : pos.x,
-                        y:
-                          pos.y < 0
-                            ? 0
-                            : pos.y > form.height - component.height
-                            ? form.height - component.height
-                            : pos.y,
-                      };
-                    },
-                  }"
                   @dragend="handleDragend"
                   @transformend="handleTransformEnd"
-                ></v-rect>
-                <v-text
-                  :key="i + '_text'"
-                  :config="{
-                    x: component.offsetX,
-                    y: component.offsetY,
-                    width: component.width,
-                    height: component.height,
-                    strokeEnabled: false,
-                    fill: component.fontColor,
-                    listening: false,
-                    fontStyle:
-                      component.fontStyle === '正常'
-                        ? 'normal'
-                        : component.fontStyle === '加粗'
-                        ? 'bold'
-                        : component.fontStyle === '斜体'
-                        ? 'italic'
-                        : component.fontStyle === '加粗、斜体'
-                        ? 'bold italic'
-                        : 'normal',
-                    wrap: 'none',
-                    fontSize: component.fontSize,
-                    text: component.materials.length
-                      ? component.materials[0].text
-                      : '请选择素材',
-                  }"
-                ></v-text>
+                ></container-rect>
+                <inner-text :form="form" :i="i" :key="i + '_text'">
+                </inner-text>
               </template>
-              <v-rect
+              <container-rect
                 v-else
+                :form="form"
+                :i="i"
                 :key="i"
-                :name="'name_' + i"
-                :config="{
-                  x: component.offsetX,
-                  y: component.offsetY,
-                  width: component.width,
-                  height: component.height,
-                  draggable: true,
-                  strokeEnabled: false,
-                  zIndex: i,
-                  fill: component.color,
-                  dragBoundFunc: (pos) => {
-                    return {
-                      x:
-                        pos.x < 0
-                          ? 0
-                          : pos.x > form.width - component.width
-                          ? form.width - component.width
-                          : pos.x,
-                      y:
-                        pos.y < 0
-                          ? 0
-                          : pos.y > form.height - component.height
-                          ? form.height - component.height
-                          : pos.y,
-                    };
-                  },
-                }"
                 @dragend="handleDragend"
                 @transformend="handleTransformEnd"
-              >
-              </v-rect>
+              ></container-rect>
             </template>
             <v-transformer
               ref="transformer"
@@ -331,7 +182,14 @@
           <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
           <template v-if="!activeComponent">
             <el-form-item class="item" label="背景颜色" prop="backgroundColor">
-              <el-color-picker v-model="form.backgroundColor">
+              <el-color-picker
+                :value="form.backgroundColor"
+                @change="
+                  (val) => {
+                    if (val) form.backgroundColor = val;
+                  }
+                "
+              >
               </el-color-picker>
             </el-form-item>
             <mat-list
@@ -791,7 +649,18 @@ import MatList from "./EditForm/MatList";
 import { ProgramApi } from "../program.js";
 import ComponentList from "./EditForm/ComponentList";
 import { svgs } from "./EditForm/svgs.js";
+import BackgroundColor from "./EditForm/KonvaComponents/BackgroundColor";
+import BackgroundImage from "./EditForm/KonvaComponents/BackgroundImage";
+import ContainerRect from "./EditForm/KonvaComponents/ContainerRect";
+import InnerImage from "./EditForm/KonvaComponents/InnerImage";
+import ImageComponent from "./EditForm/KonvaComponents/ImageComponent";
+import InnerText from "./EditForm/KonvaComponents/InnerText";
 import PreviewProgram from "./PreviewProgram";
+import createComponent, {
+  weatherStyles,
+  clockStyles,
+  componentSubMap,
+} from "./Component.js";
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
@@ -802,6 +671,9 @@ const logos = {
   url: "#iconlianjie",
   video: "#iconshipin",
   weather: "#icontianqi-1",
+  facility: "#icontianqi-1",
+  brand: "#icontianqi-1",
+  position: "#icontianqi-1",
 };
 const componentKeys = [
   "code",
@@ -813,17 +685,8 @@ const componentKeys = [
   "offsetX",
   "offsetY",
   "materials",
-];
-const weatherStyles = [
-  { type: 0, width: 500, height: 80 },
-  { type: 1, width: 400, height: 80 },
-];
-const clockStyles = [
-  { type: 0, width: 320, height: 80 },
-  { type: 1, width: 320, height: 80 },
-  { type: 2, width: 320, height: 80 },
-  { type: 3, width: 320, height: 80 },
-  { type: 4, width: 320, height: 80 },
+  "bindingCode",
+  "bindingName",
 ];
 const flatenComponent = ({ config, ...component }) => {
   if (!config) return { ...component };
@@ -831,7 +694,17 @@ const flatenComponent = ({ config, ...component }) => {
 };
 
 export default {
-  components: { MatList, ComponentList, PreviewProgram },
+  components: {
+    MatList,
+    ComponentList,
+    PreviewProgram,
+    BackgroundColor,
+    BackgroundImage,
+    ContainerRect,
+    InnerImage,
+    ImageComponent,
+    InnerText,
+  },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -880,6 +753,9 @@ export default {
         "url",
         "audio",
         "stream",
+        "facility",
+        "brand",
+        "position",
       ],
       componentTypeTip: {
         video: "一个节目只能由2个视频控件。",
@@ -892,6 +768,8 @@ export default {
       colorIndex: 0,
       logos,
       componentTypes: {},
+      subComponentTypes: {},
+      componentSubMap,
       showSelectMaterial: false,
       materials: [],
       q: "",
@@ -1075,32 +953,6 @@ export default {
         component.fontSize = Math.min(component.height, component.fontSize);
       this.setComponents();
     },
-    getVideoImageProp(image, component) {
-      const width = component.width;
-      const height = component.height;
-      const aspectRatio = width / height;
-
-      let newWidth;
-      let newHeight;
-
-      const imageRatio = image.width / image.height;
-
-      if (aspectRatio >= imageRatio) {
-        newHeight = height;
-        newWidth = height * imageRatio;
-      } else {
-        newWidth = width;
-        newHeight = width / imageRatio;
-      }
-      let x = (width - newWidth) / 2 + component.offsetX;
-      let y = (height - newHeight) / 2 + component.offsetY;
-      return {
-        x,
-        y,
-        width: newWidth,
-        height: newHeight,
-      };
-    },
     handleDragend({
       target: {
         attrs: { name, x, y },
@@ -1187,62 +1039,11 @@ export default {
         default:
           break;
       }
-      const component = {
+      const component = createComponent({
         typeCode,
         zIndex: this.form.components.length,
-        width: 200,
-        height: 200,
-        offsetX: 0,
-        offsetY: 0,
-        materials: [],
         color: this.colors[this.colorIndex],
-      };
-      switch (typeCode) {
-        case "image":
-          component.transition = "随机";
-          component.transitionPeriod = 15;
-          component.materials = [];
-          break;
-        case "url":
-          component.refreshPeriod = "00:00:00";
-          component.materials = [];
-          break;
-        case "html":
-          component.materials = [];
-          break;
-        case "text":
-          component.backgroundColor = "#FFFFFF";
-          component.backgroundOpacity = 100;
-          component.fontColor = "#000000";
-          component.fontSize = 24;
-          component.fontStyle = "正常";
-          component.animationSpeed = "中等";
-          component.animation = "从左往右";
-          component.materials = [];
-          break;
-        case "weather":
-          component.cityName = "";
-          component.style = 0;
-          component.width = weatherStyles[0].width;
-          component.height = weatherStyles[0].height;
-          component.fontColor = "#FFFFFF";
-          component.backgroundColor = "#777777";
-          break;
-        case "clock":
-          component.fontColor = "#FFFFFF";
-          component.style = 0;
-          component.width = clockStyles[0].width;
-          component.height = clockStyles[0].height;
-          component.backgroundColor = "#777777";
-          break;
-        case "audio":
-          component.materials = [];
-        case "stream":
-          component.materials = [];
-          break;
-        default:
-          break;
-      }
+      });
       this.colorIndex++;
       if (this.colorIndex === this.colors.length) this.colorIndex = 0;
       this.activeComponent = component;
@@ -1400,8 +1201,11 @@ export default {
     this.init();
   },
   async created() {
-    const componentTypes = await ProgramApi.getComponentTypes();
-    this.componentTypes = componentTypes;
+    const [componentTypes, subComponentTypes] = await Promise.all([
+      ProgramApi.getComponentTypes(),
+      ProgramApi.getSubComponentTypes(),
+    ]);
+    Object.assign(this, { componentTypes, subComponentTypes });
   },
 };
 </script>
