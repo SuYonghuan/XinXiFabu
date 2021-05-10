@@ -7,7 +7,7 @@
       width: component.width,
       height: component.height,
       draggable: true,
-      strokeEnabled: false,
+      stroke: component.color,
       zIndex: i,
       dragBoundFunc: (pos) => {
         return {

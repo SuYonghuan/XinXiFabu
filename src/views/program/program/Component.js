@@ -27,7 +27,7 @@ export const componentSubMap = {
   position: ["signImage_direction", "signTxt_distance", "signTxt_time"],
 }
 class BaseComponent {
-  constructor({ typeCode, zIndex, color }) {
+  constructor({ typeCode, zIndex, color, j }) {
     const component = {
       typeCode,
       zIndex,
@@ -38,6 +38,7 @@ class BaseComponent {
       materials: [],
       color,
     };
+    if (j) component.offsetX += j * 200
     Object.assign(this, component)
   }
 }
@@ -55,9 +56,9 @@ class UrlComponent extends BaseComponent {
   }
 }
 class TextComponent extends BaseComponent {
-  constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
-    this.backgroundColor = "#FFFFFF";
+  constructor({ typeCode, zIndex, color, j }) {
+    super({ typeCode, zIndex, color, j })
+    this.backgroundColor = j === undefined ? "#FFFFFF" : null;
     this.backgroundOpacity = 100;
     this.fontColor = "#000000";
     this.fontSize = 24;
@@ -98,7 +99,7 @@ class SignComponent extends BaseComponent {
     this.bindingCode = null;
     this.bindingName = null;
     this.dirTheme = null;
-    this.subComponents = componentSubMap[typeCode].map(code => new (typeCodeClassMap[code])(code));
+    this.subComponents = componentSubMap[typeCode].map((code, j) => new (typeCodeClassMap[code])({ typeCode: code, j, color }));
     if (typeCode !== 'position') this.logoTheme = null;
   }
 }

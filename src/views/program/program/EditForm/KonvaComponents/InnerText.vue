@@ -1,8 +1,8 @@
 <template>
   <v-text
     :config="{
-      x: component.offsetX,
-      y: component.offsetY,
+      x,
+      y,
       width: component.width,
       height: component.height,
       strokeEnabled: false,
@@ -19,19 +19,37 @@
           ? 'bold italic'
           : 'normal',
       wrap: 'none',
-      fontSize: component.fontSize,
-      text: component.materials.length
-        ? component.materials[0].text
-        : '请选择素材',
+      fontSize,
+      text,
     }"
   ></v-text>
 </template>
 <script>
+import { ProgramApi } from "../../../program.js";
 export default {
-  props: ["form", "i"],
+  props: ["form", "i", "component", "subComponentTypes", "componentTypes"],
   computed: {
-    component() {
-      return this.form.components[this.i];
+    fontSize() {
+      return this.component.fontSize ? this.component.fontSize : 24;
+    },
+    text() {
+      const { component, subComponentTypes, componentTypes } = this;
+      return subComponentTypes[component.typeCode]
+        ? subComponentTypes[component.typeCode]
+        : component.materials && component.materials.length
+        ? component.materials[0].text
+        : componentTypes[component.typeCode];
+    },
+    x() {
+      const { component, text, fontSize } = this;
+      let { offsetX, width } = component;
+      return text.length * fontSize > width
+        ? component.offsetX
+        : component.offsetX + (width - text.length * fontSize) / 2;
+    },
+    y() {
+      const { component, fontSize } = this;
+      return component.offsetY + (component.height - fontSize) / 2;
     },
   },
 };

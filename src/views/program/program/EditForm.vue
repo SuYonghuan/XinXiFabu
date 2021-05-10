@@ -91,12 +91,14 @@
                 <container-rect
                   :form="form"
                   :i="i"
+                  :component="component"
                   :key="i"
                   @dragend="handleDragend"
                   @transformend="handleTransformEnd"
                 ></container-rect>
                 <inner-image
                   :form="form"
+                  :component="component"
                   :i="i"
                   :key="i + '_innerImage'"
                 ></inner-image>
@@ -109,25 +111,73 @@
                 @dragend="handleDragend"
                 @transformend="handleTransformEnd"
               ></image-component>
-              <template v-else-if="component.typeCode === 'text'">
+
+              <template
+                v-else-if="
+                  component.typeCode === 'facility' ||
+                    component.typeCode === 'brand' ||
+                    component.typeCode === 'position'
+                "
+              >
+                <template v-for="(subComponent, j) in component.subComponents">
+                  <template v-if="subComponent.image">
+                    <container-rect
+                      :form="form"
+                      :i="i"
+                      :j="j"
+                      :component="subComponent"
+                      :key="i + '_' + j"
+                      @dragend="handleDragend"
+                      @transformend="handleTransformEnd"
+                    ></container-rect>
+                    <inner-image
+                      :form="form"
+                      :component="subComponent"
+                      :i="i"
+                      :key="i + '_' + j + '_innerImage'"
+                    ></inner-image>
+                  </template>
+                  <template v-else>
+                    <container-rect
+                      :form="form"
+                      :i="i"
+                      :j="j"
+                      :component="subComponent"
+                      :key="i + '_' + j"
+                      @dragend="handleDragend"
+                      @transformend="handleTransformEnd"
+                    ></container-rect>
+                    <inner-text
+                      :form="form"
+                      :component="subComponent"
+                      :i="i"
+                      :key="i + '_' + j + '_text'"
+                      :subComponentTypes="subComponentTypes"
+                      :componentTypes="componentTypes"
+                    >
+                    </inner-text>
+                  </template>
+                </template>
+              </template>
+              <template v-else>
                 <container-rect
                   :form="form"
                   :i="i"
+                  :component="component"
                   :key="i"
                   @dragend="handleDragend"
                   @transformend="handleTransformEnd"
                 ></container-rect>
-                <inner-text :form="form" :i="i" :key="i + '_text'">
+                <inner-text
+                  :form="form"
+                  :component="component"
+                  :i="i"
+                  :key="i + '_text'"
+                  :subComponentTypes="subComponentTypes"
+                  :componentTypes="componentTypes"
+                >
                 </inner-text>
               </template>
-              <container-rect
-                v-else
-                :form="form"
-                :i="i"
-                :key="i"
-                @dragend="handleDragend"
-                @transformend="handleTransformEnd"
-              ></container-rect>
             </template>
             <v-transformer
               ref="transformer"
@@ -201,7 +251,7 @@
             ></mat-list>
           </template>
           <template v-else>
-            <div class="pos-items">
+            <div class="pos-items" v-if="!isSignComponentActive">
               <el-form-item
                 label-width="18px"
                 class="short-item"
@@ -347,7 +397,12 @@
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
-            <template v-else-if="activeComponent.typeCode === 'text'">
+            <template
+              v-else-if="
+                activeComponent.typeCode === 'text' ||
+                  activeComponent.typeCode.includes('signTxt')
+              "
+            >
               <el-form-item
                 class="item"
                 label="背景颜色"
@@ -415,6 +470,7 @@
                 </el-select>
               </el-form-item>
               <mat-list
+                v-if="activeComponent.typeCode === 'text'"
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
                 @preview="previewMat"
@@ -523,6 +579,82 @@
                 :limit="1"
                 @selectMat="openMaterialModal"
               ></mat-list>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'facility'">
+              <el-form-item class="item" label="设施选择">
+                <el-select v-model="activeComponent.bindingCode">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="图标主题">
+                <el-select v-model="activeComponent.logoTheme">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="方向主题">
+                <el-select v-model="activeComponent.dirTheme">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'brand'">
+              <el-form-item class="item" label="品牌选择">
+                <el-select v-model="activeComponent.bindingCode">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="方向主题">
+                <el-select v-model="activeComponent.dirTheme">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <template v-else-if="activeComponent.typeCode === 'position'">
+              <el-form-item class="item" label="地图选点">
+                <el-select v-model="activeComponent.bindingCode">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="方向主题">
+                <el-select v-model="activeComponent.dirTheme">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
             </template>
           </template>
         </div>
@@ -661,6 +793,9 @@ import createComponent, {
   clockStyles,
   componentSubMap,
 } from "./Component.js";
+import defaultLogo from "./defaultLogo.svg";
+import defaultArrow from "./defaultArrow.svg";
+
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
@@ -785,6 +920,13 @@ export default {
     };
   },
   computed: {
+    isSignComponentActive() {
+      return !this.activeComponent
+        ? false
+        : this.activeComponent.typeCode === "facility" ||
+            this.activeComponent.typeCode === "brand" ||
+            this.activeComponent.typeCode === "position";
+    },
     stageScale() {
       if (!this.form) return 0;
       return Math.min(
@@ -842,6 +984,24 @@ export default {
           this.setComponents();
         };
         image.src = url;
+      }
+      if (component && component.typeCode === "signImage_logo") {
+        const image = new Image();
+        image.id = new Date().getTime();
+        image.onload = () => {
+          component.image = image;
+          this.setComponents();
+        };
+        image.src = defaultLogo;
+      }
+      if (component && component.typeCode === "signImage_direction") {
+        const image = new Image();
+        image.id = new Date().getTime();
+        image.onload = () => {
+          component.image = image;
+          this.setComponents();
+        };
+        image.src = defaultArrow;
       }
     },
     selectWeatherOrClock(style) {
@@ -921,8 +1081,7 @@ export default {
 
       // find clicked rect by its name
       const name = e.target.name();
-
-      const component = this.form.components[name.replace("name_", "")];
+      const component = this.getComponentByName(name);
       if (component) {
         this.activeComponent = component;
         this.selectedShapeName = name;
@@ -931,12 +1090,20 @@ export default {
       }
       this.updateTransformer();
     },
+    getComponentByName(name) {
+      const nameArr = name.split("_");
+      const component = !name.startsWith("name_")
+        ? null
+        : nameArr.length === 3
+        ? this.form.components[nameArr[1]].subComponents[nameArr[2]]
+        : this.form.components[nameArr[1]];
+      return component;
+    },
     handleTransformEnd({ target }) {
       const {
         attrs: { x, y, scaleX, scaleY, name },
       } = target;
-      const index = Number(name.split("_")[1]);
-      const component = this.form.components[index];
+      const component = this.getComponentByName(name);
       let newWidth = component.width * scaleX;
 
       let newHeight = component.height * scaleY;
@@ -949,6 +1116,7 @@ export default {
       });
       target.scaleX(1);
       target.scaleY(1);
+      console.log(name);
       if (component.typeCode === "text")
         component.fontSize = Math.min(component.height, component.fontSize);
       this.setComponents();
@@ -958,9 +1126,8 @@ export default {
         attrs: { name, x, y },
       },
     }) {
-      if (!name.includes("_")) return;
-      const index = Number(name.split("_")[1]);
-      const component = this.form.components[index];
+      const component = this.getComponentByName(name);
+      if (!component) return;
       Object.assign(component, {
         offsetX: Math.floor(x),
         offsetY: Math.floor(y),
@@ -1049,6 +1216,10 @@ export default {
       this.activeComponent = component;
       this.form.components.push(component);
       this.attachImage(component);
+      component.subComponents &&
+        component.subComponents.forEach((subComponent) =>
+          this.attachImage(subComponent)
+        );
       this.form = {
         ...this.form,
       };

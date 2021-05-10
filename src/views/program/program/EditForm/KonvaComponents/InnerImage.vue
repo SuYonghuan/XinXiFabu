@@ -11,12 +11,7 @@
 </template>
 <script>
 export default {
-  props: ["form", "i"],
-  computed: {
-    component() {
-      return this.form.components[this.i];
-    },
-  },
+  props: ["form", "i", "component"],
   methods: {
     getVideoImageProp(image, component) {
       const width = component.width;
