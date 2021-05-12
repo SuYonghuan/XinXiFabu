@@ -9,9 +9,19 @@
       </el-col>
       <el-col class="middle">
         <span class="meta1">节目名称</span>
-        <input class="input1" :value="form.name" readonly />
+        <input
+          class="input1"
+          :value="form.name"
+          readonly
+          style="pointer-events:none;"
+        />
         <span class="meta1">屏幕属性</span>
-        <input class="input1" :value="form.resolution" readonly />
+        <input
+          class="input1"
+          :value="form.resolution"
+          readonly
+          style="pointer-events:none;"
+        />
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
@@ -1839,7 +1849,7 @@ export default {
       font-weight: bold;
       color: #3a4763;
       height: 44px;
-      font-size: 18px;
+      font-size: 12px;
       line-height: 44px;
     }
     .el-slider__runway {

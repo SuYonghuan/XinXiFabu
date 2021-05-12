@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      :class="(activeComponent ? '' : 'selected') + ' component-item'"
+      :class="(activeComponent ? '' : 'selected') + ' component-item bold'"
       @click="$emit('selectBg')"
     >
       <svg class="icon icon-avatar" aria-hidden="true">
@@ -14,14 +14,16 @@
         <div
           :class="
             (activeComponent === component ? 'selected' : '') +
-              ' component-item'
+              ' component-item bold'
           "
           @click="$emit('selectComponent', i)"
         >
           <svg
             class="icon icon-avatar"
             aria-hidden="true"
-            :style="`color:${component.color}`"
+            :style="
+              activeComponent === component ? '' : `color:${component.color}`
+            "
           >
             <use :xlink:href="logos[component.typeCode]"></use>
           </svg>
@@ -52,7 +54,12 @@
             <svg
               class="icon icon-avatar"
               aria-hidden="true"
-              :style="`color:${component.color}`"
+              :style="
+                activeComponent &&
+                activeComponent === component.subComponents[typeCode]
+                  ? ''
+                  : `color:${component.color}`
+              "
             >
               <use xlink:href="#icondian"></use>
             </svg>
@@ -135,6 +142,10 @@ export default {
   color: #868f9f;
   border-radius: 6px;
   white-space: nowrap;
+  &.bold {
+    font-weight: bold;
+    color: #3a4763;
+  }
   .icon-avatar {
     position: absolute;
     font-size: 20px;
