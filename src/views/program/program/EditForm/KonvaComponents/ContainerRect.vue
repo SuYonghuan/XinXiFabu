@@ -1,7 +1,7 @@
 <template>
   <v-rect
     :key="i"
-    :name="'name_' + i + (j !== undefined ? '_' + j : '')"
+    :name="'name*' + i + (j !== undefined ? '*' + j : '')"
     :config="config"
     @dragend="(e) => $emit('dragend', e)"
     @transformend="(e) => $emit('transformend', e)"

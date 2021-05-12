@@ -10,31 +10,83 @@
       背景
     </div>
     <draggable :list="list" :sort="true">
-      <div
-        v-for="(component, i) in list"
-        :key="'a' + i"
-        :class="
-          (activeComponent === component ? 'selected' : '') + ' component-item'
-        "
-        @click="$emit('selectComponent', i)"
-      >
-        <svg
-          class="icon icon-avatar"
-          aria-hidden="true"
-          :style="`color:${component.color}`"
+      <div v-for="(component, i) in list" :key="'a' + i">
+        <div
+          :class="
+            (activeComponent === component ? 'selected' : '') +
+              ' component-item'
+          "
+          @click="$emit('selectComponent', i)"
         >
-          <use :xlink:href="logos[component.typeCode]"></use>
-        </svg>
-        <span>{{ componentTypes[component.typeCode] }}组件</span>
-        <div>
           <svg
-            class="icon btn"
+            class="icon icon-avatar"
             aria-hidden="true"
-            style="margin-left: 16px"
-            @click="$emit('remove', i)"
+            :style="`color:${component.color}`"
           >
-            <use xlink:href="#iconshanchu"></use>
+            <use :xlink:href="logos[component.typeCode]"></use>
           </svg>
+          <span>{{ componentTypes[component.typeCode] }}组件</span>
+          <div>
+            <svg
+              class="icon btn"
+              aria-hidden="true"
+              style="margin-left: 16px;cursor: pointer;"
+              @click="$emit('remove', i)"
+            >
+              <use xlink:href="#iconshanchu"></use>
+            </svg>
+          </div>
+        </div>
+        <div v-if="componentSubMap[component.typeCode]" :key="'b' + i">
+          <div
+            v-for="typeCode in componentSubMap[component.typeCode]"
+            :key="typeCode"
+            :class="
+              (activeComponent &&
+              activeComponent === component.subComponents[typeCode]
+                ? 'selected'
+                : '') + ' component-item'
+            "
+            @click.stop="$emit('selectSubComponent', { i, typeCode })"
+          >
+            <svg
+              class="icon icon-avatar"
+              aria-hidden="true"
+              :style="`color:${component.color}`"
+            >
+              <use xlink:href="#icondian"></use>
+            </svg>
+            <span>{{ subComponentTypes[typeCode] }}</span>
+            <div
+              :title="
+                `${required[component.typeCode + '_' + typeCode] ? '必要' : ''}`
+              "
+            >
+              <svg
+                class="icon btn"
+                :style="
+                  `margin-left: 16px;cursor: ${
+                    required[component.typeCode + '_' + typeCode]
+                      ? 'not-allowed'
+                      : 'pointer'
+                  };`
+                "
+                @click="
+                  required[component.typeCode + '_' + typeCode]
+                    ? void 0
+                    : $emit('toggleSubComponent', { i, typeCode })
+                "
+              >
+                <use
+                  :xlink:href="
+                    component.subComponents[typeCode]
+                      ? '#iconquanxuanze'
+                      : '#iconquan'
+                  "
+                ></use>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </draggable>
@@ -44,8 +96,26 @@
 <script>
 import draggable from "vuedraggable";
 export default {
-  props: ["list", "activeComponent", "logos", "componentTypes"],
+  props: [
+    "list",
+    "activeComponent",
+    "logos",
+    "componentTypes",
+    "componentSubMap",
+    "subComponentTypes",
+  ],
   components: { draggable },
+  data() {
+    return {
+      required: {
+        facility_signImage_logo: true,
+        facility_signImage_direction: true,
+        brand_signImage_direction: true,
+        position__signImage_direction: true,
+      },
+    };
+  },
+  computed: {},
   methods: {},
 };
 </script>

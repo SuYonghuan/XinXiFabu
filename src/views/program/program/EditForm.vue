@@ -126,7 +126,7 @@
                       :i="i"
                       :j="j"
                       :component="subComponent"
-                      :key="i + '_' + j"
+                      :key="i + '*' + j"
                       @dragend="handleDragend"
                       @transformend="handleTransformEnd"
                     ></container-rect>
@@ -134,7 +134,7 @@
                       :form="form"
                       :component="subComponent"
                       :i="i"
-                      :key="i + '_' + j + '_innerImage'"
+                      :key="i + '*' + j + '_innerImage'"
                     ></inner-image>
                   </template>
                   <template v-else>
@@ -143,7 +143,7 @@
                       :i="i"
                       :j="j"
                       :component="subComponent"
-                      :key="i + '_' + j"
+                      :key="i + '*' + j"
                       @dragend="handleDragend"
                       @transformend="handleTransformEnd"
                     ></container-rect>
@@ -151,7 +151,7 @@
                       :form="form"
                       :component="subComponent"
                       :i="i"
-                      :key="i + '_' + j + '_text'"
+                      :key="i + '*' + j + '_text'"
                       :subComponentTypes="subComponentTypes"
                       :componentTypes="componentTypes"
                     >
@@ -212,9 +212,13 @@
             :list="form.components"
             :activeComponent="activeComponent"
             :componentTypes="componentTypes"
+            :componentSubMap="componentSubMap"
+            :subComponentTypes="subComponentTypes"
             @selectBg="activeComponent = null"
             @remove="removeComponent"
             @selectComponent="setActiveComponent"
+            @selectSubComponent="setActiveSubComponent"
+            @toggleSubComponent="toggleSubComponent"
           ></component-list>
         </div>
         <div class="r2">
@@ -792,6 +796,7 @@ import createComponent, {
   weatherStyles,
   clockStyles,
   componentSubMap,
+  typeCodeClassMap,
 } from "./Component.js";
 import defaultLogo from "./defaultLogo.svg";
 import defaultArrow from "./defaultArrow.svg";
@@ -806,9 +811,9 @@ const logos = {
   url: "#iconlianjie",
   video: "#iconshipin",
   weather: "#icontianqi-1",
-  facility: "#icontianqi-1",
-  brand: "#icontianqi-1",
-  position: "#icontianqi-1",
+  facility: "#iconsheshi",
+  brand: "#iconpinpai",
+  position: "#icondianwei",
 };
 const componentKeys = [
   "code",
@@ -1091,8 +1096,8 @@ export default {
       this.updateTransformer();
     },
     getComponentByName(name) {
-      const nameArr = name.split("_");
-      const component = !name.startsWith("name_")
+      const nameArr = name.split("*");
+      const component = !name.startsWith("name*")
         ? null
         : nameArr.length === 3
         ? this.form.components[nameArr[1]].subComponents[nameArr[2]]
@@ -1144,7 +1149,12 @@ export default {
     },
     setActiveComponent(i) {
       this.activeComponent = this.form.components[i];
-      this.selectedShapeName = "name_" + i;
+      this.selectedShapeName = "name*" + i;
+      this.updateTransformer();
+    },
+    setActiveSubComponent({ i, typeCode }) {
+      this.activeComponent = this.form.components[i].subComponents[typeCode];
+      this.selectedShapeName = "name*" + i + "*" + typeCode;
       this.updateTransformer();
     },
     appendComponent(typeCode) {
@@ -1217,14 +1227,14 @@ export default {
       this.form.components.push(component);
       this.attachImage(component);
       component.subComponents &&
-        component.subComponents.forEach((subComponent) =>
+        Object.values(component.subComponents).forEach((subComponent) =>
           this.attachImage(subComponent)
         );
       this.form = {
         ...this.form,
       };
       this.$nextTick(() => {
-        this.selectedShapeName = "name_" + (this.form.components.length - 1);
+        this.selectedShapeName = "name*" + (this.form.components.length - 1);
         this.updateTransformer();
       });
     },
@@ -1240,6 +1250,26 @@ export default {
         this.updateTransformer();
         this.setComponents();
       });
+    },
+    toggleSubComponent({ i, typeCode }) {
+      if (this.form.components[i].subComponents[typeCode]) {
+        delete this.form.components[i].subComponents[typeCode];
+        this.activeComponent = null;
+        this.selectedShapeName = "";
+      } else {
+        const zIndex = i;
+        const color = this.form.components[i].color;
+        const subComponent = new typeCodeClassMap[typeCode]({
+          typeCode,
+          zIndex,
+          color,
+        });
+        this.form.components[i].subComponents[typeCode] = subComponent;
+        this.activeComponent = subComponent;
+        this.selectedShapeName = "name*" + i + "*" + typeCode;
+      }
+      this.updateTransformer();
+      this.setComponents();
     },
     async submit() {
       if (this.form.duration === "00:00:00")

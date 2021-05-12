@@ -6,6 +6,62 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "21527207",
+      "name": "点",
+      "font_class": "dian",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
+      "icon_id": "21527208",
+      "name": "圈",
+      "font_class": "quan",
+      "unicode": "e679",
+      "unicode_decimal": 59001
+    },
+    {
+      "icon_id": "21527209",
+      "name": "设施",
+      "font_class": "sheshi",
+      "unicode": "e67a",
+      "unicode_decimal": 59002
+    },
+    {
+      "icon_id": "21527210",
+      "name": "圈选择",
+      "font_class": "quanxuanze",
+      "unicode": "e67b",
+      "unicode_decimal": 59003
+    },
+    {
+      "icon_id": "21527211",
+      "name": "品牌",
+      "font_class": "pinpai",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    },
+    {
+      "icon_id": "21527217",
+      "name": "点位",
+      "font_class": "dianwei",
+      "unicode": "e67d",
+      "unicode_decimal": 59005
+    },
+    {
+      "icon_id": "21004047",
+      "name": "播放",
+      "font_class": "bofang",
+      "unicode": "e676",
+      "unicode_decimal": 58998
+    },
+    {
+      "icon_id": "21004048",
+      "name": "暂停",
+      "font_class": "zanting",
+      "unicode": "e677",
+      "unicode_decimal": 58999
+    },
+    {
       "icon_id": "20927083",
       "name": "复制",
       "font_class": "fuzhi",

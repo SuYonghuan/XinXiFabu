@@ -1,6 +1,6 @@
 <template>
   <v-image
-    :name="'name_' + i"
+    :name="'name*' + i"
     :config="{
       x: component.offsetX,
       y: component.offsetY,
