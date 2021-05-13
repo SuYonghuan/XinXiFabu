@@ -832,6 +832,7 @@ export default {
     handleResolutionChange() {
       if (this.form.playMode === "carousel") {
         this.form.playList = [];
+        this.currentPlayList = null;
       } else this.form.programme = null;
       this.getPrograms();
     },
@@ -869,6 +870,7 @@ export default {
     handlePlayModeChange(key) {
       if (key === "carousel") {
         this.form.playList = [];
+        this.currentPlayList = null;
       } else if (key === "customize") {
         this.form.ranges = {};
         this.monthKeys = {
