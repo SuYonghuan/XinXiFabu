@@ -58,7 +58,7 @@ class UrlComponent extends BaseComponent {
 class TextComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color, j }) {
     super({ typeCode, zIndex, color, j })
-    this.backgroundColor = j === undefined ? "#FFFFFF" : null;
+    this.backgroundColor = (typeCode === 'signTxt_distance' || typeCode === 'signTxt_time' || typeCode === 'signTxt_name') ? null : "#FFFFFF";
     this.backgroundOpacity = 100;
     this.fontColor = "#000000";
     this.fontSize = 24;

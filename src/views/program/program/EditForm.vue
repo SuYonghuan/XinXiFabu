@@ -937,11 +937,33 @@ const componentKeys = [
   "materials",
   "bindingCode",
   "bindingName",
+  "subComponents",
 ];
-const flatenComponent = ({ config, ...component }) => {
-  if (!config) return { ...component };
-  return { ...component, ...config };
+const toObj = (acc, [k, v]) => ({ ...acc, [k]: v });
+const flatenComponent = ({ config, subComponents, ...component }) => {
+  let result = !config ? { ...component } : { ...component, ...config };
+  if (subComponents) {
+    result.subComponents = Object.entries(subComponents)
+      .map(([k, component]) => [k, flatenComponent(component)])
+      .reduce(toObj, {});
+  }
+  return result;
 };
+const seperateConfig = (component) =>
+  Object.entries(component).reduce(
+    (acc, [k, v]) =>
+      componentKeys.includes(k)
+        ? k === "subComponents"
+          ? {
+              ...acc,
+              [k]: Object.entries(v)
+                .map(([kk, vv]) => [kk, seperateConfig(vv)])
+                .reduce(toObj, {}),
+            }
+          : { ...acc, [k]: v }
+        : { ...acc, config: { ...acc.config, [k]: v } },
+    { config: {} }
+  );
 
 export default {
   components: {
@@ -1410,6 +1432,7 @@ export default {
         backgroundMaterial,
         components,
       } = this.form;
+
       const { code, msg } = await ProgramApi.put({
         programCode: this.form.code,
         duration,
@@ -1418,15 +1441,7 @@ export default {
         components: components
           ? components
               .map(({ color, image, ...component }) => component)
-              .map((component) =>
-                Object.entries(component).reduce(
-                  (acc, [k, v]) =>
-                    componentKeys.includes(k)
-                      ? { ...acc, [k]: v }
-                      : { ...acc, config: { ...acc.config, [k]: v } },
-                  { config: {} }
-                )
-              )
+              .map(seperateConfig)
               .map((component, i) => ({
                 ...component,
                 materials: component.materials.map(({ code }) => code),
@@ -1527,10 +1542,7 @@ export default {
       }
     },
   },
-  mounted() {
-    this.init();
-  },
-  async created() {
+  async mounted() {
     const [
       componentTypes,
       subComponentTypes,
@@ -1551,6 +1563,7 @@ export default {
       logoThemes,
       arrowThemes,
     });
+    this.init();
   },
 };
 </script>
