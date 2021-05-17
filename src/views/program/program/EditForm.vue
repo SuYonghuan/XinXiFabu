@@ -808,7 +808,8 @@ import createComponent, {
   componentSubMap,
   typeCodeClassMap,
 } from "./Component.js";
-import defaultLogo from "./defaultLogo.svg";
+import defaultBrand from "./defaultBrand.svg";
+import defaultFac from "./defaultFac.svg";
 import defaultArrow from "./defaultArrow.svg";
 
 const logos = {
@@ -963,7 +964,7 @@ export default {
     },
   },
   methods: {
-    attachImage(component) {
+    attachImage(component, parent) {
       if (
         component &&
         (component.typeCode === "image" || component.typeCode === "video")
@@ -1007,7 +1008,7 @@ export default {
           component.image = image;
           this.setComponents();
         };
-        image.src = defaultLogo;
+        image.src = parent.typeCode === "brand" ? defaultBrand : defaultFac;
       }
       if (component && component.typeCode === "signImage_direction") {
         const image = new Image();
@@ -1131,7 +1132,6 @@ export default {
       });
       target.scaleX(1);
       target.scaleY(1);
-      console.log(name);
       if (component.typeCode === "text")
         component.fontSize = Math.min(component.height, component.fontSize);
       this.setComponents();
@@ -1238,7 +1238,7 @@ export default {
       this.attachImage(component);
       component.subComponents &&
         Object.values(component.subComponents).forEach((subComponent) =>
-          this.attachImage(subComponent)
+          this.attachImage(subComponent, component)
         );
       this.form = {
         ...this.form,
@@ -1385,7 +1385,6 @@ export default {
       this.attachImage(this.activeComponent);
     },
     preview() {
-      console.log("showPreview");
       this.showPreview = true;
     },
   },
