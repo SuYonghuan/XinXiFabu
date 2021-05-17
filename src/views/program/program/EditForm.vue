@@ -607,62 +607,70 @@
               <el-form-item class="item" label="图标主题">
                 <el-select v-model="activeComponent.logoTheme">
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in logoThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item class="item" label="箭头主题">
                 <el-select v-model="activeComponent.arrowTheme">
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in arrowThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item class="item" label="方向主题">
-                <el-select v-model="activeComponent.dirTheme">
+                <el-select
+                  v-model="activeComponent.dirTheme"
+                  placeholder="默认8方向"
+                >
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in dirThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
             </template>
             <template v-else-if="activeComponent.typeCode === 'brand'">
               <el-form-item class="item" label="品牌选择">
-                <el-select v-model="activeComponent.bindingCode">
-                  <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
-                  ></el-option>
-                </el-select>
+                <el-input
+                  :value="activeComponent.bindingName"
+                  readonly
+                  placeholder="请选择"
+                  @focus="
+                    showSelectBrands = true;
+                    getBrands();
+                  "
+                >
+                </el-input>
               </el-form-item>
               <el-form-item class="item" label="箭头主题">
                 <el-select v-model="activeComponent.arrowTheme">
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in arrowThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item class="item" label="方向主题">
-                <el-select v-model="activeComponent.dirTheme">
+                <el-select
+                  v-model="activeComponent.dirTheme"
+                  placeholder="默认8方向"
+                >
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in dirThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -681,20 +689,23 @@
               <el-form-item class="item" label="箭头主题">
                 <el-select v-model="activeComponent.arrowTheme">
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in arrowThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
               <el-form-item class="item" label="方向主题">
-                <el-select v-model="activeComponent.dirTheme">
+                <el-select
+                  v-model="activeComponent.dirTheme"
+                  placeholder="默认8方向"
+                >
                   <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
+                    :key="theme.code"
+                    :value="theme.code"
+                    :label="theme.name"
+                    v-for="theme in dirThemes"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -824,6 +835,38 @@
         "
         >{{ facility.name }}</el-button
       >
+    </el-dialog>
+    <el-dialog append-to-body :visible.sync="showSelectBrands" title="品牌列表">
+      <el-input
+        placeholder="搜索品牌名称"
+        v-model="brandQ"
+        suffix-icon="el-icon-search"
+        style="margin-bottom: 40px;"
+        clearable
+        @input="getBrands"
+      ></el-input>
+      <el-tabs v-model="brandTab">
+        <el-tab-pane
+          v-for="floor in brandsGroupByFloor"
+          :key="floor.floorName"
+          :label="floor.floorName"
+          :name="floor.floorName"
+        >
+          <el-button
+            plain
+            v-for="brand in floor.list"
+            :key="brand.code"
+            @click="
+              activeComponent.bindingCode = brand.code;
+              activeComponent.bindingName = brand.name;
+              brandQ = '';
+              brandTab = '';
+              showSelectBrands = false;
+            "
+            >{{ brand.name }}</el-button
+          ></el-tab-pane
+        >
+      </el-tabs>
     </el-dialog>
     <el-dialog
       fullscreen
@@ -991,7 +1034,19 @@ export default {
       Image,
       showPreview: false,
       previewKey: null,
+      logoThemes: [],
+      arrowThemes: [],
+      dirThemes: [
+        { code: 8, name: "八方向" },
+        { code: 12, name: "十二方向" },
+      ],
       ...{ showSelectFacilities: false, facilityQ: "", facilities: [] },
+      ...{
+        showSelectBrands: false,
+        brandQ: "",
+        brandsGroupByFloor: [],
+        brandTab: "",
+      },
     };
   },
   computed: {
@@ -1023,6 +1078,12 @@ export default {
     },
   },
   methods: {
+    async getBrands() {
+      this.brandsGroupByFloor = await ProgramApi.getBrands(this.brandQ);
+      this.brandTab = this.brandsGroupByFloor[0]
+        ? this.brandsGroupByFloor[0].floorName
+        : "";
+    },
     attachImage(component, parent) {
       if (
         component &&
@@ -1470,11 +1531,26 @@ export default {
     this.init();
   },
   async created() {
-    const [componentTypes, subComponentTypes] = await Promise.all([
+    const [
+      componentTypes,
+      subComponentTypes,
+      facilities,
+      logoThemes,
+      arrowThemes,
+    ] = await Promise.all([
       ProgramApi.getComponentTypes(),
       ProgramApi.getSubComponentTypes(),
+      ProgramApi.getFacilities(),
+      ProgramApi.getLogoThemes(),
+      ProgramApi.getArrowThemes(),
     ]);
-    Object.assign(this, { componentTypes, subComponentTypes });
+    Object.assign(this, {
+      componentTypes,
+      subComponentTypes,
+      facilities,
+      logoThemes,
+      arrowThemes,
+    });
   },
 };
 </script>

@@ -41,6 +41,28 @@ export class ProgramApi {
         ProgramApi.subComponentTypes = data
         return data;
     };
+    static async getFacilities() {
+        if (ProgramApi.facilities) return ProgramApi.facilities
+        const { data } = await cPost(`/Api/Programme/GroupDataList`)({ dataKey: "facility" })
+        ProgramApi.subComponentTypes = data
+        return data;
+    }
+    static async getLogoThemes() {
+        if (ProgramApi.logoThemes) return ProgramApi.logoThemes
+        const { data } = await cPost(`/Api/Programme/GroupDataList`)({ dataKey: "signtheme" })
+        ProgramApi.logoThemes = data
+        return data;
+    }
+    static async getArrowThemes() {
+        if (ProgramApi.arrowThemes) return ProgramApi.arrowThemes
+        const { data } = await cPost(`/Api/Programme/GroupDataList`)({ dataKey: "arrow" })
+        ProgramApi.arrowThemes = data
+        return data;
+    }
+    static async getBrands(name) {
+        const { data } = await cPost(`/Api/Programme/GroupDataList`)({ dataKey: "shop", name })
+        return data;
+    }
     static getMaterials = cPost('/Api/Programme/ComponentMaterials');
 }
 
