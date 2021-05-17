@@ -76,13 +76,6 @@
           }}</el-link>
         </template>
       </el-table-column>
-      <el-table-column label="包含节目组" width="100px">
-        <template slot-scope="scope">
-          <el-link type="primary" @click="handleEditGroup(scope.row)">{{
-            scope.row.pgCount
-          }}</el-link>
-        </template>
-      </el-table-column>
       <el-table-column prop="founderName" label="创建用户"></el-table-column>
       <el-table-column prop="addTime" width="160px" label="创建时间">
         <template slot-scope="scope">
