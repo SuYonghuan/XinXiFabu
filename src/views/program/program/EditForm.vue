@@ -596,7 +596,16 @@
             </template>
             <template v-else-if="activeComponent.typeCode === 'facility'">
               <el-form-item class="item" label="设施选择">
-                <el-select v-model="activeComponent.bindingCode">
+                <el-input
+                  :value="activeComponent.bindingName"
+                  readonly
+                  placeholder="请选择"
+                  @focus="showSelectFacilities = true"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item class="item" label="图标主题">
+                <el-select v-model="activeComponent.logoTheme">
                   <el-option
                     :key="key"
                     :value="key"
@@ -605,8 +614,8 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item class="item" label="图标主题">
-                <el-select v-model="activeComponent.logoTheme">
+              <el-form-item class="item" label="箭头主题">
+                <el-select v-model="activeComponent.arrowTheme">
                   <el-option
                     :key="key"
                     :value="key"
@@ -637,6 +646,16 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
+              <el-form-item class="item" label="箭头主题">
+                <el-select v-model="activeComponent.arrowTheme">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item class="item" label="方向主题">
                 <el-select v-model="activeComponent.dirTheme">
                   <el-option
@@ -651,6 +670,16 @@
             <template v-else-if="activeComponent.typeCode === 'position'">
               <el-form-item class="item" label="地图选点">
                 <el-select v-model="activeComponent.bindingCode">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in []"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="箭头主题">
+                <el-select v-model="activeComponent.arrowTheme">
                   <el-option
                     :key="key"
                     :value="key"
@@ -768,6 +797,33 @@
           :data="previewMaterial.fileUrl"
         ></object>
       </template>
+    </el-dialog>
+    <el-dialog
+      append-to-body
+      :visible.sync="showSelectFacilities"
+      title="设施列表"
+    >
+      <el-input
+        placeholder="搜索设施名称"
+        v-model="facilityQ"
+        suffix-icon="el-icon-search"
+        style="margin-bottom: 40px;"
+        clearable
+      ></el-input>
+      <el-button
+        plain
+        v-for="facility in facilities.filter(({ name }) =>
+          name.includes(facilityQ)
+        )"
+        :key="facility.code"
+        @click="
+          activeComponent.bindingCode = facility.code;
+          activeComponent.bindingName = facility.name;
+          facilityQ = '';
+          showSelectFacilities = false;
+        "
+        >{{ facility.name }}</el-button
+      >
     </el-dialog>
     <el-dialog
       fullscreen
@@ -921,18 +977,21 @@ export default {
       componentTypes: {},
       subComponentTypes: {},
       componentSubMap,
-      showSelectMaterial: false,
-      materials: [],
-      q: "",
-      pageIndex: 1,
-      total: 0,
-      showMaterialPreview: false,
-      previewMaterial: null,
+      ...{
+        showSelectMaterial: false,
+        materials: [],
+        q: "",
+        pageIndex: 1,
+        total: 0,
+        showMaterialPreview: false,
+        previewMaterial: null,
+      },
       selectedShapeName: "",
       backgroundImage: null,
       Image,
       showPreview: false,
       previewKey: null,
+      ...{ showSelectFacilities: false, facilityQ: "", facilities: [] },
     };
   },
   computed: {

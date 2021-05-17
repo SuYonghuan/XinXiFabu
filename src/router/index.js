@@ -104,21 +104,6 @@ const routes = [
         component: () => import('views/device/device-group'),
       },
       {
-        path: '/program/program-list',
-        name: '节目管理列表',
-        component: () => import('views/program/program-list'),
-      },
-      {
-        path: '/program/program-group',
-        name: '节目组管理',
-        component: () => import('views/program/program-group'),
-      },
-      {
-        path: '/program/news',
-        name: '插播管理',
-        component: () => import('views/program/news'),
-      },
-      {
         path: '/app/app-list',
         name: '我的应用',
         component: () => import('views/app/app-list'),

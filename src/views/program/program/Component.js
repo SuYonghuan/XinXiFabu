@@ -99,6 +99,7 @@ class SignComponent extends BaseComponent {
     this.bindingCode = null;
     this.bindingName = null;
     this.dirTheme = null;
+    this.arrowTheme = null;
     this.subComponents = componentSubMap[typeCode].map((code, j) => new (typeCodeClassMap[code])({ typeCode: code, j, color })).reduce((acc, nxt) => ({ ...acc, [nxt.typeCode]: nxt }), {});
     if (typeCode !== 'position') this.logoTheme = null;
   }
