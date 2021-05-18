@@ -1108,6 +1108,7 @@ export default {
         : "";
     },
     attachImage(component, parent) {
+      if (component.image) delete component.image;
       if (
         component &&
         (component.typeCode === "image" || component.typeCode === "video")
@@ -1476,11 +1477,23 @@ export default {
           };
         }
         if (!this.form.components) this.form.components = [];
-        this.form.components = this.form.components.map(flatenComponent);
         this.form.components.forEach((component) => {
           component.color = this.colors[this.colorIndex];
-          this.attachImage(component);
+          if (component.subComponents) {
+            component.subComponents.forEach((subComponent) => {
+              subComponent.color = this.colors[this.colorIndex];
+            });
+          }
           this.colorIndex++;
+        });
+        this.form.components = this.form.components.map(flatenComponent);
+        this.form.components.forEach((component) => {
+          this.attachImage(component);
+          if (component.subComponents) {
+            Object.values(component.subComponents).forEach((subComponent) => {
+              this.attachImage(subComponent, component);
+            });
+          }
         });
       } else {
         this.$message({ type: "error", message: msg });
