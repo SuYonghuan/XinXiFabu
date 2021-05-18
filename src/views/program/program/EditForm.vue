@@ -939,13 +939,16 @@ const componentKeys = [
   "bindingName",
   "subComponents",
 ];
-const toObj = (acc, [k, v]) => ({ ...acc, [k]: v });
+
 const flatenComponent = ({ config, subComponents, ...component }) => {
   let result = !config ? { ...component } : { ...component, ...config };
   if (subComponents) {
-    result.subComponents = Object.entries(subComponents)
-      .map(([k, component]) => [k, flatenComponent(component)])
-      .reduce(toObj, {});
+    result.subComponents = subComponents
+      .map(flatenComponent)
+      .reduce(
+        (acc, component) => ({ ...acc, [component.typeCode]: component }),
+        {}
+      );
   }
   return result;
 };
@@ -956,9 +959,7 @@ const seperateConfig = (component) =>
         ? k === "subComponents"
           ? {
               ...acc,
-              [k]: Object.entries(v)
-                .map(([kk, vv]) => [kk, seperateConfig(vv)])
-                .reduce(toObj, {}),
+              [k]: Object.values(v).map(seperateConfig),
             }
           : { ...acc, [k]: v }
         : { ...acc, config: { ...acc.config, [k]: v } },
