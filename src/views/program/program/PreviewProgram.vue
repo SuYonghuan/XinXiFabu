@@ -92,29 +92,7 @@
               component.materials &&
               component.materials.length
           "
-          :style="{
-            fontSize:
-              (component.config ? component.config : component).fontSize + 'px',
-            color: (component.config ? component.config : component).fontColor,
-            lineHeight: 1,
-            fontWeight: (component.config
-              ? component.config
-              : component
-            ).fontStyle.includes('加粗')
-              ? 'bold'
-              : 'normal',
-            fontStyle: (component.config
-              ? component.config
-              : component
-            ).fontStyle.includes('斜体')
-              ? 'italic'
-              : 'normal',
-            top: component.offsetY + 'px',
-            left: component.offsetX + 'px',
-            width: component.width + 'px',
-            height: component.height + 'px',
-            zIndex: 1000 + i,
-          }"
+          :style="textComponentStyle(component, i)"
         >
           <div
             :style="{
@@ -123,6 +101,7 @@
               left: 0,
               right: 0,
               bottom: 0,
+              zIndex: -1,
               background: (component.config ? component.config : component)
                 .backgroundColor,
               opacity:
@@ -130,7 +109,36 @@
                   .backgroundOpacity + '%',
             }"
           ></div>
+          <template
+            v-if="
+              (component.config ? component.config : component).animation ===
+                '自动'
+            "
+          >
+            <span
+              style="white-space: nowrap;"
+              v-if="
+                component.materials[0].text.length *
+                  (component.config ? component.config : component).fontSize <
+                  component.width
+              "
+              >{{ component.materials[0].text }}</span
+            >
+            <v-text-marquee
+              v-else
+              :content="component.materials[0].text"
+            ></v-text-marquee>
+          </template>
+          <span
+            style="white-space: nowrap;"
+            v-else-if="
+              (component.config ? component.config : component).animation ===
+                '固定'
+            "
+            >{{ component.materials[0].text }}</span
+          >
           <v-text-marquee
+            v-else
             :content="component.materials[0].text"
           ></v-text-marquee>
         </div>
@@ -281,6 +289,32 @@ export default {
   },
 
   methods: {
+    textComponentStyle(component, i) {
+      return {
+        fontSize:
+          (component.config ? component.config : component).fontSize + "px",
+        color: (component.config ? component.config : component).fontColor,
+        lineHeight: 1,
+        fontWeight: (component.config
+          ? component.config
+          : component
+        ).fontStyle.includes("加粗")
+          ? "bold"
+          : "normal",
+        fontStyle: (component.config
+          ? component.config
+          : component
+        ).fontStyle.includes("斜体")
+          ? "italic"
+          : "normal",
+        top: component.offsetY + "px",
+        left: component.offsetX + "px",
+        width: component.width + "px",
+        height: component.height + "px",
+        zIndex: 1000 + i,
+        overflow: "hidden",
+      };
+    },
     handleError(e, component, i) {
       const video = e.target;
       const mat = component.materials[this.handle[i]];
