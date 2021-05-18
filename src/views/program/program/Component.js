@@ -1,3 +1,4 @@
+import { ProgramApi } from "../program.js";
 export const weatherStyles = [
   { type: 0, width: 500, height: 80 },
   { type: 1, width: 400, height: 80 },
@@ -98,10 +99,27 @@ class SignComponent extends BaseComponent {
     delete this.height;
     this.bindingCode = null;
     this.bindingName = null;
-    this.dirTheme = null;
-    this.arrowTheme = null;
+
+    this.dirTheme = '8';
+    this.arrowTheme = null
+    ProgramApi.getArrowThemes().then(themes => {
+      themes.forEach(theme => {
+        if (theme.readOnly) {
+          this.arrowTheme = theme.code;
+        }
+      });
+    })
     this.subComponents = componentSubMap[typeCode].map((code, j) => new (typeCodeClassMap[code])({ typeCode: code, j, color })).reduce((acc, nxt) => ({ ...acc, [nxt.typeCode]: nxt }), {});
-    if (typeCode !== 'position') this.logoTheme = null;
+    if (typeCode !== 'position') {
+      this.logoTheme = null
+      ProgramApi.getLogoThemes().then(themes => {
+        themes.forEach(theme => {
+          if (theme.readOnly) {
+            this.logoTheme = theme.code;
+          }
+        });
+      })
+    }
   }
 }
 export const typeCodeClassMap = {

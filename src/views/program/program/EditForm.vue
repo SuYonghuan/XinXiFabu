@@ -1060,8 +1060,8 @@ export default {
       logoThemes: [],
       arrowThemes: [],
       dirThemes: [
-        { code: 8, name: "八方向" },
-        { code: 12, name: "十二方向" },
+        { code: "8", name: "八方向" },
+        { code: "12", name: "十二方向" },
       ],
       ...{ showSelectFacilities: false, facilityQ: "", facilities: [] },
       ...{
