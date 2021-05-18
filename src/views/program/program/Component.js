@@ -65,7 +65,7 @@ class TextComponent extends BaseComponent {
     this.fontSize = 24;
     this.fontStyle = "正常";
     this.animationSpeed = "中等";
-    this.animation = "从左往右";
+    this.animation = (typeCode === 'signTxt_distance' || typeCode === 'signTxt_time' || typeCode === 'signTxt_name') ? '自动' : "从左往右";
     this.materials = [];
   }
 }

@@ -479,7 +479,7 @@
                     :key="key"
                     :value="key"
                     :label="key"
-                    v-for="key in ['从左往右', '从右往左']"
+                    v-for="key in ['自动', '固定', '从右往左']"
                   ></el-option>
                 </el-select>
               </el-form-item>
