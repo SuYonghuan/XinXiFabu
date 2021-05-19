@@ -94,7 +94,7 @@
           </div>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="节目列表" name="2">
+      <!-- <el-tab-pane label="节目列表" name="2">
         <p>节目发布类型：</p>
         <div class="program-list">
           <el-card class="box-card program-item" v-for="item of programData">
@@ -111,7 +111,7 @@
             </p>
           </el-card>
         </div>
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane label="管理部门列表" name="3">
         <el-table :data="departmentData">
           <el-table-column type="index" label="序号"></el-table-column>
