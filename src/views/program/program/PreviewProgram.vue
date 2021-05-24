@@ -63,6 +63,23 @@
             />
           </el-carousel-item>
         </el-carousel>
+        <div
+          :key="i"
+          class="sign-img"
+          v-else-if="
+            component.typeCode.includes('signImage') &&
+              component.materials &&
+              component.materials.length
+          "
+          :style="{
+            top: component.offsetY + 'px',
+            left: component.offsetX + 'px',
+            width: component.width + 'px',
+            height: component.height + 'px',
+            zIndex: 1000 + i,
+            backgroundImage: `url(${component.materials[0].fileUrl})`,
+          }"
+        ></div>
         <video
           :key="i"
           class="component"
@@ -88,7 +105,8 @@
           :key="i"
           class="component"
           v-else-if="
-            component.typeCode === 'text' &&
+            (component.typeCode === 'text' ||
+              component.typeCode.includes('signTxt')) &&
               component.materials &&
               component.materials.length
           "
@@ -294,7 +312,7 @@ export default {
         fontSize:
           (component.config ? component.config : component).fontSize + "px",
         color: (component.config ? component.config : component).fontColor,
-        lineHeight: 1,
+        lineHeight: component.height + "px",
         fontWeight: (component.config
           ? component.config
           : component
@@ -313,6 +331,7 @@ export default {
         height: component.height + "px",
         zIndex: 1000 + i,
         overflow: "hidden",
+        textAlign: "center",
       };
     },
     handleError(e, component, i) {
@@ -456,6 +475,11 @@ export default {
       overflow: hidden;
       pointer-events: none;
     }
+  }
+  .sign-img {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }
 </style>

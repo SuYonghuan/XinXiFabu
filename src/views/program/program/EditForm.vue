@@ -871,7 +871,6 @@
     <el-dialog
       fullscreen
       append-to-body
-      :program="form"
       class="preview-program"
       :visible.sync="showPreview"
     >
@@ -883,7 +882,7 @@
           previewKey = null;
         "
         v-if="showPreview"
-        :program="form"
+        :program="previewForm"
       ></preview-program>
     </el-dialog>
   </div>
@@ -1070,6 +1069,7 @@ export default {
         brandsGroupByFloor: [],
         brandTab: "",
       },
+      previewForm: null,
     };
   },
   computed: {
@@ -1425,17 +1425,14 @@ export default {
       this.updateTransformer();
       this.setComponents();
     },
-    async submit() {
-      if (this.form.duration === "00:00:00")
-        return this.$message({ type: "error", message: "节目时长不能为0" });
+    form2Body() {
       const {
         duration,
         backgroundColor,
         backgroundMaterial,
         components,
       } = this.form;
-
-      const { code, msg } = await ProgramApi.put({
+      return {
         programCode: this.form.code,
         duration,
         backgroundColor,
@@ -1450,7 +1447,12 @@ export default {
                 zIndex: i,
               }))
           : [],
-      });
+      };
+    },
+    async submit() {
+      if (this.form.duration === "00:00:00")
+        return this.$message({ type: "error", message: "节目时长不能为0" });
+      const { code, msg } = await ProgramApi.put(this.form2Body());
       if (code === "200") {
         this.$message({ type: "success", message: msg });
         this.$emit("saved");
@@ -1533,8 +1535,33 @@ export default {
       this.activeComponent.materials = [...this.activeComponent.materials];
       this.attachImage(this.activeComponent);
     },
-    preview() {
-      this.showPreview = true;
+    async preview() {
+      if (
+        this.form.components.find(
+          ({ typeCode }) =>
+            typeCode === "facility" ||
+            typeCode === "brand" ||
+            typeCode === "position"
+        )
+      ) {
+        const { code, data, msg } = await ProgramApi.preview({
+          ...this.form2Body(),
+          devCode: "a",
+        });
+        if (code === "200") {
+          this.previewForm = {
+            ...data,
+            width: this.form.width,
+            height: this.form.height,
+          };
+          this.showPreview = true;
+        } else {
+          this.$message({ type: "error", message: msg });
+        }
+      } else {
+        this.previewForm = this.form;
+        this.showPreview = true;
+      }
     },
   },
   watch: {
