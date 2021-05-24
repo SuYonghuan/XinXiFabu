@@ -13,7 +13,6 @@
     <el-tree
       v-if="deviceQueryType === 'group'"
       :data="devices"
-      default-expand-all
       show-checkbox
       @check="handleDeviceCheck"
     ></el-tree>
