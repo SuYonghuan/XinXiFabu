@@ -95,7 +95,13 @@
                :before-close="handleClose" append-to-body>
       <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
         <el-form-item label="商铺名称" prop="name">
-          <el-input type="text" v-model="editForm.name" class="" style="width: 40%" placeholder="请输入中文商铺名称"></el-input>
+          <el-autocomplete
+                  v-model="editForm.name"
+                  :fetch-suggestions="querySearchAsync"
+                  placeholder="请输入中文商铺名称"
+                  :value-key="'name'"
+                  @select="handleSelect"
+          ></el-autocomplete>
           <el-input type="text" v-model="editForm.nameEn" style="width: 40%;margin-left: 10px;"
                     placeholder="请输入英文商铺名称"></el-input>
         </el-form-item>
@@ -202,6 +208,7 @@
     ExportTemplate,
     ImportShopData,
     UpLoadLogoFiles,
+    GetBrandList,
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
@@ -252,6 +259,7 @@
         regionList: [],
         logoData: {},
         loading: false,
+        shopList: [],
 			}
 		},
 		created() {
@@ -510,6 +518,18 @@
           this.$message.error(res.msg);
         })
       },
+      GetBrandList(queryString, cb) {
+        const param = {
+          "name": queryString
+        }
+        GetBrandList(param).then(res => {
+          if (res.code === ERR_OK) {
+            cb(res.data);
+            return
+          }
+          cb([]);
+        })
+      },
 			/**
 			 * End
 			 * @param val
@@ -728,6 +748,18 @@
           this.$message.error('上传失败!');
         }
       },
+      querySearchAsync(queryString, cb) {
+        if ( queryString != undefined && queryString != '' ) {
+          this.GetBrandList(queryString, cb)
+        } else {
+          cb([]);
+        }
+      },
+      handleSelect(item) {
+			  this.editForm.nameEn = item.nameEn
+			  this.editForm.intro = item.intro
+			  this.editForm.introEn = item.introEn
+      }
 		},
 		computed: {
 			...mapGetters(['presentMenu', 'user', 'config'])
