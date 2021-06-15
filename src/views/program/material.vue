@@ -766,35 +766,44 @@ export default {
       });
     },
     async handleDelete(codes) {
-      let { code, msg } = await MaterialApi.delete({ codes });
-      if (code === "200") {
-        this.$message({
-          type: "success",
-          message: msg,
-        });
-        this.getList();
-      } else if (code === "201") {
-        await this.$confirm(msg, "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning",
-        });
-        const res = await MaterialApi.delete({
-          codes,
-          confirm: true,
-        });
-        if (res.code === "200") {
+      try {
+        let { code, msg } = await MaterialApi.delete({ codes });
+        if (code === "200") {
           this.$message({
             type: "success",
-            message: res.msg,
+            message: msg,
           });
           this.getList();
-        } else {
+        } else if (code !== "201") {
           this.$message({
             type: "error",
-            message: res.msg,
+            message: msg,
           });
+        } else {
+          await this.$confirm(msg, "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          });
+          const res = await MaterialApi.delete({
+            codes,
+            confirm: true,
+          });
+          if (res.code === "200") {
+            this.$message({
+              type: "success",
+              message: res.msg,
+            });
+            this.getList();
+          } else {
+            this.$message({
+              type: "error",
+              message: res.msg,
+            });
+          }
         }
+      } catch (error) {
+        console.log(error);
       }
     },
     async bulkDelete() {
