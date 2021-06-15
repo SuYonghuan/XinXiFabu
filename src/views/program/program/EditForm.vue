@@ -454,6 +454,32 @@
               ></mat-list>
             </template>
             <template v-else-if="activeComponent.typeCode === 'video'">
+              <el-form-item class="item" label="显示效果">
+                <el-select v-model="activeComponent.transition">
+                  <el-option
+                    :key="op"
+                    :value="op"
+                    :label="op"
+                    v-for="op in [
+                      '随机',
+                      '马赛克',
+                      '上下滚动',
+                      '左右滚动',
+                      '渐入',
+                    ]"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="切换时间">
+                <el-input-number
+                  v-model="activeComponent.transitionPeriod"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >秒
+              </el-form-item>
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
@@ -743,18 +769,18 @@
           </div>
         </el-alert>
         <video
-          v-if="currentMaterialType === 'video'"
+          v-if="previewMaterial.typeCode === '视频'"
           style="width:100%;min-height:500px;"
           controls
           :src="previewMaterial.fileUrl"
         ></video>
         <img
-          v-else-if="currentMaterialType === 'image'"
+          v-else-if="previewMaterial.typeCode === '图片'"
           style="width:100%;min-height:500px;"
           :src="previewMaterial.fileUrl"
         />
         <audio
-          v-else-if="currentMaterialType === 'audio'"
+          v-else-if="previewMaterial.typeCode === '音频'"
           controls
           :src="previewMaterial.fileUrl"
         ></audio>
@@ -1199,6 +1225,7 @@ export default {
       };
       switch (typeCode) {
         case "image":
+        case "video":
           component.transition = "随机";
           component.transitionPeriod = 15;
           component.materials = [];

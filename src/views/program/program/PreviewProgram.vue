@@ -285,10 +285,15 @@ export default {
       const video = e.target;
       const mat = component.materials[this.handle[i]];
       video.pause();
-      video.poster = videoPlaceHolder;
-      setTimeout(() => {
-        this.handleEnded(e, component, i);
-      }, mat.duration);
+      video.poster = mat.typeCode === "图片" ? mat.fileUrl : videoPlaceHolder;
+      setTimeout(
+        () => {
+          this.handleEnded(e, component, i);
+        },
+        mat.typeCode === "图片"
+          ? (mat.transitionPeriod || 15) * 1000
+          : mat.duration
+      );
     },
     handleEnded(e, component, i) {
       const video = e.target;
@@ -301,10 +306,16 @@ export default {
       const promise = video.play();
       if (promise) {
         promise.catch(() => {
-          video.poster = videoPlaceHolder;
-          setTimeout(() => {
-            this.handleEnded(e, component, i);
-          }, mat.duration);
+          video.poster =
+            mat.typeCode === "图片" ? mat.fileUrl : videoPlaceHolder;
+          setTimeout(
+            () => {
+              this.handleEnded(e, component, i);
+            },
+            mat.typeCode === "图片"
+              ? (mat.transitionPeriod || 15) * 1000
+              : mat.duration
+          );
         });
       }
     },
