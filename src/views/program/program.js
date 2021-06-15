@@ -31,6 +31,7 @@ export class ProgramApi {
     static put = cPost('/Api/Programme/EditProgramme')
     static delete = cPost('/Api/Programme/Del');
     static getResolutions = cPost('/Api/Programme/ResolutionList');
+    static getSchedules = cPost('/Api/Programme/ProgScheduleList');
     static async getComponentTypes() {
         if (ProgramApi.componentTypes) return ProgramApi.componentTypes
         const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "ComponentType" })
