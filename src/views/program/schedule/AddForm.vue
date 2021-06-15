@@ -573,7 +573,7 @@
 </template>
 
 <script>
-import { ScheduleApi } from "../program.js";
+import { ScheduleApi, ProgramApi } from "../program.js";
 import TimeSlider from "./TimeSlider";
 import CopyToWeekday from "./CopyToWeekday";
 import CopyToMonthDay from "./CopyToMonthDay";
@@ -644,17 +644,12 @@ export default {
       monthDayFrom: null,
       editCode: null,
       showEditForm: false,
+      playModes: {},
+      intervalTypes: {},
+      resolutions: {},
     };
   },
-  props: [
-    "code",
-    "playModes",
-    "showAddForm",
-    "intervalTypes",
-    "resolutions",
-    "readonly",
-    "api",
-  ],
+  props: ["code", "showAddForm", "readonly", "api"],
   watch: {
     showAddForm(val) {
       if (val) {
@@ -997,6 +992,16 @@ export default {
         12: [],
       };
       this.q = "";
+      const [
+        playModes,
+        intervalTypes,
+        { data: resolutions },
+      ] = await Promise.all([
+        ScheduleApi.getPlayModes(),
+        ScheduleApi.getIntervalTypes(),
+        ProgramApi.getResolutions(),
+      ]);
+      Object.assign(this, { playModes, intervalTypes, resolutions });
       if (!this.code) {
         this.form = {
           name: "",

@@ -281,10 +281,7 @@
     >
       <add-form
         :readonly="isPreview"
-        :playModes="playModes"
         :showAddForm="showAddForm"
-        :intervalTypes="intervalTypes"
-        :resolutions="resolutions"
         :code="editCode"
         @closeAddForm="showAddForm = false"
         @added="postAdd"

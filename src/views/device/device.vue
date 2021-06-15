@@ -133,6 +133,7 @@
           {{ scope.row.groupList.length }}
         </template>
       </el-table-column>
+      <el-table-column prop="bootTime" label="开机时间"></el-table-column>
       <el-table-column prop="shutdownTime" label="关机时间"></el-table-column>
       <el-table-column
         prop="name"
@@ -221,7 +222,7 @@
                   @click="handleEdit(scope.row, 2)"
                   v-if="pageMenu.devsetshutdowntime"
                 >
-                  关机时间
+                  开关机时间
                 </p>
               </el-dropdown-item>
               <el-dropdown-item
@@ -229,7 +230,7 @@
                   @click="cleanShutTime(scope.row)"
                   v-if="pageMenu.devclearshutdowntime"
                 >
-                  清除关机时间
+                  清除开关机时间
                 </p>
               </el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.devdel"
@@ -281,7 +282,7 @@
           @click="handleEdit(tableChecked, 1)"
           ><svg class="icon" aria-hidden="true">
             <use xlink:href="#iconguanjishijian"></use></svg
-          >关机时间</el-button
+          >开关机时间</el-button
         >
         <el-button
           class="svg-suffix s"
@@ -290,7 +291,7 @@
           @click="cleanShutTime(tableChecked, 1)"
           ><svg class="icon" aria-hidden="true">
             <use xlink:href="#iconqingchuguanjishijian"></use></svg
-          >清除关机时间</el-button
+          >清除开关机时间</el-button
         >
         <el-button
           class="svg-suffix s"
@@ -312,9 +313,9 @@
       ></pagination>
     </el-row>
 
-    <!--  关机时间  -->
+    <!--  开关机时间  -->
     <el-dialog
-      title="关机时间"
+      title="开关机时间"
       :visible.sync="dialogVisible"
       width="50%"
       :before-close="handleClose"
@@ -326,6 +327,15 @@
         :rules="rules1"
         ref="editForm"
       >
+        <el-form-item label="开机时间" prop="bootTime">
+          <el-time-picker
+            v-model="editForm.bootTime"
+            :format="'HH:mm'"
+            :value-format="'HH:mm'"
+            placeholder="开机时间"
+          >
+          </el-time-picker>
+        </el-form-item>
         <el-form-item label="关机时间" prop="shutdownTime">
           <el-time-picker
             v-model="editForm.shutdownTime"
@@ -420,7 +430,7 @@ export default {
       dialogVisible: false,
       nameDialogVisible: false,
       dialogTitle: "新增",
-      editForm: { shutdownTime: "" },
+      editForm: { bootTime: "", shutdownTime: "" },
       formLabelWidth: "120px",
       tableChecked: [],
       status: [
@@ -443,6 +453,9 @@ export default {
         ],
       },
       rules1: {
+        bootTime: [
+          { required: true, message: "请选择开机时间", trigger: "blur" },
+        ],
         shutdownTime: [
           { required: true, message: "请选择关机时间", trigger: "blur" },
         ],
@@ -713,7 +726,7 @@ export default {
       this.dialogVisible = false;
       this.nameDialogVisible = false;
       this.$refs["editForm"].resetFields();
-      this.editForm = { shutdownTime: "" };
+      this.editForm = { bootTime: "", shutdownTime: "" };
     },
     //提交
     submitDownForm(row) {
@@ -728,6 +741,7 @@ export default {
             ids = [this.editForm.code];
           }
           const param = {
+            BootTime: this.editForm.bootTime,
             ShutdownTime: this.editForm.shutdownTime,
             Code: ids,
           };
@@ -860,13 +874,13 @@ export default {
           });
         });
     },
-    //清除关机时间
+    //清除开关机时间
     cleanShutTime(item, type = 0) {
       if (type == 1 && item.length === 0) {
         this.$message.error("请选择您要操作的选项");
         return;
       }
-      this.$confirm("此操作将清除关机时间, 是否继续?", "提示", {
+      this.$confirm("此操作将清除开关机时间, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning",
@@ -988,6 +1002,7 @@ export default {
           "IP地址",
           "屏幕分辨率",
           "楼层",
+          "开机时间",
           "关机时间",
           "设备状态",
           "前端状态",
@@ -998,6 +1013,7 @@ export default {
           "ip",
           "sName",
           "floor",
+          "bootTime",
           "shutdownTime",
           "deviceOnlineTxt",
           "frontOnlineTxt",
