@@ -7,6 +7,8 @@ export class MaterialApi {
     static put = cPost(`/Api/Material/EditMaterial`);
     static delete = cPost('/Api/Material/Del');
     static getAuditList = cPost('/Api/Material/AuditMaterialList');
+    static getProgList = cPost('/Api/Material/MaterialProgList');
+    static deleteMatProgRel = cPost('/Api/Material/MaterialProgDel')
     static audit = cPost('/Api/Material/AuditMaterials');
     static async getMaterialTypes() {
         if (MaterialApi.materialTypes) return MaterialApi.materialTypes
