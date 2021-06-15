@@ -449,7 +449,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="previewMat"
                 @remove="removeMaterial"
-                :limit="10"
+                :limit="50"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -485,7 +485,7 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="previewMat"
                 @remove="removeMaterial"
-                :limit="5"
+                :limit="50"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
