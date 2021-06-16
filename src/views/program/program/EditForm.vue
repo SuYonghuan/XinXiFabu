@@ -1305,7 +1305,7 @@ export default {
         backgroundMaterial,
         components,
       } = this.form;
-      const { code, msg } = await ProgramApi.put({
+      const form = {
         programCode: this.form.code,
         duration,
         backgroundColor,
@@ -1328,11 +1328,36 @@ export default {
                 zIndex: i,
               }))
           : [],
-      });
+      };
+      const { code, msg } = await ProgramApi.put(form);
       if (code === "200") {
         this.$message({ type: "success", message: msg });
         this.$emit("saved");
-      } else this.$message({ type: "error", message: msg });
+      } else if (code !== "201") {
+        this.$message({
+          type: "error",
+          message: msg,
+        });
+      } else {
+        await this.$confirm(msg, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        const res = await ProgramApi.put({ ...form, confirm: true });
+        if (res.code === "200") {
+          this.$message({
+            type: "success",
+            message: res.msg,
+          });
+          this.$emit("saved");
+        } else {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
+        }
+      }
     },
     reset() {
       this.form = null;

@@ -124,6 +124,7 @@
             ]"
             v-for="prog in programs"
             :key="prog.code"
+            @click="!readonly && handleProgram(prog)"
           >
             <div class="left">
               <svg class="icon" aria-hidden="true">
@@ -139,7 +140,6 @@
             </div>
             <div
               v-if="!(form.playMode === 'carousel' && readonly)"
-              @click="!readonly && handleProgram(prog)"
               :class="
                 form.playMode === 'carousel'
                   ? ['right']
@@ -1330,7 +1330,7 @@ export default {
           height: 16px;
           top: 22px;
           right: 22px;
-          background: #f5f8fe;
+          background: #fff;
           border: 1px solid #dadfe6;
           box-sizing: border-box;
           border-radius: 3px;

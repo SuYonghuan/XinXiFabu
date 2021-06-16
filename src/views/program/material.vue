@@ -933,8 +933,15 @@ export default {
       }
     },
     async bulkDelete() {
-      await this.handleDelete(this.toDelCodes);
-      this.toDelCodes = [];
+      try {
+        await this.$confirm("您确认要删除该素材?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        await this.handleDelete(this.toDelCodes);
+        this.toDelCodes = [];
+      } catch (error) {}
     },
     dateFormatter(row) {
       let [date, time] = row.addTime.split("T");
