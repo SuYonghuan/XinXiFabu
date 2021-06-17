@@ -63,27 +63,41 @@
             />
           </el-carousel-item>
         </el-carousel>
-        <video
-          :key="i"
-          class="component"
+
+        <template
           v-else-if="
             component.typeCode === 'video' &&
               component.materials &&
               component.materials.length
           "
-          autoplay
-          playsinline
-          :src="component.materials[handle[i]].fileUrl"
-          @ended="handleEnded($event, component, i)"
-          @error="handleError($event, component, i)"
-          :style="{
-            top: component.offsetY + 'px',
-            left: component.offsetX + 'px',
-            width: component.width + 'px',
-            height: component.height + 'px',
-            zIndex: 1000 + i,
-          }"
-        ></video>
+        >
+          <video
+            :key="`video_${i}_video`"
+            class="component"
+            :ref="`video_${i}_video`"
+            playsinline
+            :style="{
+              top: component.offsetY + 'px',
+              left: component.offsetX + 'px',
+              width: component.width + 'px',
+              height: component.height + 'px',
+              zIndex: 1000 + i,
+            }"
+          ></video>
+          <img
+            :key="`video_${i}_img`"
+            :ref="`video_${i}_img`"
+            class="component"
+            :style="{
+              top: component.offsetY + 'px',
+              left: component.offsetX + 'px',
+              width: component.width + 'px',
+              height: component.height + 'px',
+              zIndex: 1000 + i,
+            }"
+          />
+        </template>
+
         <div
           :key="i"
           class="component"
@@ -213,6 +227,45 @@
 import videoPlaceHolder from "./video-unsupported.png";
 import { VTextMarquee } from "vue-text-marquee";
 import { svgs } from "./EditForm/svgs.js";
+
+const playVideo = (video, src, poster, duration) =>
+  new Promise((resolve, reject) => {
+    if (video.id === "destroyed") reject();
+    video.pause();
+    video.src = src;
+    video.style.visibility = "visible";
+    video.poster = poster;
+    video.load();
+    video
+      .play()
+      .then(() => {
+        const listener = video.addEventListener("ended", () => {
+          video.pause();
+          video.removeEventListener("ended", listener);
+          video.style.visibility = "hidden";
+          resolve();
+        });
+      })
+      .catch(() => {
+        video.pause();
+        video.poster = videoPlaceHolder;
+        setTimeout(() => {
+          video.style.visibility = "hidden";
+          resolve();
+        }, duration);
+      });
+  });
+const playImage = (img, src, duration) =>
+  new Promise((resolve, reject) => {
+    if (img.id === "destroyed") reject();
+    img.src = src;
+    img.style.visibility = "visible";
+    setTimeout(() => {
+      img.style.visibility = "hidden";
+      img.src = "";
+      resolve();
+    }, duration);
+  });
 export default {
   components: { VTextMarquee },
   data() {
@@ -221,6 +274,7 @@ export default {
       duration: 60,
       handle: new Array(16).fill(0),
       intervals: [],
+      doms: [],
     };
   },
   props: ["program"],
@@ -271,54 +325,37 @@ export default {
             document.getElementById(i).src = document.getElementById(i).src;
           }, period)
         );
+      } else if (component.typeCode === "video") {
+        let transitionPeriod =
+          (component.config || component).transitionPeriod || 15;
+        const video = this.$refs[`video_${i}_video`][0];
+        const img = this.$refs[`video_${i}_img`][0];
+        this.doms.push(video, img);
+        const playSeries = async () => {
+          for (let mat of component.materials) {
+            const { typeCode, fileUrl, previewPath, duration } = mat;
+            await (typeCode === "图片"
+              ? playImage(img, fileUrl, transitionPeriod * 1000)
+              : playVideo(video, fileUrl, previewPath, duration));
+          }
+
+          await playSeries();
+        };
+        playSeries();
       }
     });
   },
   beforeDestroy() {
+    this.doms.forEach((dom) => {
+      if (dom.pause) dom.pause();
+      dom.id = "destroyed";
+    });
     this.intervals.forEach((interval) => {
       clearInterval(interval);
     });
   },
 
   methods: {
-    handleError(e, component, i) {
-      const video = e.target;
-      const mat = component.materials[this.handle[i]];
-      video.pause();
-      video.poster = mat.typeCode === "图片" ? mat.fileUrl : videoPlaceHolder;
-      setTimeout(
-        () => {
-          this.handleEnded(e, component, i);
-        },
-        mat.typeCode === "图片"
-          ? (mat.transitionPeriod || 15) * 1000
-          : mat.duration
-      );
-    },
-    handleEnded(e, component, i) {
-      const video = e.target;
-      video.pause();
-      this.handle[i] = (this.handle[i] + 1) % component.materials.length;
-      const mat = component.materials[this.handle[i]];
-      video.src = mat.fileUrl;
-      video.poster = mat.previewPath;
-      video.load();
-      const promise = video.play();
-      if (promise) {
-        promise.catch(() => {
-          video.poster =
-            mat.typeCode === "图片" ? mat.fileUrl : videoPlaceHolder;
-          setTimeout(
-            () => {
-              this.handleEnded(e, component, i);
-            },
-            mat.typeCode === "图片"
-              ? (mat.transitionPeriod || 15) * 1000
-              : mat.duration
-          );
-        });
-      }
-    },
     svgs,
     hms(seconds) {
       const hours = Math.floor(seconds / 3600);

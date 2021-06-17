@@ -1878,6 +1878,11 @@ export default {
         max-width: 160px;
       }
     }
+    .el-input-number__increase,
+    .el-input-number__decrease {
+      height: 42px;
+      border: none;
+    }
     input {
       max-width: 180px;
       border: 1px solid #e6eaf0;
