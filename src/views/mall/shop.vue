@@ -524,6 +524,7 @@
         }
         GetBrandList(param).then(res => {
           if (res.code === ERR_OK) {
+            console.log(res.data)
             cb(res.data);
             return
           }
@@ -759,6 +760,8 @@
 			  this.editForm.nameEn = item.nameEn
 			  this.editForm.intro = item.intro
 			  this.editForm.introEn = item.introEn
+			  this.editForm.logo = item.logo
+        this.imageUrl = item.logoPath
       }
 		},
 		computed: {
