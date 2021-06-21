@@ -748,6 +748,7 @@
         layout="prev, pager, next"
         :current-page.sync="pageIndex"
         @current-change="getMaterials"
+        :page-size="8"
         :total="total"
       >
       </el-pagination>
