@@ -722,12 +722,12 @@
         >
           <div class="item">
             <img
-              v-if="currentMaterialType === 'video'"
+              v-if="material.typeCode === '视频'"
               :src="material.previewPath"
               alt=""
             />
             <img
-              v-else-if="currentMaterialType === 'image'"
+              v-else-if="material.typeCode === '图片'"
               :src="material.fileUrl"
               alt=""
             />
@@ -969,7 +969,7 @@ export default {
             this.setComponents();
           };
           image.src =
-            last[component.typeCode === "video" ? "previewPath" : "fileUrl"];
+            last[last.typeCode === "视频" ? "previewPath" : "fileUrl"];
         } else {
           delete component.image;
         }
