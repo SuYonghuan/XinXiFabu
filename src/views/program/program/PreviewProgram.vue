@@ -9,6 +9,7 @@
     <div
       class="bg"
       :style="{
+        flex: `0 0 ${program.width}px`,
         width: program.width + 'px',
         height: program.height + 'px',
         background: program.backgroundColor,
@@ -374,9 +375,13 @@ export default {
 
 <style lang="scss" scoped>
 .modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   overflow: hidden;
+
   .progress {
     position: absolute;
     top: calc(100vh - 53px);
@@ -415,7 +420,7 @@ export default {
     vertical-align: middle;
     text-align: left;
     position: absolute;
-    top: 18px;
+    top: 5px;
     right: 64px;
     display: inline-block;
     width: 88px;
