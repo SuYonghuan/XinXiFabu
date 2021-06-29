@@ -124,6 +124,7 @@
             ]"
             v-for="prog in programs"
             :key="prog.code"
+            @click="!readonly && handleProgram(prog)"
           >
             <div class="left">
               <svg class="icon" aria-hidden="true">
@@ -139,7 +140,6 @@
             </div>
             <div
               v-if="!(form.playMode === 'carousel' && readonly)"
-              @click="!readonly && handleProgram(prog)"
               :class="
                 form.playMode === 'carousel'
                   ? ['right']
@@ -358,6 +358,39 @@
               :disabled="readonly"
             />
           </template>
+          <div
+            v-if="form.programme"
+            style="margin-top: 8px;background:#fff;"
+            class="program"
+          >
+            <div class="left">
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconjiemubao"></use>
+              </svg>
+            </div>
+            <div class="r1">{{ form.programme.name }}</div>
+            <div class="r2">
+              {{
+                form.programme.addTime
+                  ? form.programme.addTime.substring(0, 10)
+                  : ""
+              }}
+              <span style="display:inline-block; width:24px;"></span>
+              时长
+              {{ form.programme.duration }}
+            </div>
+            <div class="right-btns" v-if="!readonly">
+              <template>
+                <svg
+                  class="icon"
+                  aria-hidden="true"
+                  @click="editProgram(form.programme.code)"
+                >
+                  <use xlink:href="#iconbianji"></use>
+                </svg>
+              </template>
+            </div>
+          </div>
         </template>
         <template v-if="form.playMode === 'carousel'">
           <el-form-item prop="playList" class="ghost"> </el-form-item>
@@ -490,6 +523,13 @@
                         <use xlink:href="#iconshanchu"></use>
                       </svg>
                     </template>
+                    <svg
+                      class="icon"
+                      aria-hidden="true"
+                      @click="editProgram(prog.code)"
+                    >
+                      <use xlink:href="#iconbianji"></use>
+                    </svg>
                   </template>
                 </div>
               </div>
@@ -516,24 +556,37 @@
         @submit="handleCopyToMonthDay"
       />
     </el-dialog>
+    <el-dialog
+      class="edit-program"
+      append-to-body
+      :visible.sync="showEditForm"
+      fullscreen
+    >
+      <edit-form
+        :showEditForm="showEditForm"
+        :code="editCode"
+        @close="showEditForm = false"
+        @saved="showEditForm = false"
+      ></edit-form>
+    </el-dialog>
   </el-form>
 </template>
 
 <script>
-import { ScheduleApi } from "../program.js";
+import { ScheduleApi, ProgramApi } from "../program.js";
 import TimeSlider from "./TimeSlider";
 import CopyToWeekday from "./CopyToWeekday";
 import CopyToMonthDay from "./CopyToMonthDay";
 import draggable from "vuedraggable";
-const getCurrentYmd = () =>
-  `${new Date().getFullYear()}-${new Date().getMonth() +
-    1}-${new Date().getDate()}`;
+import EditForm from "../program/EditForm.vue";
+
 export default {
   components: {
     TimeSlider,
     CopyToWeekday,
     CopyToMonthDay,
     draggable,
+    EditForm,
   },
   data() {
     return {
@@ -589,17 +642,14 @@ export default {
       },
       showSelectMonthDay: false,
       monthDayFrom: null,
+      editCode: null,
+      showEditForm: false,
+      playModes: {},
+      intervalTypes: {},
+      resolutions: {},
     };
   },
-  props: [
-    "code",
-    "playModes",
-    "showAddForm",
-    "intervalTypes",
-    "resolutions",
-    "readonly",
-    "api",
-  ],
+  props: ["code", "showAddForm", "readonly", "api"],
   watch: {
     showAddForm(val) {
       if (val) {
@@ -738,10 +788,11 @@ export default {
           };
     },
   },
-  mounted() {
-    this.init();
-  },
   methods: {
+    editProgram(code) {
+      this.editCode = code;
+      this.showEditForm = true;
+    },
     handleCopyToMonthDay(monthDays) {
       const range = this.range;
       const val = !!range;
@@ -941,6 +992,16 @@ export default {
         12: [],
       };
       this.q = "";
+      const [
+        playModes,
+        intervalTypes,
+        { data: resolutions },
+      ] = await Promise.all([
+        ScheduleApi.getPlayModes(),
+        ScheduleApi.getIntervalTypes(),
+        ProgramApi.getResolutions(),
+      ]);
+      Object.assign(this, { playModes, intervalTypes, resolutions });
       if (!this.code) {
         this.form = {
           name: "",
@@ -1093,6 +1154,16 @@ export default {
 </script>
 
 <style lang="scss">
+.edit-program {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+}
 .saf {
   overflow: hidden;
 
@@ -1217,78 +1288,78 @@ export default {
         color: #2f6bff;
       }
     }
-    .programs {
-      .program {
-        position: relative;
-        height: 60px;
-        border-radius: 8px;
-        padding: 10px 60px 0 68px;
-        &.active {
-          background: #e6eaf0;
-        }
-        > .left {
-          position: absolute;
-          width: 44px;
-          height: 44px;
-          left: 8px;
-          top: 8px;
-          background: #ffffff;
-          border: 1px solid #e6eaf0;
-          box-sizing: border-box;
-          border-radius: 6px;
-          text-align: center;
-          line-height: 44px;
-          > svg {
-            font-size: 24px;
-            color: 868f9f;
-          }
-        }
-        > .right {
-          position: absolute;
-          width: 44px;
-          height: 44px;
-          right: 8px;
-          top: 8px;
-          background: #ffffff;
-          border: 1px solid #e6eaf0;
-          box-sizing: border-box;
-          border-radius: 6px;
-          text-align: center;
-          line-height: 44px;
-          &.s {
-            width: 16px;
-            height: 16px;
-            top: 22px;
-            right: 22px;
-            background: #f5f8fe;
-            border: 1px solid #dadfe6;
-            box-sizing: border-box;
-            border-radius: 3px;
-            &.active {
-              background: #2f6bff;
-              border: 1px solid #2f6bff;
-            }
-          }
-
-          > svg {
-            font-size: 24px;
-            color: 868f9f;
-          }
-        }
-        > .r1 {
-          font-size: 14px;
-          line-height: 21px;
-          color: #3a4763;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        > .r2 {
-          font-size: 12px;
-          line-height: 23px;
-          color: #868f9f;
+    .program {
+      position: relative;
+      height: 60px;
+      border-radius: 8px;
+      padding: 10px 60px 0 68px;
+      &.active {
+        background: #e6eaf0;
+      }
+      > .left {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        left: 8px;
+        top: 8px;
+        background: #ffffff;
+        border: 1px solid #e6eaf0;
+        box-sizing: border-box;
+        border-radius: 6px;
+        text-align: center;
+        line-height: 44px;
+        > svg {
+          font-size: 24px;
+          color: 868f9f;
         }
       }
+      > .right {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        right: 8px;
+        top: 8px;
+        background: #ffffff;
+        border: 1px solid #e6eaf0;
+        box-sizing: border-box;
+        border-radius: 6px;
+        text-align: center;
+        line-height: 44px;
+        &.s {
+          width: 16px;
+          height: 16px;
+          top: 22px;
+          right: 22px;
+          background: #fff;
+          border: 1px solid #dadfe6;
+          box-sizing: border-box;
+          border-radius: 3px;
+          &.active {
+            background: #2f6bff;
+            border: 1px solid #2f6bff;
+          }
+        }
+
+        > svg {
+          font-size: 24px;
+          color: 868f9f;
+        }
+      }
+      > .r1 {
+        font-size: 14px;
+        line-height: 21px;
+        color: #3a4763;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      > .r2 {
+        font-size: 12px;
+        line-height: 23px;
+        color: #868f9f;
+      }
+    }
+    .programs {
       .program + .program {
         margin-top: 8px;
       }
@@ -1349,6 +1420,24 @@ export default {
       background: #f6f6f6;
       overflow-x: hidden;
       overflow-y: auto;
+      .program {
+        background: #fafafa;
+        .right-btns {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          line-height: 20px;
+          font-size: 20px;
+          text-align: right;
+          color: #868f9f;
+          svg {
+            font-size: 20px;
+          }
+          svg + svg {
+            margin-left: 8px;
+          }
+        }
+      }
       .mid-header {
         font-weight: bold;
         font-size: 18px;
@@ -1456,24 +1545,6 @@ export default {
         .programs {
           padding: 8px;
           padding-top: 24px;
-          .program {
-            background: #fafafa;
-            .right-btns {
-              position: absolute;
-              top: 20px;
-              right: 20px;
-              line-height: 20px;
-              font-size: 20px;
-              text-align: right;
-              color: #868f9f;
-              svg {
-                font-size: 20px;
-              }
-              svg + svg {
-                margin-left: 8px;
-              }
-            }
-          }
         }
       }
       .playlist + .playlist {

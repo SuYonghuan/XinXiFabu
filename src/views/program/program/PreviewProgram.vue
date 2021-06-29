@@ -9,6 +9,7 @@
     <div
       class="bg"
       :style="{
+        flex: `0 0 ${program.width}px`,
         width: program.width + 'px',
         height: program.height + 'px',
         background: program.backgroundColor,
@@ -80,27 +81,41 @@
             backgroundImage: `url(${component.materials[0].fileUrl})`,
           }"
         ></div>
-        <video
-          :key="i"
+        <template
           class="component"
           v-else-if="
             component.typeCode === 'video' &&
               component.materials &&
               component.materials.length
           "
-          autoplay
-          playsinline
-          :src="component.materials[handle[i]].fileUrl"
-          @ended="handleEnded($event, component, i)"
-          @error="handleError($event, component, i)"
-          :style="{
-            top: component.offsetY + 'px',
-            left: component.offsetX + 'px',
-            width: component.width + 'px',
-            height: component.height + 'px',
-            zIndex: 1000 + i,
-          }"
-        ></video>
+        >
+          <video
+            :key="`video_${i}_video`"
+            class="component"
+            :ref="`video_${i}_video`"
+            playsinline
+            :style="{
+              top: component.offsetY + 'px',
+              left: component.offsetX + 'px',
+              width: component.width + 'px',
+              height: component.height + 'px',
+              zIndex: 1000 + i,
+            }"
+          ></video>
+          <img
+            :key="`video_${i}_img`"
+            :ref="`video_${i}_img`"
+            class="component"
+            :style="{
+              top: component.offsetY + 'px',
+              left: component.offsetX + 'px',
+              width: component.width + 'px',
+              height: component.height + 'px',
+              zIndex: 1000 + i,
+            }"
+          />
+        </template>
+
         <div
           :key="i"
           class="component"
@@ -239,6 +254,45 @@
 import videoPlaceHolder from "./video-unsupported.png";
 import { VTextMarquee } from "vue-text-marquee";
 import { svgs } from "./EditForm/svgs.js";
+
+const playVideo = (video, src, poster, duration) =>
+  new Promise((resolve, reject) => {
+    if (video.id === "destroyed") reject();
+    video.pause();
+    video.src = src;
+    video.style.visibility = "visible";
+    video.poster = poster;
+    video.load();
+    video
+      .play()
+      .then(() => {
+        const listener = video.addEventListener("ended", () => {
+          video.pause();
+          video.removeEventListener("ended", listener);
+          video.style.visibility = "hidden";
+          resolve();
+        });
+      })
+      .catch(() => {
+        video.pause();
+        video.poster = videoPlaceHolder;
+        setTimeout(() => {
+          video.style.visibility = "hidden";
+          resolve();
+        }, duration);
+      });
+  });
+const playImage = (img, src, duration) =>
+  new Promise((resolve, reject) => {
+    if (img.id === "destroyed") reject();
+    img.src = src;
+    img.style.visibility = "visible";
+    setTimeout(() => {
+      img.style.visibility = "hidden";
+      img.src = "";
+      resolve();
+    }, duration);
+  });
 export default {
   components: { VTextMarquee },
   data() {
@@ -247,6 +301,7 @@ export default {
       duration: 60,
       handle: new Array(16).fill(0),
       intervals: [],
+      doms: [],
     };
   },
   props: ["program"],
@@ -297,10 +352,31 @@ export default {
             document.getElementById(i).src = document.getElementById(i).src;
           }, period)
         );
+      } else if (component.typeCode === "video") {
+        let transitionPeriod =
+          (component.config || component).transitionPeriod || 15;
+        const video = this.$refs[`video_${i}_video`][0];
+        const img = this.$refs[`video_${i}_img`][0];
+        this.doms.push(video, img);
+        const playSeries = async () => {
+          for (let mat of component.materials) {
+            const { typeCode, fileUrl, previewPath, duration } = mat;
+            await (typeCode === "图片"
+              ? playImage(img, fileUrl, transitionPeriod * 1000)
+              : playVideo(video, fileUrl, previewPath, duration));
+          }
+
+          await playSeries();
+        };
+        playSeries();
       }
     });
   },
   beforeDestroy() {
+    this.doms.forEach((dom) => {
+      if (dom.pause) dom.pause();
+      dom.id = "destroyed";
+    });
     this.intervals.forEach((interval) => {
       clearInterval(interval);
     });
@@ -379,9 +455,13 @@ export default {
 
 <style lang="scss" scoped>
 .modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   overflow: hidden;
+
   .progress {
     position: absolute;
     top: calc(100vh - 53px);
@@ -420,7 +500,7 @@ export default {
     vertical-align: middle;
     text-align: left;
     position: absolute;
-    top: 18px;
+    top: 5px;
     right: 64px;
     display: inline-block;
     width: 88px;

@@ -149,36 +149,47 @@
       </el-table-column>
       <el-table-column
         prop="operating"
-        width="132px;"
+        width="170px;"
         key="operating"
         label="操作"
       >
         <template slot-scope="scope">
-          <el-button
-            class="svg-button"
-            type="text"
-            v-if="canI.editmaterial"
-            @click="handleEdit(scope.row)"
-          >
-            <svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconbianji"></use></svg
-          ></el-button>
-          <el-button
-            class="svg-button"
-            type="text"
-            @click="preview(scope.row)"
-            :disabled="!scope.row.fileUrl"
-            ><svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconyanjing"></use></svg
-          ></el-button>
-          <el-button
-            v-if="canI.deletematerial"
-            class="svg-button"
-            @click="deleteRow(scope.row.code)"
-            type="text"
-            ><svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconshanchu"></use></svg
-          ></el-button>
+          <div style="text-align: right;">
+            <el-button
+              class="svg-button"
+              type="text"
+              v-if="canI.getmaterialproglist && scope.row.progs"
+              @click="showProgsModal(scope.row)"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconjiemubao"></use></svg
+            ></el-button>
+            <el-button
+              class="svg-button"
+              type="text"
+              v-if="canI.editmaterial"
+              @click="handleEdit(scope.row)"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconbianji"></use></svg
+            ></el-button>
+            <el-button
+              class="svg-button"
+              type="text"
+              @click="preview(scope.row)"
+              :disabled="!scope.row.fileUrl"
+              ><svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconyanjing"></use></svg
+            ></el-button>
+            <el-button
+              v-if="canI.deletematerial"
+              class="svg-button"
+              @click="deleteRow(scope.row.code)"
+              type="text"
+              ><svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconshanchu"></use></svg
+            ></el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -521,6 +532,64 @@
         ></object>
       </template>
     </el-dialog>
+    <el-dialog title="引用节目列表" append-to-body :visible.sync="showProgs">
+      <el-table :data="progs" @selection-change="handleProgsSelectionChange">
+        <el-table-column type="selection"></el-table-column>
+        <el-table-column prop="name" label="名称"></el-table-column>
+        <el-table-column prop="resolution" label="分辨率"></el-table-column>
+        <el-table-column label="操作" width="100px;">
+          <template slot-scope="scope">
+            <el-button
+              class="svg-button"
+              type="text"
+              @click="editProgram(scope.row)"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconbianji"></use></svg
+            ></el-button>
+            <el-button
+              v-if="canI.getmaterialprogdel"
+              class="svg-button"
+              @click="deleteMatProgRel(scope.row)"
+              type="text"
+              ><svg class="icon" aria-hidden="true">
+                <use xlink:href="#iconshanchu"></use></svg
+            ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-row type="flex" style="margin-top: 16px;" justify="space-between">
+        <el-col>
+          <el-button
+            class="svg-suffix s"
+            plain
+            :disabled="!selectedProgs.length"
+            v-if="canI.getmaterialprogdel"
+            @click="bulkDeleteRel"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshanchu"></use></svg
+            >删除</el-button
+          >
+        </el-col>
+      </el-row>
+    </el-dialog>
+    <el-dialog
+      class="edit-program"
+      append-to-body
+      :visible.sync="showEditForm"
+      fullscreen
+    >
+      <edit-form
+        :showEditForm="showEditForm"
+        :code="editCode"
+        @close="showEditForm = false"
+        @saved="
+          refreshProgs();
+          showEditForm = false;
+        "
+      ></edit-form>
+    </el-dialog>
   </table-page>
 </template>
 
@@ -529,8 +598,9 @@ import { MaterialApi } from "./program.js";
 import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
-
+import EditForm from "./program/EditForm.vue";
 export default {
+  components: { EditForm },
   data() {
     return {
       name: "",
@@ -566,6 +636,12 @@ export default {
       showModal: false,
       modalMat: null,
       toDelCodes: [],
+      showProgs: false,
+      progs: [],
+      showEditForm: false,
+      editCode: null,
+      progMaterialCode: null,
+      selectedProgs: [],
     };
   },
   computed: {
@@ -696,6 +772,56 @@ export default {
   },
 
   methods: {
+    async bulkDeleteRel() {
+      await this.$confirm("您确认要在这些节目中删除该素材?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      });
+      const { code, msg } = await MaterialApi.deleteMatProgRel({
+        programmeCode: this.selectedProgs,
+        materialCode: this.progMaterialCode,
+      });
+      this.$message({
+        type: code === "200" ? "success" : "error",
+        message: msg,
+      });
+      this.refreshProgs();
+    },
+    handleProgsSelectionChange(data) {
+      this.selectedProgs = data.map(({ code }) => code);
+    },
+    async deleteMatProgRel(row) {
+      await this.$confirm("您确认要在节目中删除该素材?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      });
+      const { code, msg } = await MaterialApi.deleteMatProgRel({
+        programmeCode: [row.code],
+        materialCode: this.progMaterialCode,
+      });
+      this.$message({
+        type: code === "200" ? "success" : "error",
+        message: msg,
+      });
+      this.refreshProgs();
+    },
+    editProgram(row) {
+      this.editCode = row.code;
+      this.showEditForm = true;
+    },
+    async showProgsModal(row) {
+      this.progMaterialCode = row.code;
+      await this.refreshProgs();
+      this.showProgs = true;
+    },
+    async refreshProgs() {
+      const { data } = await MaterialApi.getProgList({
+        code: this.progMaterialCode,
+      });
+      this.progs = data;
+    },
     deleteRow(code) {
       this.$confirm("您确认要删除该素材?", "提示", {
         confirmButtonText: "确定",
@@ -766,16 +892,56 @@ export default {
       });
     },
     async handleDelete(codes) {
-      const { code, msg } = await MaterialApi.delete({ codes });
-      this.$message({
-        type: code === "200" ? "success" : "error",
-        message: code === "200" ? "删除成功" : msg,
-      });
-      if (code === "200") this.getList();
+      try {
+        let { code, msg } = await MaterialApi.delete({ codes });
+        if (code === "200") {
+          this.$message({
+            type: "success",
+            message: msg,
+          });
+          this.getList();
+        } else if (code !== "201") {
+          this.$message({
+            type: "error",
+            message: msg,
+          });
+        } else {
+          await this.$confirm(msg, "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          });
+          const res = await MaterialApi.delete({
+            codes,
+            confirm: true,
+          });
+          if (res.code === "200") {
+            this.$message({
+              type: "success",
+              message: res.msg,
+            });
+            this.getList();
+          } else {
+            this.$message({
+              type: "error",
+              message: res.msg,
+            });
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
     async bulkDelete() {
-      await this.handleDelete(this.toDelCodes);
-      this.toDelCodes = [];
+      try {
+        await this.$confirm("您确认要删除该素材?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        await this.handleDelete(this.toDelCodes);
+        this.toDelCodes = [];
+      } catch (error) {}
     },
     dateFormatter(row) {
       let [date, time] = row.addTime.split("T");
@@ -1025,8 +1191,6 @@ export default {
       }
     },
   },
-
-  components: {},
 };
 </script>
 
@@ -1052,6 +1216,24 @@ export default {
   max-width: 100%;
   max-height: 100%;
 }
+.svg-button {
+  font-size: 20px;
+  color: #868f9f;
+  &.is-disabled {
+    color: #bbc1cc;
+    &:focus,
+    &:hover {
+      color: #bbc1cc;
+    }
+  }
+  &:focus,
+  &:hover {
+    color: #2f6bff;
+  }
+}
+.svg-button + .svg-button {
+  margin-left: 20px;
+}
 </style>
 <style lang="scss">
 .matmodal {
@@ -1059,6 +1241,16 @@ export default {
     .el-upload-list {
       margin-top: -12px;
     }
+  }
+}
+.edit-program {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
   }
 }
 </style>

@@ -94,23 +94,29 @@
           </div>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="节目列表" name="2">
-        <p>节目发布类型：</p>
-        <div class="program-list">
-          <el-card class="box-card program-item" v-for="item of programData">
-            <img
-              :src="item.previewSrc"
-              alt=""
-              @click="clickImage(item)"
-              class="program-img"
-            />
-            <p>
-              <i class="el-icon-date"></i>
-              {{ timestampToTime(item.launchTime, "y-m-d") }} 至
-              {{ timestampToTime(item.expiryDate, "y-m-d") }}
-            </p>
-          </el-card>
-        </div>
+      <el-tab-pane label="日程列表" name="2">
+        <el-table :data="schedules">
+          <el-table-column
+            prop="name"
+            key="name"
+            label="日程名称"
+          ></el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button
+                class="svg-button"
+                type="text"
+                @click="
+                  editCode = scope.row.code;
+                  showAddForm = true;
+                "
+              >
+                <svg class="icon" aria-hidden="true">
+                  <use xlink:href="#iconbianji"></use></svg
+              ></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-tab-pane>
       <el-tab-pane label="管理部门列表" name="3">
         <el-table :data="departmentData">
@@ -165,6 +171,21 @@
       v-if="bigFile"
       @closeImg="closeImg"
     ></bigImage>
+    <el-dialog
+      title="编辑日程"
+      class="edit-schedule"
+      append-to-body
+      :visible.sync="showAddForm"
+      fullscreen
+    >
+      <add-form
+        :showAddForm="showAddForm"
+        :code="editCode"
+        @closeAddForm="showAddForm = false"
+        @added="showAddForm = false"
+        @saved="showAddForm = false"
+      ></add-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -182,8 +203,13 @@ import { ERR_OK } from "http/config";
 import { mapGetters } from "vuex";
 import { timeFormatting } from "common/js/mixins";
 import bigImage from "components/big-image/big-image";
+import AddForm from "../program/schedule/AddForm.vue";
 
 export default {
+  components: {
+    bigImage,
+    AddForm,
+  },
   name: "device-details",
   mixins: [timeFormatting],
   data() {
@@ -193,15 +219,17 @@ export default {
       type: 1,
       deviceInfo: {},
       devCoordinate: {},
-      programData: [],
       departmentData: [],
       code: this.$route.query.code,
       bigFile: null,
+      schedules: [],
+      showAddForm: false,
+      editCode: null,
     };
   },
   created() {
     this.GetDeviceInfo();
-    // this.GetLocalProgram()
+    this.getSchedules();
     this.GetDevCoordinate();
     // Config.setDeviceSite({floorOrder:0})
     // Config.getMapInfo("9d9ccf33-9ee6-49d7-8cc3-e1aaa75f896c","http://saas.1000my.com:8013","nbfbc",0);
@@ -227,15 +255,13 @@ export default {
         }
       });
     },
-    GetLocalProgram() {
+    getSchedules() {
       const param = {
         DevCode: this.code,
-        EffcTime: this.dateFormat("y-m-d"),
       };
       GetLocalProgram(param).then((res) => {
         if (res.code === ERR_OK) {
-          this.programData = res.data;
-          // console.log(this.programData)
+          this.schedules = res.data;
         }
       });
     },
@@ -326,7 +352,7 @@ export default {
       if (val.index == 0) {
         this.GetDevCoordinate();
       } else if (val.index == 1) {
-        this.GetLocalProgram();
+        this.getSchedules();
       } else {
         this.GetDeptListByDeviceCode();
       }
@@ -377,12 +403,20 @@ export default {
   computed: {
     ...mapGetters(["presentMenu", "config", "user"]),
   },
-  components: {
-    bigImage,
-  },
 };
 </script>
-
+<style lang="scss">
+.edit-schedule {
+  .el-dialog__header {
+    display: none;
+  }
+  .el-dialog__body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+}
+</style>
 <style scoped lang="scss">
 .device-details {
   .box-card {

@@ -38,6 +38,7 @@
       :dateFormatter="dateFormatter"
       @editProgram="editProgram"
       @deleteProgram="deleteProgram"
+      @getSchedules="getSchedules"
     ></program-table>
     <el-row type="flex" style="margin-top: 16px;" justify="space-between">
       <el-col></el-col>
@@ -73,6 +74,26 @@
         "
       ></edit-form>
     </el-dialog>
+    <el-dialog
+      title="关联日程列表"
+      append-to-body
+      :visible.sync="showSchedules"
+    >
+      <el-table :data="schedules">
+        <el-table-column
+          prop="name"
+          key="name"
+          label="日程名称"
+        ></el-table-column>
+
+        <el-table-column
+          prop="addTime"
+          key="addTime"
+          label="创建时间"
+          :formatter="dateFormatter"
+        ></el-table-column>
+      </el-table>
+    </el-dialog>
   </table-page>
 </template>
 
@@ -98,8 +119,9 @@ export default {
       showEditForm: false,
       showSelectMaterial: false,
       resolutions: [],
-
       editCode: null,
+      showSchedules: false,
+      schedules: [],
     };
   },
   computed: {
@@ -120,6 +142,13 @@ export default {
     } else this.$message({ message: msg, type: "error" });
   },
   methods: {
+    async getSchedules(code) {
+      const { data } = await ProgramApi.getSchedules({
+        code,
+      });
+      this.schedules = data;
+      this.showSchedules = true;
+    },
     async getResolutions() {
       const { code, data, msg } = await ProgramApi.getResolutions();
       if (code === "200") this.resolutions = data;

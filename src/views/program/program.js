@@ -7,6 +7,8 @@ export class MaterialApi {
     static put = cPost(`/Api/Material/EditMaterial`);
     static delete = cPost('/Api/Material/Del');
     static getAuditList = cPost('/Api/Material/AuditMaterialList');
+    static getProgList = cPost('/Api/Material/MaterialProgList');
+    static deleteMatProgRel = cPost('/Api/Material/MaterialProgDel')
     static audit = cPost('/Api/Material/AuditMaterials');
     static async getMaterialTypes() {
         if (MaterialApi.materialTypes) return MaterialApi.materialTypes
@@ -29,6 +31,7 @@ export class ProgramApi {
     static put = cPost('/Api/Programme/EditProgramme')
     static delete = cPost('/Api/Programme/Del');
     static getResolutions = cPost('/Api/Programme/ResolutionList');
+    static getSchedules = cPost('/Api/Programme/ProgScheduleList');
     static async getComponentTypes() {
         if (ProgramApi.componentTypes) return ProgramApi.componentTypes
         const { data } = await cPost(`/Api/Programme/ProgramDataDict`)({ name: "ComponentType" })

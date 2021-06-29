@@ -39,29 +39,40 @@
     ></el-table-column>
     <el-table-column
       prop="operating"
-      width="92px;"
+      width="160px;"
       key="operating"
       label="操作"
     >
       <template slot-scope="scope">
-        <el-button
-          v-if="canI.editprogramme"
-          class="svg-button"
-          type="text"
-          @click="$emit('editProgram', scope.row.code)"
-        >
-          <svg class="icon" aria-hidden="true">
-            <use xlink:href="#iconbianji"></use></svg
-        ></el-button>
-        <el-button
-          v-if="canI.deleteprogramme"
-          slot="reference"
-          class="svg-button"
-          type="text"
-          @click="deleteRow(scope.row.code)"
-          ><svg class="icon" aria-hidden="true">
-            <use xlink:href="#iconshanchu"></use></svg
-        ></el-button>
+        <div style="text-align:right">
+          <el-button
+            v-if="canI.getprogschedulelist && scope.row.schedules"
+            class="svg-button"
+            type="text"
+            @click="$emit('getSchedules', scope.row.code)"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconrichengguanli"></use></svg
+          ></el-button>
+          <el-button
+            v-if="canI.editprogramme"
+            class="svg-button"
+            type="text"
+            @click="$emit('editProgram', scope.row.code)"
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconbianji"></use></svg
+          ></el-button>
+          <el-button
+            v-if="canI.deleteprogramme"
+            slot="reference"
+            class="svg-button"
+            type="text"
+            @click="deleteRow(scope.row.code)"
+            ><svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconshanchu"></use></svg
+          ></el-button>
+        </div>
       </template>
     </el-table-column>
   </el-table>

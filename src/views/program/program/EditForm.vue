@@ -371,17 +371,43 @@
                 @swap="([i, j]) => swap(i, j)"
                 @preview="previewMat"
                 @remove="removeMaterial"
-                :limit="10"
+                :limit="50"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
             <template v-else-if="activeComponent.typeCode === 'video'">
+              <el-form-item class="item" label="显示效果">
+                <el-select v-model="activeComponent.transition">
+                  <el-option
+                    :key="op"
+                    :value="op"
+                    :label="op"
+                    v-for="op in [
+                      '随机',
+                      '马赛克',
+                      '上下滚动',
+                      '左右滚动',
+                      '渐入',
+                    ]"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item class="item" label="切换时间">
+                <el-input-number
+                  v-model="activeComponent.transitionPeriod"
+                  :step="1"
+                  step-strictly
+                  :min="1"
+                  :max="1000"
+                ></el-input-number
+                >秒
+              </el-form-item>
               <mat-list
                 :data="activeComponent.materials"
                 @swap="([i, j]) => swap(i, j)"
                 @preview="previewMat"
                 @remove="removeMaterial"
-                :limit="5"
+                :limit="50"
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
@@ -740,12 +766,12 @@
         >
           <div class="item">
             <img
-              v-if="currentMaterialType === 'video'"
+              v-if="material.typeCode === '视频'"
               :src="material.previewPath"
               alt=""
             />
             <img
-              v-else-if="currentMaterialType === 'image'"
+              v-else-if="material.typeCode === '图片'"
               :src="material.fileUrl"
               alt=""
             />
@@ -766,6 +792,7 @@
         layout="prev, pager, next"
         :current-page.sync="pageIndex"
         @current-change="getMaterials"
+        :page-size="8"
         :total="total"
       >
       </el-pagination>
@@ -787,18 +814,18 @@
           </div>
         </el-alert>
         <video
-          v-if="currentMaterialType === 'video'"
+          v-if="previewMaterial.typeCode === '视频'"
           style="width:100%;min-height:500px;"
           controls
           :src="previewMaterial.fileUrl"
         ></video>
         <img
-          v-else-if="currentMaterialType === 'image'"
+          v-else-if="previewMaterial.typeCode === '图片'"
           style="width:100%;min-height:500px;"
           :src="previewMaterial.fileUrl"
         />
         <audio
-          v-else-if="currentMaterialType === 'audio'"
+          v-else-if="previewMaterial.typeCode === '音频'"
           controls
           :src="previewMaterial.fileUrl"
         ></audio>
@@ -1122,7 +1149,7 @@ export default {
             this.setComponents();
           };
           image.src =
-            last[component.typeCode === "video" ? "previewPath" : "fileUrl"];
+            last[last.typeCode === "视频" ? "previewPath" : "fileUrl"];
         } else {
           delete component.image;
         }
@@ -1456,7 +1483,31 @@ export default {
       if (code === "200") {
         this.$message({ type: "success", message: msg });
         this.$emit("saved");
-      } else this.$message({ type: "error", message: msg });
+      } else if (code !== "201") {
+        this.$message({
+          type: "error",
+          message: msg,
+        });
+      } else {
+        await this.$confirm(msg, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        });
+        const res = await ProgramApi.put({ ...form, confirm: true });
+        if (res.code === "200") {
+          this.$message({
+            type: "success",
+            message: res.msg,
+          });
+          this.$emit("saved");
+        } else {
+          this.$message({
+            type: "error",
+            message: res.msg,
+          });
+        }
+      }
     },
     reset() {
       this.form = null;
@@ -2028,6 +2079,11 @@ export default {
       input {
         max-width: 160px;
       }
+    }
+    .el-input-number__increase,
+    .el-input-number__decrease {
+      height: 42px;
+      border: none;
     }
     input {
       max-width: 180px;
