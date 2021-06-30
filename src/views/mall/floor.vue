@@ -4,14 +4,18 @@
       <el-row class="gap" type="flex" justify="space-between">
         <el-col style="display:flex;">
           <span class="meta1">楼栋</span>
-          <el-radio-group v-model="buildingCode" @change="tabClick">
-            <el-radio-button
-              :label="item.code"
-              :key="item.code"
+          <el-select
+            v-model="buildingCode"
+            placeholder="请选择"
+            @change="tabClick"
+          >
+            <el-option
               v-for="item of buildingData"
-              >{{ item.name }}</el-radio-button
-            >
-          </el-radio-group>
+              :key="item.code"
+              :label="item.name"
+              :value="item.code"
+            ></el-option>
+          </el-select>
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button

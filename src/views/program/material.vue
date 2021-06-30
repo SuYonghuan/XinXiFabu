@@ -511,13 +511,13 @@
         </el-alert>
         <video
           v-if="modalMat.typeCode === '视频'"
-          style="width:100%;min-height:500px;object-fit: contain;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           controls
           :src="modalMat.fileUrl"
         ></video>
         <img
           v-else-if="modalMat.typeCode === '图片'"
-          style="width:100%;min-height:500px;object-fit: contain;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :src="modalMat.fileUrl"
         />
         <audio
@@ -527,7 +527,7 @@
         ></audio>
         <object
           v-else
-          style="width:100%;min-height:500px;object-fit: contain;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :data="modalMat.fileUrl"
         ></object>
       </template>
