@@ -557,6 +557,7 @@ export default {
     }
   }
   .sign-img {
+    position: absolute;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

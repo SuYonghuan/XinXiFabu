@@ -1494,7 +1494,10 @@ export default {
           cancelButtonText: "取消",
           type: "warning",
         });
-        const res = await ProgramApi.put({ ...form, confirm: true });
+        const res = await ProgramApi.put({
+          ...this.form2Body(),
+          confirm: true,
+        });
         if (res.code === "200") {
           this.$message({
             type: "success",
