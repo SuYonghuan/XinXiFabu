@@ -815,13 +815,13 @@
         </el-alert>
         <video
           v-if="previewMaterial.typeCode === '视频'"
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           controls
           :src="previewMaterial.fileUrl"
         ></video>
         <img
           v-else-if="previewMaterial.typeCode === '图片'"
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :src="previewMaterial.fileUrl"
         />
         <audio
@@ -831,7 +831,7 @@
         ></audio>
         <object
           v-else
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :data="previewMaterial.fileUrl"
         ></object>
       </template>
@@ -1597,7 +1597,7 @@ export default {
       ) {
         const { code, data, msg } = await ProgramApi.preview({
           ...this.form2Body(),
-          devCode: "a",
+          devCode: "1640d451-fd3e-4ef5-9b85-40e1cd2a262f",
         });
         if (code === "200") {
           this.previewForm = {
