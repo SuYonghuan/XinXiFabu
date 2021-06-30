@@ -771,13 +771,13 @@
         </el-alert>
         <video
           v-if="previewMaterial.typeCode === '视频'"
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           controls
           :src="previewMaterial.fileUrl"
         ></video>
         <img
           v-else-if="previewMaterial.typeCode === '图片'"
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :src="previewMaterial.fileUrl"
         />
         <audio
@@ -787,7 +787,7 @@
         ></audio>
         <object
           v-else
-          style="width:100%;min-height:500px;"
+          style="width:100%;min-height:500px;object-fit:contain;"
           :data="previewMaterial.fileUrl"
         ></object>
       </template>
