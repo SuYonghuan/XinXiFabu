@@ -1,17 +1,17 @@
-window.QM_Line_Father = function(sPoint,ePoint,ctrlPoint1,ctrlPoint2,isStrLine) {
+window.QM_Line_Father = function (sPoint, ePoint, ctrlPoint1, ctrlPoint2, isStrLine) {
 	this.startPoint = sPoint;     //起始点
-	this.endPoint =  ePoint;        //结束点
+	this.endPoint = ePoint;        //结束点
 	this.ctrlPoint1 = ctrlPoint1;
 	this.ctrlPoint2 = ctrlPoint2;
 	this.isStrLine = isStrLine;    //是否是直线
 }
 
 let Map_QM, shopData, mapObj, mapJSON, shopJSON;
-let deviceSite={"floorOrder":1,"angle":0,"x":0,"y":0,"navPoint":1};
+let deviceSite = { "floorOrder": 1, "angle": 0, "x": 0, "y": 0, "navPoint": 1 };
 
 ConfigFun = function () {
 	this.spriteMaterialArr = [];
-	this.shopHeight=10;
+	this.shopHeight = 10;
 
 	this.pocHeight = 18;
 	this.Point = function (x = 0, y = 0) {
@@ -19,103 +19,103 @@ ConfigFun = function () {
 		this.y = y;
 	}
 
-  this.WallLine = function (start, end) {
-    this.start = start;  //起始点位
-    this.end = end;     //结束点位
-    this.leftParLine;   //左侧平行线段
-    this.rightParLine;  //右侧平行线段
-    this.leftPoint;     //左侧平行线交点
-    this.rightPoint;    //右侧平行线交点
-  }
+	this.WallLine = function (start, end) {
+		this.start = start;  //起始点位
+		this.end = end;     //结束点位
+		this.leftParLine;   //左侧平行线段
+		this.rightParLine;  //右侧平行线段
+		this.leftPoint;     //左侧平行线交点
+		this.rightPoint;    //右侧平行线交点
+	}
 
-  this.getMapInfo = function (mallCode,mallName="",buildOrder=0){
-    let url = "http://saas.1000my.com:8013";
-    let tim = Config.timeStamp();
-    let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
-    Config.requestNoJM({
-      method: "POST",
-      data: JSON.stringify({ "mallCode": mallCode, "key": mallName + "editor" }),
-      url: url + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
-      success: (res) => {
-        if (res.code == "200") {
-          mapJSON = res.data;
-          tim = Config.timeStamp();
-          token = encodeURIComponent(Config.encrypt("/api/Shop/QueryShopListForMap" + tim));
-          param = Config.encrypt(JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder}));
-          if (url.search("saas")!==-1) {
-            Config.request({
-              method: "POST",
-              data: param,
-              url: url + '/api/Shop/QueryShopListForMap?token=' + token + '&time=' + tim,
-              success: (res) => {
-                if (res.code == "200") {
-                  shopJSON = res.data;
-                  Config.initData(mapJSON,shopJSON);
-                }
-              },
-              fail: () => {
-                console.log("QueryShopListForMap 接口失败");
-              }
-            });
-          } else {
-            Config.requestNoJM({
-              method: "POST",
-              data: JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }),
-              url: url + '/api/Shop/QueryShopListForMap',
-              success: (res) => {
-                if (res.code == "200") {
-                  shopJSON = res.data;
-                  Config.initData(mapJSON,shopJSON);
-                }
-              },
-              fail: () => {
-                console.log("QueryShopListForMap 接口失败");
-              }
-            });
-          }
-        }
-      },
-      fail: () => {
-        console.log("GetMapInfo 接口失败");
-      }
-    });
-  }
-  this.setDeviceSite = function (obj){
-    deviceSite.navPoint = obj.hasOwnProperty("navPoint")?obj.navPoint : deviceSite.navPoint;
-    deviceSite.angle = obj.hasOwnProperty("angle")?obj.angle : deviceSite.angle;
-    deviceSite.floorOrder = obj.hasOwnProperty("floorOrder")?obj.floorOrder : deviceSite.floorOrder;
-    console.log(deviceSite);
-    if(mapObj){
-      let pathArr = mapObj.mapData.path.nodes;
-      try{
-        deviceSite.x = pathArr[parseInt(deviceSite.navPoint)].x;
-        deviceSite.y = -1*pathArr[parseInt(deviceSite.navPoint)].y;
-      }catch(error){
-        console.error("未找到点");
-        deviceSite.x = 0;
-        deviceSite.y = 0;
-      }
-      Map_QM.floor.setStartSite();
-    }
-  }
-  //mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
-  this.initData = function (mapJSON,shopJSON){
-    console.log(mapJSON,shopJSON);
+	this.getMapInfo = function (mallCode, mallName = "", buildOrder = 0) {
+		let url = "http://122.112.233.82/mall";
+		let tim = Config.timeStamp();
+		let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
+		Config.requestNoJM({
+			method: "POST",
+			data: JSON.stringify({ "mallCode": mallCode, "key": mallName + "editor" }),
+			url: url + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
+			success: (res) => {
+				if (res.code == "200") {
+					mapJSON = res.data;
+					tim = Config.timeStamp();
+					token = encodeURIComponent(Config.encrypt("/api/Shop/QueryShopListForMap" + tim));
+					param = Config.encrypt(JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }));
+					// if (url.search("saas") !== -1) {
+					Config.request({
+						method: "POST",
+						data: param,
+						url: url + '/api/Shop/QueryShopListForMap?token=' + token + '&time=' + tim,
+						success: (res) => {
+							if (res.code == "200") {
+								shopJSON = res.data;
+								Config.initData(mapJSON, shopJSON);
+							}
+						},
+						fail: () => {
+							console.log("QueryShopListForMap 接口失败");
+						}
+					});
+					// } else {
+					// Config.requestNoJM({
+					// 	method: "POST",
+					// 	data: JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }),
+					// 	url: url + '/api/Shop/QueryShopListForMap',
+					// 	success: (res) => {
+					// 		if (res.code == "200") {
+					// 			shopJSON = res.data;
+					// 			Config.initData(mapJSON, shopJSON);
+					// 		}
+					// 	},
+					// 	fail: () => {
+					// 		console.log("QueryShopListForMap 接口失败");
+					// 	}
+					// });
+					// }
+				}
+			},
+			fail: () => {
+				console.log("GetMapInfo 接口失败");
+			}
+		});
+	}
+	this.setDeviceSite = function (obj) {
+		deviceSite.navPoint = obj.hasOwnProperty("navPoint") ? obj.navPoint : deviceSite.navPoint;
+		deviceSite.angle = obj.hasOwnProperty("angle") ? obj.angle : deviceSite.angle;
+		deviceSite.floorOrder = obj.hasOwnProperty("floorOrder") ? obj.floorOrder : deviceSite.floorOrder;
+		console.log(deviceSite);
+		if (mapObj) {
+			let pathArr = mapObj.mapData.path.nodes;
+			try {
+				deviceSite.x = pathArr[parseInt(deviceSite.navPoint)].x;
+				deviceSite.y = -1 * pathArr[parseInt(deviceSite.navPoint)].y;
+			} catch (error) {
+				console.error("未找到点");
+				deviceSite.x = 0;
+				deviceSite.y = 0;
+			}
+			Map_QM.floor.setStartSite();
+		}
+	}
+	//mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
+	this.initData = function (mapJSON, shopJSON) {
+		console.log(mapJSON, shopJSON);
 
-    let array = JSON.parse(mapJSON.mapData);
-    let mapArray;
-    if(array.length>1){
-      mapArray = array[1].buildArr;
-    }else{
-      mapArray = array[0] && array[0].buildArr;
-    }
-    mapObj = mapArray[parseInt(deviceSite.floorOrder)];
+		let array = JSON.parse(mapJSON.mapData);
+		let mapArray;
+		if (array.length > 1) {
+			mapArray = array[1].buildArr;
+		} else {
+			mapArray = array[0] && array[0].buildArr;
+		}
+		mapObj = mapArray[parseInt(deviceSite.floorOrder)];
 
-    let shopArray = shopJSON;
-    shopData = shopArray[parseInt(deviceSite.floorOrder)];
-    Map_QM = new MainMap_QM();
-    Map_QM.initBuild();
-  }
+		let shopArray = shopJSON;
+		shopData = shopArray[parseInt(deviceSite.floorOrder)];
+		Map_QM = new MainMap_QM();
+		Map_QM.initBuild();
+	}
 
 	/**
 	 * 检测点是否在多边形区域内
@@ -261,24 +261,24 @@ ConfigFun = function () {
 	}
 	this.changeWallToString = function (area) {
 		let areaArr = [];
-		let points = Config.getWallPoints(area.pathPoints,area.thick);
+		let points = Config.getWallPoints(area.pathPoints, area.thick);
 		for (let i = 0; i < points.length; i++) {
 			let array = [];
-			let pend = i==points.length-1 ? points[0] : points[i+1];
+			let pend = i == points.length - 1 ? points[0] : points[i + 1];
 			array.push(points[i].x, points[i].y, pend.x, pend.y);
 			areaArr.push(array);
 		}
 		return areaArr;
 	}
 	//检测区域是否在矩形内
-	this.checkAreaInRect = function(area,rect) {
+	this.checkAreaInRect = function (area, rect) {
 		let ptPolygon = [];
-		ptPolygon.push(rect[0], new Config.Point(rect[1].x,rect[0].y), rect[1], new Config.Point(rect[0].x,rect[1].y));
+		ptPolygon.push(rect[0], new Config.Point(rect[1].x, rect[0].y), rect[1], new Config.Point(rect[0].x, rect[1].y));
 		for (let f = 0; f < area.hasLines.length; f++) {
 			let line2 = area.hasLines[f];
-			let sPoint = Config.checkBoundary(new Config.Point(line2.startPoint.x,line2.startPoint.y),ptPolygon);
-			let ePoint = Config.checkBoundary(new Config.Point(line2.endPoint.x,line2.endPoint.y),ptPolygon);
-			if(!sPoint || !ePoint){
+			let sPoint = Config.checkBoundary(new Config.Point(line2.startPoint.x, line2.startPoint.y), ptPolygon);
+			let ePoint = Config.checkBoundary(new Config.Point(line2.endPoint.x, line2.endPoint.y), ptPolygon);
+			if (!sPoint || !ePoint) {
 				return false;
 			}
 		}
@@ -307,17 +307,17 @@ ConfigFun = function () {
 		for (let i = 0; i < lines.length; i++) {
 			let line0 = lines[i];
 			let line1 = (i < lines.length - 1) ? lines[i + 1] : lines[0];
-			if (Config.angleRadius>2) {
-				if (line0.isStrLine && line1.isStrLine && Math.abs(line0.endPoint.x - line0.startPoint.x)  + Math.abs(line0.endPoint.y - line0.startPoint.y) > parseInt(Config.angleRadius)*2) {
+			if (Config.angleRadius > 2) {
+				if (line0.isStrLine && line1.isStrLine && Math.abs(line0.endPoint.x - line0.startPoint.x) + Math.abs(line0.endPoint.y - line0.startPoint.y) > parseInt(Config.angleRadius) * 2) {
 					let x1 = line0.endPoint.x;
 					let y1 = line0.endPoint.y;
 					let x2 = line0.startPoint.x;
 					let y2 = line0.startPoint.y;
 					let x3 = line1.endPoint.x;
 					let y3 = line1.endPoint.y;
-					if(Math.abs((x3 - x1)/(x2 - x1) - (y3 - y1)/(y2 - y1))<0.1){
-						let yArr=[];
-						yArr.push(line0.startPoint.x , line0.startPoint.y , line0.endPoint.x , line0.endPoint.y);
+					if (Math.abs((x3 - x1) / (x2 - x1) - (y3 - y1) / (y2 - y1)) < 0.1) {
+						let yArr = [];
+						yArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
 						areaStr.push(yArr);
 						continue;
 					}
@@ -327,23 +327,23 @@ ConfigFun = function () {
 						0].y, result.tangencyPoints[1].x, result.tangencyPoints[1].y, x1, y1, Config.angleRadius);
 
 					if (i > 0) {
-						let ctrlPoint1, ctrlPoint2, array=[];
+						let ctrlPoint1, ctrlPoint2, array = [];
 						ctrlPoint1 = ctrlPoint2 = new Config.Point(((bezierResult[0].x - line0.startPoint.x) / 2 + line0.startPoint.x) >> 0, ((
 							bezierResult[0].y - line0.startPoint.y) / 2 + line0.startPoint.y) >> 0); //控制点
-							array.push(line0.startPoint.x, line0.startPoint.y, ctrlPoint1.x, ctrlPoint1.y, ctrlPoint2.x, ctrlPoint2.y, bezierResult[0].x, bezierResult[0].y );
-							areaStr.push(array);
+						array.push(line0.startPoint.x, line0.startPoint.y, ctrlPoint1.x, ctrlPoint1.y, ctrlPoint2.x, ctrlPoint2.y, bezierResult[0].x, bezierResult[0].y);
+						areaStr.push(array);
 					} else {
 						lines[0].endPoint.x = bezierResult[0].x;
 						lines[0].endPoint.y = bezierResult[0].y;
 					}
-					let arr=[];
-					arr.push(bezierResult[0].x , bezierResult[0].y, bezierResult[1].x, bezierResult[1].y, bezierResult[2].x, bezierResult[2].y, bezierResult[3].x, bezierResult[3].y);
+					let arr = [];
+					arr.push(bezierResult[0].x, bezierResult[0].y, bezierResult[1].x, bezierResult[1].y, bezierResult[2].x, bezierResult[2].y, bezierResult[3].x, bezierResult[3].y);
 					areaStr.push(arr);
 					line1.startPoint.x = bezierResult[3].x;
 					line1.startPoint.y = bezierResult[3].y;
 				} else {   /////////////////////////////
 					if (i != 0) {
-						let pArr=[];
+						let pArr = [];
 						if (line0.isStrLine) {
 							pArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
 						} else {
@@ -353,22 +353,22 @@ ConfigFun = function () {
 					}
 				}
 				if (i == lines.length - 1) {
-					let ocPoint1, ocPoint2,oArr=[];
+					let ocPoint1, ocPoint2, oArr = [];
 					if (line1.isStrLine) {
 						oArr.push(line1.startPoint.x, line1.startPoint.y, line1.endPoint.x, line1.endPoint.y);
 					} else {
 						ocPoint1 = new Config.Point(line1.ctrlPoint1.x, line1.ctrlPoint1.y);
 						ocPoint2 = new Config.Point(line1.ctrlPoint2.x, line1.ctrlPoint2.y);
-						oArr.push(line1.startPoint.x, line1.startPoint.y , ocPoint1.x, ocPoint1.y, ocPoint2.x, ocPoint2.y, line1.endPoint.x , line1.endPoint.y);
+						oArr.push(line1.startPoint.x, line1.startPoint.y, ocPoint1.x, ocPoint1.y, ocPoint2.x, ocPoint2.y, line1.endPoint.x, line1.endPoint.y);
 					}
 					areaStr.push(oArr);
 				}
 			} else {
-				let yArr=[];
+				let yArr = [];
 				if (line0.isStrLine) {
-					yArr.push(line0.startPoint.x , line0.startPoint.y , line0.endPoint.x , line0.endPoint.y);
+					yArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
 				} else {
-					yArr.push(line0.startPoint.x , line0.startPoint.y , line0.ctrlPoint1.x , line0.ctrlPoint1.y , line0.ctrlPoint2.x , line0.ctrlPoint2.y, line0.endPoint.x, line0.endPoint.y);
+					yArr.push(line0.startPoint.x, line0.startPoint.y, line0.ctrlPoint1.x, line0.ctrlPoint1.y, line0.ctrlPoint2.x, line0.ctrlPoint2.y, line0.endPoint.x, line0.endPoint.y);
 				}
 				areaStr.push(yArr);
 			}
@@ -554,27 +554,27 @@ ConfigFun = function () {
 		return n;
 	}
 
-	this.checkPointLiePath = function(point){
-		let pathArea =  Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path;
-		if(!pathArea){
-			pathArea =  Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path = new QM_PathLine();
+	this.checkPointLiePath = function (point) {
+		let pathArea = Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path;
+		if (!pathArea) {
+			pathArea = Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path = new QM_PathLine();
 		}
-		for(let i=0;i<pathArea.nodes.length;i++){
-			for(let j=0;j<pathArea.nodes[i].list.length;j++){
-				let getPoints = Config.getPointArrOnLine(pathArea.nodes[i].list[j].selfNode,pathArea.nodes[i].list[j].nextNode);
-				for(let k=0; k<getPoints.length; k++){
-					if(Math.abs(getPoints[k].x-point.x)<5 && Math.abs(getPoints[k].y-point.y)<5){
-						return {"line":pathArea.nodes[i].list[j],"point":getPoints[k]};
+		for (let i = 0; i < pathArea.nodes.length; i++) {
+			for (let j = 0; j < pathArea.nodes[i].list.length; j++) {
+				let getPoints = Config.getPointArrOnLine(pathArea.nodes[i].list[j].selfNode, pathArea.nodes[i].list[j].nextNode);
+				for (let k = 0; k < getPoints.length; k++) {
+					if (Math.abs(getPoints[k].x - point.x) < 5 && Math.abs(getPoints[k].y - point.y) < 5) {
+						return { "line": pathArea.nodes[i].list[j], "point": getPoints[k] };
 					}
 				}
 			}
 		}
 		return null;
 	}
-	this.deleteAssist=function(assistObj){
-		for(let i=0;i<Config.assistPoint.length;i++){
-			if(assistObj == Config.assistPoint[i]){
-				Config.assistPoint.splice(i,1);
+	this.deleteAssist = function (assistObj) {
+		for (let i = 0; i < Config.assistPoint.length; i++) {
+			if (assistObj == Config.assistPoint[i]) {
+				Config.assistPoint.splice(i, 1);
 			}
 		}
 	}
@@ -688,7 +688,7 @@ ConfigFun = function () {
 	}
 	//转换公共设施type值
 	this.getFacType = function (str) {
-		let typeObj = { ft: 0, mys: 3, xsj: 4, dt: 5, fwt: 7, tcc: 8, cjr: 10, xys: 11, dit: 21, czc: 22, atm: 23, jcfw: 24, sjcd: 25, bc: 26, cjc: 27, jtn: 28, jtv: 29, ksgj: 30, sjxsn: 31, sjxsv: 32, tcjf: 33, vip: 34, xsjn: 35, xsjv: 36, yszj: 37, xxt: 38, door: 39, pq: 40, upft:0, downft:0, ysp: 50, lt: 88 };
+		let typeObj = { ft: 0, mys: 3, xsj: 4, dt: 5, fwt: 7, tcc: 8, cjr: 10, xys: 11, dit: 21, czc: 22, atm: 23, jcfw: 24, sjcd: 25, bc: 26, cjc: 27, jtn: 28, jtv: 29, ksgj: 30, sjxsn: 31, sjxsv: 32, tcjf: 33, vip: 34, xsjn: 35, xsjv: 36, yszj: 37, xxt: 38, door: 39, pq: 40, upft: 0, downft: 0, ysp: 50, lt: 88 };
 		return typeObj[str];
 	}
 
@@ -877,24 +877,24 @@ ConfigFun = function () {
 		let y = ((y1 - y2) * (x3 * y4 - x4 * y3) - (x1 * y2 - x2 * y1) * (y3 - y4)) / ((y1 - y2) * (x3 - x4) - (x1 - x2) * (y3 - y4));
 		return new Config.Point(x, y);
 	}
-//计算点到线段的距离
+	//计算点到线段的距离
 	this.PointToLineDistance = function (xx, yy, x1, y1, x2, y2) {
 		let ang1, ang2, ang, m;
 		let result = 0;
 		// 分别计算三条边的长度
 		const a = Math.sqrt((x1 - xx) * (x1 - xx) + (y1 - yy) * (y1 - yy));
 		if (a === 0) {
-			return [0, {x: x1,y: y1}];
+			return [0, { x: x1, y: y1 }];
 		}
 		const b = Math.sqrt((x2 - xx) * (x2 - xx) + (y2 - yy) * (y2 - yy));
 		if (b === 0) {
-			return [0, {x: x2,y: y2}];
+			return [0, { x: x2, y: y2 }];
 		}
 		const c = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 		// 如果线段是一个点则退出函数并返回距离
 		if (c === 0) {
 			result = a;
-			return [result, {x: x1,y: y1}];
+			return [result, { x: x1, y: y1 }];
 		}
 		// 如果点(xx,yy到点x1,y1)这条边短
 		if (a < b) {
@@ -932,23 +932,23 @@ ConfigFun = function () {
 			}
 			// 如果是钝角则直接返回距离
 			if (ang > Math.PI / 2) {
-				return [a, {x: x1,y: y1}];
+				return [a, { x: x1, y: y1 }];
 			}
 			// 返回距离并且求得当前距离所在线段的坐标
 			if (x1 === x2) {
-				return [b * Math.sin(ang), {x: x1,y: yy}];
+				return [b * Math.sin(ang), { x: x1, y: yy }];
 			} else if (y1 === y2) {
-				return [b * Math.sin(ang), {x: xx,y: y1}];
+				return [b * Math.sin(ang), { x: xx, y: y1 }];
 			}
 			// 直线的斜率存在且不为0的情况下
-			let x = 0,y = 0;
+			let x = 0, y = 0;
 			const k1 = ((y2 - y1) / x2 - x1);
 			const kk = -1 / k1;
 			const bb = yy - xx * kk;
 			const b1 = y2 - x2 * k1;
 			x = (b1 - bb) / (kk - k1);
 			y = kk * x + bb;
-			return [a * Math.sin(ang), {x,y}];
+			return [a * Math.sin(ang), { x, y }];
 		}
 		// 如果两个点的纵坐标相同，则直接得到直线斜率的弧度
 		if (y1 === y2) {
@@ -984,34 +984,34 @@ ConfigFun = function () {
 		}// 交角的大小
 		// 如果是对角则直接返回距离
 		if (ang > Math.PI / 2) {
-			return [b, {x: x2,y: y2}];
+			return [b, { x: x2, y: y2 }];
 		}
 		// 如果是锐角，返回计算得到的距离,并计算出相应的坐标
 		if (x1 === x2) {
-			return [b * Math.sin(ang), {x: x1,y: yy}];
+			return [b * Math.sin(ang), { x: x1, y: yy }];
 		} else if (y1 === y2) {
-			return [b * Math.sin(ang), {x: xx,y: y1}];
+			return [b * Math.sin(ang), { x: xx, y: y1 }];
 		}
 		// 直线的斜率存在且不为0的情况下
-		let x = 0,y = 0;
+		let x = 0, y = 0;
 		const k1 = ((y2 - y1) / x2 - x1);
 		const kk = -1 / k1;
 		const bb = yy - xx * kk;
 		const b1 = y2 - x2 * k1;
 		x = (b1 - bb) / (kk - k1);
 		y = kk * x + bb;
-		return [b * Math.sin(ang), {x,y}];
+		return [b * Math.sin(ang), { x, y }];
 	}
-//点到直线距离
+	//点到直线距离
 	this.PointToLineDis = function (xx, yy, x1, y1, x2, y2) {
 		let len;
-    	if(x1-x2==0){
-			len=Math.abs(xx-x1);
-    	}else {
-        	let A=(y1-y2)/(x1-x2);
-        	let B=y1-A*x1;
-        	len=Math.abs((A*xx+B-yy)/Math.sqrt(A*A+1))
-   	 	}
+		if (x1 - x2 == 0) {
+			len = Math.abs(xx - x1);
+		} else {
+			let A = (y1 - y2) / (x1 - x2);
+			let B = y1 - A * x1;
+			len = Math.abs((A * xx + B - yy) / Math.sqrt(A * A + 1))
+		}
 		return len;
 	}
 
@@ -1032,8 +1032,8 @@ ConfigFun = function () {
 			icons: [],
 			stairs: [],
 			parkArea: [],
-			devices:[],
-			wallArea:[]
+			devices: [],
+			wallArea: []
 		};
 		mapData.icons = fromData.icons;
 		mapData.stairs = fromData.stairs;
@@ -1065,16 +1065,16 @@ ConfigFun = function () {
 			mapData.parkArea[g] = new QM_Park(fromData.parkArea[g].name);
 			mapData.parkArea[g].initFromServe(fromData.parkArea[g]);
 		}
-		if(fromData.wallArea){
+		if (fromData.wallArea) {
 			for (let g = 0; g < fromData.wallArea.length; g++) {
 				mapData.wallArea[g] = new QM_Wall(fromData.wallArea[g].name);
 				mapData.wallArea[g].initFromServe(fromData.wallArea[g]);
 			}
 		}
-		if(fromData.path && Config.mapState=="path"){
+		if (fromData.path && Config.mapState == "path") {
 			mapData.path = new QM_PathLine();
 			mapData.path.initFromServe(fromData.path);
-		}else{
+		} else {
 			mapData.path = fromData.path;
 		}
 
@@ -1093,22 +1093,22 @@ ConfigFun = function () {
 			QM_PointList = QM_PointList.concat(bPoints);
 		}
 		for (let i = 0; i < mapData.buildArea.length; i++) {
-			if(!mapData.buildArea[i].isSelect){
+			if (!mapData.buildArea[i].isSelect) {
 				let bPoints = Config.getPointListByArea(mapData.buildArea[i]);
 				QM_PointList = QM_PointList.concat(bPoints);
 			}
 		}
 		if (Config.mapState == "shop") {
 			for (let k = 0; k < mapData.shopArea.length; k++) {
-				if(!mapData.shopArea[k].isSelect){
+				if (!mapData.shopArea[k].isSelect) {
 					let sPoints = Config.getPointListByArea(mapData.shopArea[k]);
 					QM_PointList = QM_PointList.concat(sPoints);
 				}
 			}
 		}
-		if(mapData.wallArea){
+		if (mapData.wallArea) {
 			for (let g = 0; g < mapData.wallArea.length; g++) {
-				if(!mapData.wallArea[g].isSelect){
+				if (!mapData.wallArea[g].isSelect) {
 					let sPoints = mapData.wallArea[g].getAllPoint();
 					QM_PointList = QM_PointList.concat(sPoints);
 					QM_PointList = QM_PointList.concat(mapData.wallArea[g].pathPoints);
