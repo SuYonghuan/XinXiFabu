@@ -29,6 +29,17 @@
               <use xlink:href="#iconsousuo"></use>
             </svg>
           </div>
+          <div
+            class="btn1"
+            @click="
+              reset();
+              getList();
+            "
+          >
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconqingchu"></use>
+            </svg>
+          </div>
         </el-col>
         <div style="width: 400px; text-align: right">
           <el-button
@@ -1127,6 +1138,9 @@ export default {
     reset() {
       this.name = "";
       this.creator = "";
+      this.$refs.table && this.$refs.table.clearFilter();
+      this.statusCode = null;
+      this.typeCode = null;
       this.pageIndex = 1;
       this.list = [];
       this.total = 0;
