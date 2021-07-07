@@ -29,24 +29,24 @@ ConfigFun = function () {
   }
 
   this.getMapInfo = function (mallCode,mallName="",buildOrder=0){
-    let url = "http://saas.1000my.com:8013";
+    let urlMap = "http://saas.1000my.com:8013";
     let tim = Config.timeStamp();
     let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
     Config.requestNoJM({
       method: "POST",
       data: JSON.stringify({ "mallCode": mallCode, "key": mallName + "editor" }),
-      url: url + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
+      url: urlMap + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
       success: (res) => {
         if (res.code == "200") {
           mapJSON = res.data;
           tim = Config.timeStamp();
           token = encodeURIComponent(Config.encrypt("/api/Shop/QueryShopListForMap" + tim));
           param = Config.encrypt(JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder}));
-          if (url.search("saas")!==-1) {
+          if (urlMap.search("saas")!==-1) {
             Config.request({
               method: "POST",
               data: param,
-              url: url + '/api/Shop/QueryShopListForMap?token=' + token + '&time=' + tim,
+              url: urlMap + '/api/Shop/QueryShopListForMap?token=' + token + '&time=' + tim,
               success: (res) => {
                 if (res.code == "200") {
                   shopJSON = res.data;
@@ -61,7 +61,7 @@ ConfigFun = function () {
             Config.requestNoJM({
               method: "POST",
               data: JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }),
-              url: url + '/api/Shop/QueryShopListForMap',
+              url: urlMap + '/api/Shop/QueryShopListForMap',
               success: (res) => {
                 if (res.code == "200") {
                   shopJSON = res.data;
