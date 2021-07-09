@@ -95,6 +95,7 @@
           {{ scope.row.groupList.length }}
         </template>
       </el-table-column>
+      <el-table-column prop="bootTime" label="开机时间"></el-table-column>
       <el-table-column prop="shutdownTime" label="关机时间"></el-table-column>
       <el-table-column prop="name" label="设备状态" column-key="deviceOnline" :filters=status :filter-multiple="false">
         <template slot-scope="scope">
@@ -132,9 +133,9 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item><p @click="reboot(scope.row)" v-if="pageMenu.devrestart">重启</p></el-dropdown-item>
               <el-dropdown-item><p @click="shut(scope.row)" v-if="pageMenu.devshutdown">关机</p></el-dropdown-item>
-              <el-dropdown-item><p @click="handleEdit(scope.row,2)" v-if="pageMenu.devsetshutdowntime">关机时间</p>
+              <el-dropdown-item><p @click="handleEdit(scope.row,2)" v-if="pageMenu.devsetshutdowntime">开关机时间</p>
               </el-dropdown-item>
-              <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除关机时间</p>
+              <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除开关机时间</p>
               </el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.startexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,2)">开启Explorer</p></el-dropdown-item>
@@ -147,8 +148,8 @@
     <div class="bottom-button">
       <el-button size="small" @click="shut(tableChecked,1)" v-if="pageMenu.devshutdown">关机</el-button>
       <el-button size="small" @click="reboot(tableChecked,1)" v-if="pageMenu.devrestart">重启</el-button>
-      <el-button size="small" @click="handleEdit(tableChecked,1)" v-if="pageMenu.devsetshutdowntime">关机时间</el-button>
-      <el-button size="small" @click="cleanShutTime(tableChecked,1)" v-if="pageMenu.devclearshutdowntime">清除关机时间
+      <el-button size="small" @click="handleEdit(tableChecked,1)" v-if="pageMenu.devsetshutdowntime">开关机时间</el-button>
+      <el-button size="small" @click="cleanShutTime(tableChecked,1)" v-if="pageMenu.devclearshutdowntime">清除开关机时间
       </el-button>
       <el-button size="small" @click="batchDelete(tableChecked)" v-if="pageMenu.devdel">删除</el-button>
     </div>
@@ -160,6 +161,15 @@
     <!--  关机时间  -->
     <el-dialog title="关机时间" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" :rules="rules1" ref="editForm">
+        <el-form-item label="开机时间" prop="bootTime">
+          <el-time-picker
+                  v-model="editForm.bootTime"
+                  :format="'HH:mm'"
+                  :value-format="'HH:mm'"
+                  placeholder="开机时间"
+          >
+          </el-time-picker>
+        </el-form-item>
         <el-form-item label="关机时间" prop="shutdownTime">
           <el-time-picker
                   v-model="editForm.shutdownTime"
@@ -235,7 +245,7 @@
         dialogVisible: false,
         nameDialogVisible: false,
         dialogTitle: '新增',
-        editForm: {shutdownTime: ''},
+        editForm: {bootTime: "",shutdownTime: ''},
         formLabelWidth: "120px",
         tableChecked: [],
         status: [
@@ -256,6 +266,7 @@
           devNum: [{required: true, message: '请输入设备名称', trigger: 'blur'}]
         },
         rules1: {
+          bootTime: [{ required: true, message: "请选择开机时间", trigger: "blur" }],
           shutdownTime: [{required: true, message: '请选择关机时间', trigger: 'blur'}]
         },
         downType: 1,
@@ -524,7 +535,7 @@
         this.dialogVisible = false
         this.nameDialogVisible = false
         this.$refs["editForm"].resetFields()
-        this.editForm = {shutdownTime: ''}
+        this.editForm = {bootTime: "",shutdownTime: ''}
       },
       //提交
       submitDownForm(row) {
@@ -539,7 +550,8 @@
               ids = [this.editForm.code];
             }
             const param = {
-              "ShutdownTime": this.editForm.shutdownTime,
+              BootTime: this.editForm.bootTime,
+              ShutdownTime: this.editForm.shutdownTime,
               "Code": ids
             }
             this.DeviceSetShutDownTime(param)
