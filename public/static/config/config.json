@@ -3,7 +3,6 @@
   "yunUrl": "http://121.37.146.236:8012",
   "mallYunUrl": "http://192.168.1.194:8013",
   "fileUrl": "http://test.1000my.com:8011",
-  "mapYunUrl": "http://122.112.233.82/mall",
   "uploadFile": "/api/FileManage/UpLoadFilesSec",
   "yunUpdateFile": "/api/MallFileManage/UpLoadFilesSec",
   "mapKey": "A",

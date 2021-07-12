@@ -6,7 +6,7 @@ window.QM_Line_Father = function(sPoint,ePoint,ctrlPoint1,ctrlPoint2,isStrLine) 
 	this.isStrLine = isStrLine;    //是否是直线
 }
 
-var Map_QM, mapObj, mapJSON, deviceData;
+var Map_QM, mapObj, deviceJSON,mapJSON;
 let deviceSite={"buildOrder":0,"floorOrder":1,"angle":0,"x":0,"y":0,"navPoint":1};
 
 ConfigFun = function () {
@@ -50,9 +50,9 @@ ConfigFun = function () {
 				url: url + '/api/CDN/DeviceListForMap?token=' + token + '&time=' + tim,
 				success: (res) => {
 					if (res.code == "200") {
-						shopJSON = res.data;
+						deviceJSON = res.data;
 					}
-					console.log(shopJSON);
+					console.log(deviceJSON);
 					Config.initData();
 				},
 				fail: () => {
@@ -65,7 +65,6 @@ ConfigFun = function () {
         console.log("GetMapInfo 接口失败");
       }
     });
-	deviceData
   }
   this.setDeviceSite = function (obj){
     deviceSite.navPoint = obj.hasOwnProperty("navPoint")?obj.navPoint : deviceSite.navPoint;
@@ -73,10 +72,10 @@ ConfigFun = function () {
     deviceSite.floorOrder = obj.hasOwnProperty("floorOrder")?obj.floorOrder : deviceSite.floorOrder;
 	deviceSite.x = obj.x;
     deviceSite.y = obj.y;
-    Config.callBack(deviceSite);
+    Config.callBack(obj);
     Map_QM.floor.setStartSite();
   }
-  //mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
+  //mapJSON 地图数据json    deviceJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
   this.initData = function () {
 	Map_QM = new MainMap_QM();
 	Map_QM.initBuild();

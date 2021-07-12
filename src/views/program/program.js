@@ -68,6 +68,7 @@ export class ProgramApi {
     }
     static getMaterials = cPost('/Api/Programme/ComponentMaterials');
     static preview = cPost('/Api/Programme/PreviewProgramme');
+    static buildingFloor = cPost('/Api/Cdn/GetConstructionList');
 }
 
 export class ScheduleApi {

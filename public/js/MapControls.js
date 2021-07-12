@@ -78,9 +78,9 @@ THREE.OrbitControls = function(object, domElement) {
 
   this.maxPan = null;
 
-  // Mouse buttons
+  // Mouse buttons   THREE.MOUSE.ROTATE
   this.mouseButtons = {
-    LEFT: THREE.MOUSE.ROTATE,
+    LEFT: THREE.MOUSE.PAN,
     MIDDLE: THREE.MOUSE.DOLLY,
     RIGHT: THREE.MOUSE.PAN
   };

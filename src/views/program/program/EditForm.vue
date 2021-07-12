@@ -703,14 +703,18 @@
             </template>
             <template v-else-if="activeComponent.typeCode === 'position'">
               <el-form-item class="item" label="地图选点">
-                <el-select v-model="activeComponent.bindingCode">
-                  <el-option
-                    :key="key"
-                    :value="key"
-                    :label="key"
-                    v-for="key in []"
-                  ></el-option>
-                </el-select>
+                <el-button
+                  @click="showSelectNavPoint(activeComponent.bindingCode)"
+                >
+                  {{ activeComponent.bindingCode || "请选择" }}</el-button
+                >
+                <el-button
+                  v-if="activeComponent.bindingCode"
+                  type="danger"
+                  icon="el-icon-delete"
+                  plain
+                  @click="activeComponent.bindingCode = null"
+                ></el-button>
               </el-form-item>
               <el-form-item class="item" label="箭头主题">
                 <el-select v-model="activeComponent.arrowTheme">
@@ -912,6 +916,34 @@
         :program="previewForm"
       ></preview-program>
     </el-dialog>
+    <el-dialog append-to-body :visible.sync="isSelectNavPointShown">
+      <el-form inline>
+        <el-form-item label="楼栋/楼层">
+          <el-cascader
+            :value="currentBF"
+            :options="bf"
+            @change="handleCurrentBfChange"
+            :props="{ value: 'order', label: 'name', children: 'floors' }"
+          ></el-cascader
+        ></el-form-item>
+        <el-form-item label="点位">
+          <el-input :value="navPointBindingCode" readonly></el-input
+        ></el-form-item>
+        <el-form-item
+          ><el-button
+            type="primary"
+            @click="
+              activeComponent.bindingCode = navPointBindingCode;
+              isSelectNavPointShown = false;
+            "
+            :disabled="!navPointBindingCode"
+            >确定</el-button
+          ></el-form-item
+        >
+      </el-form>
+
+      <div v-if="isSelectNavPointShown" id="threeDiv"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -936,6 +968,7 @@ import createComponent, {
 import defaultBrand from "./defaultBrand.svg";
 import defaultFac from "./defaultFac.svg";
 import defaultArrow from "./defaultArrow.svg";
+import { mapGetters } from "vuex";
 
 const logos = {
   audio: "#iconyinpin",
@@ -1097,6 +1130,10 @@ export default {
         brandTab: "",
       },
       previewForm: null,
+      isSelectNavPointShown: false,
+      bf: [],
+      currentBF: null,
+      navPointBindingCode: "",
     };
   },
   computed: {
@@ -1126,8 +1163,49 @@ export default {
     currentMaterialType() {
       return this.activeComponent ? this.activeComponent.typeCode : "image";
     },
+    ...mapGetters(["config", "user"]),
   },
   methods: {
+    handleCurrentBfChange(v) {
+      this.currentBF = v;
+      if (v && v.length) {
+        Map_QM.changeFloor(...v);
+        this.navPointBindingCode = null;
+      }
+    },
+    async showSelectNavPoint(bindingCode) {
+      this.navPointBindingCode = "";
+      const bindings = bindingCode ? bindingCode.split("_") : null;
+      if (!this.bf.length) {
+        const { data: buildings } = await ProgramApi.buildingFloor();
+        this.bf = buildings;
+      }
+      if (bindings && bindings.length === 3) {
+        this.currentBF = [bindings[0], bindings[1]];
+        this.navPointBindingCode = bindingCode;
+      } else {
+        const validBuilding = this.bf.find((b) => b.floors && b.floors.length);
+        if (validBuilding)
+          this.currentBF = [validBuilding.order, validBuilding.floors[0].order];
+      }
+      this.isSelectNavPointShown = true;
+      await this.$nextTick();
+      Config.getMapInfo(
+        (deviceSite) => {
+          if (
+            deviceSite.type === "path" &&
+            deviceSite.navPoint >= 0 &&
+            this.currentBF
+          ) {
+            this.navPointBindingCode = `${this.currentBF[0]}_${this.currentBF[1]}_${deviceSite.navPoint}`;
+          }
+        },
+        this.user.mallCode,
+        this.currentBF[0],
+        this.currentBF[1],
+        this.config.url
+      );
+    },
     async getBrands() {
       this.brandsGroupByFloor = await ProgramApi.getBrands(this.brandQ);
       this.brandTab = this.brandsGroupByFloor[0]
@@ -1664,11 +1742,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
+#threeDiv {
+  position: relative;
+  width: 100%;
+  height: 600px;
+}
 .pef {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
+
   .header {
     background: #ffffff;
     height: 80px;

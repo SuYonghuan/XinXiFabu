@@ -48,6 +48,7 @@ MainMap_QM = function (callBackFun) {
 	this.controls = new THREE.OrbitControls(this.camera, this.labelRenderer.domElement);
 	//禁用旋转
 	this.controls.enableRotate = false;
+	//this.controls.mouseButtons = { ORBIT: THREE.MOUSE.RIGHT, ZOOM: THREE.MOUSE.MIDDLE, PAN: THREE.MOUSE.LEFT };
 	//设置相机距离原点的最远距离
 	this.controls.minPolarAngle = 0;  // radians
 	this.controls.maxPolarAngle = 0.001;   // radians
@@ -176,8 +177,8 @@ MainMap_QM.prototype = {
 	onMouseClick: function (event) {
 		let mouse = new THREE.Vector2();
 		const { left, top } = Map_QM.renderer.domElement.getBoundingClientRect();
-		mouse.x = (((event.offsetX)) / Map_QM.w) * 2 - 1;
-		mouse.y = -(((event.offsetY)) / Map_QM.h) * 2 + 1;
+		mouse.x = (event.offsetX / Map_QM.w) * 2 - 1;
+		mouse.y = -(event.offsetY / Map_QM.h) * 2 + 1;
 
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mouse, Map_QM.camera);
@@ -185,12 +186,12 @@ MainMap_QM.prototype = {
 		let interDevs = raycaster.intersectObjects(Map_QM.floor.devObj.children, true);
 		if (interDevs.length > 0) {
 			let selected = interDevs[0].object;//取第一个物体
-			Config.callBack({ "name": selected.name, "x": parseInt(selected.position.x), "y": parseInt(selected.position.y), "floorOrder": deviceSite.floorOrder });
+			Config.callBack({ "type": selected.userData.type, "code": selected.userData.code, "name": selected.name, "x": parseInt(selected.position.x), "y": parseInt(selected.position.y), "floorOrder": deviceSite.floorOrder });
 		} else {
 			let intersects = raycaster.intersectObjects(Map_QM.floor.pathObj.children, true);
 			if (intersects.length > 0) {
 				let selected = intersects[0].object;//取第一个物体
-				let site = { "x": parseInt(selected.position.x), "y": parseInt(selected.position.y), "navPoint": selected.name, "angle": parseInt(deviceSite.angle), "floorOrder": deviceSite.floorOrder };
+				let site = { "type": selected.userData.type, "code": selected.userData.code, "x": parseInt(selected.position.x), "y": parseInt(selected.position.y), "navPoint": selected.name, "angle": parseInt(deviceSite.angle), "floorOrder": deviceSite.floorOrder };
 				Config.setDeviceSite(site);
 			}
 		}
@@ -344,7 +345,8 @@ FloorMap_QM.prototype.initFloor = function () {
 	}
 
 	let css = `color: ${Config.pocColor};height: ${parseInt(Config.pocHeight) * 0.2}px;
-	font-size: ${parseInt(Config.pocHeight)}px; z-index: 90;
+	font-size: ${parseInt(Config.pocHeight)}px; z-index: 90; user-select: none;
+    -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;
 	text-shadow: ${Config.pocBorderColor} 1px 0 0, ${Config.pocBorderColor} 0 1px 0, ${Config.pocBorderColor} -1px 0 0, ${Config.pocBorderColor} 0 -1px 0;`;
 
 	//店铺
@@ -374,6 +376,7 @@ FloorMap_QM.prototype.initFloor = function () {
 			}, 0, entColor, borderColor, 1, i);
 			mahc.node = mapData.shopArea[i].shopNav;
 			mahc.shopName = show;
+			mahc.userData = { "type": "shop", "code": show };
 			mahc.xaxis = mapData.shopArea[i].xaxis >> 0;
 			mahc.yaxis = mapData.shopArea[i].yaxis >> 0;
 			this.allObj.add(mahc);
@@ -390,27 +393,34 @@ FloorMap_QM.prototype.initFacilitie = function () {
 }
 //初始化设备
 FloorMap_QM.prototype.initDevice = function () {
-	console.log(shopJSON, deviceSite);
-	if (parseInt(deviceSite.buildOrder) < shopJSON.length && parseInt(deviceSite.floorOrder) < shopJSON[parseInt(deviceSite.buildOrder)].floors.length) {
-		let devArr = shopJSON[parseInt(deviceSite.buildOrder)].floors[parseInt(deviceSite.floorOrder)].devices;
-		for (let i = 0; i < devArr.length; i++) {
-			if (mapObj.mapData.path) {
-				let pathArr = mapObj.mapData.path.nodes;
-				pathArr.sort(Config.sortNode);
-				let index = parseInt(devArr[i].yaxis);
-				let planeGeom = new THREE.PlaneGeometry(48, 48);
-				let texture = new THREE.Texture();
-				let color = devArr[i].deviceOnline ? 'rgba(0, 225, 0, 1)' : 'rgba(225, 0, 0, 1)';
-				texture.image = Map_QM.createPointCanvas("", color);
-				texture.needsUpdate = true;
-				let material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, depthTest: false, transparent: true });
-				let plane = new THREE.Mesh(planeGeom, material)
-				plane.position.x = pathArr[index].x;
-				plane.position.y = -1 * pathArr[index].y;
-				plane.position.z = 2;
-				plane.renderOrder = 210;
-				plane.name = devArr[i].devNum;
-				this.devObj.add(plane);
+	if (deviceJSON) {
+		if (parseInt(deviceSite.buildOrder) < deviceJSON.length) {
+			for (let k = 0; k < deviceJSON[parseInt(deviceSite.buildOrder)].floors.length; k++) {  //parseInt(deviceSite.floorOrder)
+				if (parseInt(deviceSite.floorOrder) == deviceJSON[parseInt(deviceSite.buildOrder)].floors[k].floorOrder) {
+					let devArr = deviceJSON[parseInt(deviceSite.buildOrder)].floors[k].devices;
+					for (let i = 0; i < devArr.length; i++) {
+						if (mapObj.mapData.path) {
+							let pathArr = mapObj.mapData.path.nodes;
+							pathArr.sort(Config.sortNode);
+							let index = parseInt(devArr[i].yaxis);
+							let planeGeom = new THREE.PlaneGeometry(48, 48);
+							let texture = new THREE.Texture();
+							let color = devArr[i].deviceOnline ? 'rgba(0, 225, 0, 1)' : 'rgba(225, 0, 0, 1)';
+							texture.image = Map_QM.createPointCanvas("", color);
+							texture.needsUpdate = true;
+							let material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, depthTest: false, transparent: true });
+							let plane = new THREE.Mesh(planeGeom, material)
+							plane.position.x = pathArr[index].x;
+							plane.position.y = -1 * pathArr[index].y;
+							plane.position.z = 2;
+							plane.renderOrder = 210;
+							plane.name = devArr[i].devNum;
+							plane.userData = { "type": "device", "code": devArr[i].code };
+							this.devObj.add(plane);
+						}
+					}
+				}
+
 			}
 		}
 	}
@@ -448,6 +458,7 @@ FloorMap_QM.prototype.initPath = function () {
 				plane.position.z = 2;
 				plane.renderOrder = 210;
 				plane.name = pathArr[i].id;
+				plane.userData = { "type": "path", "code": pathArr[i].id };
 				this.pathObj.add(plane);
 			}
 		}
@@ -462,7 +473,7 @@ FloorMap_QM.prototype.initPath = function () {
 FloorMap_QM.prototype.setStartSite = function () {
 	if (!siteIcon) {
 		let planeGeom = new THREE.PlaneGeometry(100, 100);
-		let textu = new THREE.TextureLoader().load("img/site.png");
+		let textu = new THREE.TextureLoader().load("./img/site.png");
 		let material = new THREE.MeshBasicMaterial({ map: textu, side: THREE.DoubleSide, depthTest: false, transparent: true });
 		siteIcon = new THREE.Mesh(planeGeom, material)
 		siteIcon.center = new THREE.Vector2(0.5, 0.5);
@@ -475,12 +486,14 @@ FloorMap_QM.prototype.setStartSite = function () {
 //初始化装饰
 FloorMap_QM.prototype.initDecos = function () {
 	let css_TD = `color: ${Config.pocColor};
-	writing-mode: vertical-rl; text-orientation: upright;
+	writing-mode: vertical-rl; text-orientation: upright; user-select: none;
+    -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;
 	font-size: ${parseInt(Config.pocHeight)}px; animation: hideIndex 1s; z-index: 90; 
 	transform-origin:center center;`;
 
 	let css_LR = `color: ${Config.pocColor};height: ${parseInt(Config.pocHeight) + 2}px;
-	font-size: ${parseInt(Config.pocHeight)}px; animation: hideIndex 1s; z-index: 90; 
+	font-size: ${parseInt(Config.pocHeight)}px; animation: hideIndex 1s; z-index: 90; user-select: none;
+    -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;
 	transform-origin:center center;`;
 
 	let mapData = mapObj.mapData;

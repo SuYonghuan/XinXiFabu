@@ -244,19 +244,20 @@ export default {
       GetDeviceInfo(param).then((res) => {
         if (res.code === ERR_OK) {
           this.deviceInfo = res.data;
-
           Config.getMapInfo(
             (deviceSite) => {
+              console.log(deviceSite);
               if (deviceSite.navPoint >= 0) {
                 this.devCoordinate.yaxis = deviceSite.navPoint;
                 this.devCoordinate.angle = deviceSite.angle;
               }
             },
             this.user.mallCode,
-            this.deviceInfo.buildingOrder,
+            this.deviceInfo.buildOrder,
             this.deviceInfo.floorOrder,
-            this.config.mapYunUrl
+            this.config.url
           );
+          this.changeNavPoint();
         }
       });
     },
