@@ -67,7 +67,7 @@
     >
       <el-tab-pane label="设备位置" name="1">
         <div class="map-div">
-          <div id="threeDiv" @click="clickThree"></div>
+          <div id="threeDiv"></div>
           <div class="device-map">
             <p>
               设备点位：
@@ -231,8 +231,6 @@ export default {
     this.GetDeviceInfo();
     this.getSchedules();
     this.GetDevCoordinate();
-    // Config.setDeviceSite({floorOrder:0})
-    // Config.getMapInfo("9d9ccf33-9ee6-49d7-8cc3-e1aaa75f896c","http://saas.1000my.com:8013","nbfbc",0);
   },
   methods: {
     /**
@@ -246,12 +244,19 @@ export default {
       GetDeviceInfo(param).then((res) => {
         if (res.code === ERR_OK) {
           this.deviceInfo = res.data;
-          console.log(this.deviceInfo);
-          Config.setDeviceSite({ floorOrder: this.deviceInfo.floorOrder });
-          // Config.setDeviceSite({floorOrder:1})
-          //商场Code，云地址，名称，当前楼栋
-          Config.getMapInfo(this.user.mallCode, this.config.mapKey, 0);
-          // Config.getMapInfo('398424aa-e79c-4033-977b-c8eba2b4e6b9',this.config.mapKey,0);
+
+          Config.getMapInfo(
+            (deviceSite) => {
+              if (deviceSite.navPoint >= 0) {
+                this.devCoordinate.yaxis = deviceSite.navPoint;
+                this.devCoordinate.angle = deviceSite.angle;
+              }
+            },
+            this.user.mallCode,
+            this.deviceInfo.buildingOrder,
+            this.deviceInfo.floorOrder,
+            this.config.mapYunUrl
+          );
         }
       });
     },
@@ -356,15 +361,6 @@ export default {
       } else {
         this.GetDeptListByDeviceCode();
       }
-    },
-    //点击地图
-    clickThree() {
-      setTimeout(() => {
-        if (deviceSite.navPoint >= 0) {
-          this.devCoordinate.yaxis = deviceSite.navPoint;
-          this.devCoordinate.angle = deviceSite.angle;
-        }
-      }, 10);
     },
     //修改设备点位
     changeNavPoint() {

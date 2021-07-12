@@ -1,18 +1,18 @@
-window.QM_Line_Father = function (sPoint, ePoint, ctrlPoint1, ctrlPoint2, isStrLine) {
+window.QM_Line_Father = function(sPoint,ePoint,ctrlPoint1,ctrlPoint2,isStrLine) {
 	this.startPoint = sPoint;     //起始点
-	this.endPoint = ePoint;        //结束点
+	this.endPoint =  ePoint;        //结束点
 	this.ctrlPoint1 = ctrlPoint1;
 	this.ctrlPoint2 = ctrlPoint2;
 	this.isStrLine = isStrLine;    //是否是直线
 }
 
-let Map_QM, shopData, mapObj, mapJSON, shopJSON;
-let deviceSite = { "floorOrder": 1, "angle": 0, "x": 0, "y": 0, "navPoint": 1 };
+var Map_QM, mapObj, mapJSON, deviceData;
+let deviceSite={"buildOrder":0,"floorOrder":1,"angle":0,"x":0,"y":0,"navPoint":1};
 
 ConfigFun = function () {
 	this.spriteMaterialArr = [];
-	this.shopHeight = 10;
-
+	this.shopHeight=10;
+    this.callBack;
 	this.pocHeight = 18;
 	this.Point = function (x = 0, y = 0) {
 		this.x = x;
@@ -28,95 +28,59 @@ ConfigFun = function () {
 		this.rightPoint;    //右侧平行线交点
 	}
 
-	this.getMapInfo = function (mallCode, mallName = "", buildOrder = 0) {
-		let url = "http://122.112.233.82/mall";
-		let tim = Config.timeStamp();
-		let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
-		Config.requestNoJM({
-			method: "POST",
-			data: JSON.stringify({ "mallCode": mallCode, "key": mallName + "editor" }),
-			url: url + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
-			success: (res) => {
-				if (res.code == "200") {
-					mapJSON = res.data;
-					tim = Config.timeStamp();
-					token = encodeURIComponent(Config.encrypt("/api/Shop/QueryShopListForMap" + tim));
-					param = Config.encrypt(JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }));
-					// if (url.search("saas") !== -1) {
-					Config.request({
-						method: "POST",
-						data: param,
-						url: url + '/api/Shop/QueryShopListForMap?token=' + token + '&time=' + tim,
-						success: (res) => {
-							if (res.code == "200") {
-								shopJSON = res.data;
-								Config.initData(mapJSON, shopJSON);
-							}
-						},
-						fail: () => {
-							console.log("QueryShopListForMap 接口失败");
-						}
-					});
-					// } else {
-					// Config.requestNoJM({
-					// 	method: "POST",
-					// 	data: JSON.stringify({ "mallCode": mallCode, "BuildingOrder": buildOrder }),
-					// 	url: url + '/api/Shop/QueryShopListForMap',
-					// 	success: (res) => {
-					// 		if (res.code == "200") {
-					// 			shopJSON = res.data;
-					// 			Config.initData(mapJSON, shopJSON);
-					// 		}
-					// 	},
-					// 	fail: () => {
-					// 		console.log("QueryShopListForMap 接口失败");
-					// 	}
-					// });
-					// }
+  this.getMapInfo = function (callBack, mallCode, build, floor, _url="http://saas.1000my.com:8013"){
+    let url = _url;
+	deviceSite.floorOrder=floor;
+	deviceSite.buildOrder=build;
+	Config.callBack = callBack;
+    let tim = Config.timeStamp();
+    let token = encodeURIComponent(Config.encrypt("/api/CDN/GetMapInfo" + tim));
+    Config.requestNoJM({
+      method: "POST",
+      data: JSON.stringify({ "mallCode": mallCode, "key": "Zeditor" }),
+      url: url + '/api/CDN/GetMapInfo?token=' + token + '&time=' + tim,
+      success: (res) => {
+        if (res.code == "200") {
+		  	mapJSON = LZString.decompressFromBase64(res.data.mapData)
+          	tim = Config.timeStamp();
+			token = encodeURIComponent(Config.encrypt("/api/CDN/DeviceListForMap" + tim));
+			Config.request({
+				method: "GET",
+				data: "",
+				url: url + '/api/CDN/DeviceListForMap?token=' + token + '&time=' + tim,
+				success: (res) => {
+					if (res.code == "200") {
+						shopJSON = res.data;
+					}
+					console.log(shopJSON);
+					Config.initData();
+				},
+				fail: () => {
+					Config.initData();
 				}
-			},
-			fail: () => {
-				console.log("GetMapInfo 接口失败");
-			}
-		});
-	}
-	this.setDeviceSite = function (obj) {
-		deviceSite.navPoint = obj.hasOwnProperty("navPoint") ? obj.navPoint : deviceSite.navPoint;
-		deviceSite.angle = obj.hasOwnProperty("angle") ? obj.angle : deviceSite.angle;
-		deviceSite.floorOrder = obj.hasOwnProperty("floorOrder") ? obj.floorOrder : deviceSite.floorOrder;
-		console.log(deviceSite);
-		if (mapObj) {
-			let pathArr = mapObj.mapData.path.nodes;
-			try {
-				deviceSite.x = pathArr[parseInt(deviceSite.navPoint)].x;
-				deviceSite.y = -1 * pathArr[parseInt(deviceSite.navPoint)].y;
-			} catch (error) {
-				console.error("未找到点");
-				deviceSite.x = 0;
-				deviceSite.y = 0;
-			}
-			Map_QM.floor.setStartSite();
-		}
-	}
-	//mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
-	this.initData = function (mapJSON, shopJSON) {
-		console.log(mapJSON, shopJSON);
-
-		let array = JSON.parse(mapJSON.mapData);
-		let mapArray;
-		if (array.length > 1) {
-			mapArray = array[1].buildArr;
-		} else {
-			mapArray = array[0] && array[0].buildArr;
-		}
-		mapObj = mapArray[parseInt(deviceSite.floorOrder)];
-
-		let shopArray = shopJSON;
-		shopData = shopArray[parseInt(deviceSite.floorOrder)];
-		Map_QM = new MainMap_QM();
-		Map_QM.initBuild();
-	}
-
+			});
+        } 
+      },
+      fail: () => {
+        console.log("GetMapInfo 接口失败");
+      }
+    });
+	deviceData
+  }
+  this.setDeviceSite = function (obj){
+    deviceSite.navPoint = obj.hasOwnProperty("navPoint")?obj.navPoint : deviceSite.navPoint;
+    deviceSite.angle = obj.hasOwnProperty("angle")?obj.angle : deviceSite.angle;
+    deviceSite.floorOrder = obj.hasOwnProperty("floorOrder")?obj.floorOrder : deviceSite.floorOrder;
+	deviceSite.x = obj.x;
+    deviceSite.y = obj.y;
+    Config.callBack(deviceSite);
+    Map_QM.floor.setStartSite();
+  }
+  //mapJSON 地图数据json    shopJSON 店铺数据    device 设备点位OBJ {x, y, floorOrder}
+  this.initData = function () {
+	Map_QM = new MainMap_QM();
+	Map_QM.initBuild();
+}
 	/**
 	 * 检测点是否在多边形区域内
 	 */
@@ -261,24 +225,24 @@ ConfigFun = function () {
 	}
 	this.changeWallToString = function (area) {
 		let areaArr = [];
-		let points = Config.getWallPoints(area.pathPoints, area.thick);
+		let points = Config.getWallPoints(area.pathPoints,area.thick);
 		for (let i = 0; i < points.length; i++) {
 			let array = [];
-			let pend = i == points.length - 1 ? points[0] : points[i + 1];
+			let pend = i==points.length-1 ? points[0] : points[i+1];
 			array.push(points[i].x, points[i].y, pend.x, pend.y);
 			areaArr.push(array);
 		}
 		return areaArr;
 	}
 	//检测区域是否在矩形内
-	this.checkAreaInRect = function (area, rect) {
+	this.checkAreaInRect = function(area,rect) {
 		let ptPolygon = [];
-		ptPolygon.push(rect[0], new Config.Point(rect[1].x, rect[0].y), rect[1], new Config.Point(rect[0].x, rect[1].y));
+		ptPolygon.push(rect[0], new Config.Point(rect[1].x,rect[0].y), rect[1], new Config.Point(rect[0].x,rect[1].y));
 		for (let f = 0; f < area.hasLines.length; f++) {
 			let line2 = area.hasLines[f];
-			let sPoint = Config.checkBoundary(new Config.Point(line2.startPoint.x, line2.startPoint.y), ptPolygon);
-			let ePoint = Config.checkBoundary(new Config.Point(line2.endPoint.x, line2.endPoint.y), ptPolygon);
-			if (!sPoint || !ePoint) {
+			let sPoint = Config.checkBoundary(new Config.Point(line2.startPoint.x,line2.startPoint.y),ptPolygon);
+			let ePoint = Config.checkBoundary(new Config.Point(line2.endPoint.x,line2.endPoint.y),ptPolygon);
+			if(!sPoint || !ePoint){
 				return false;
 			}
 		}
@@ -307,17 +271,17 @@ ConfigFun = function () {
 		for (let i = 0; i < lines.length; i++) {
 			let line0 = lines[i];
 			let line1 = (i < lines.length - 1) ? lines[i + 1] : lines[0];
-			if (Config.angleRadius > 2) {
-				if (line0.isStrLine && line1.isStrLine && Math.abs(line0.endPoint.x - line0.startPoint.x) + Math.abs(line0.endPoint.y - line0.startPoint.y) > parseInt(Config.angleRadius) * 2) {
+			if (Config.angleRadius>2) {
+				if (line0.isStrLine && line1.isStrLine && Math.abs(line0.endPoint.x - line0.startPoint.x)  + Math.abs(line0.endPoint.y - line0.startPoint.y) > parseInt(Config.angleRadius)*2) {
 					let x1 = line0.endPoint.x;
 					let y1 = line0.endPoint.y;
 					let x2 = line0.startPoint.x;
 					let y2 = line0.startPoint.y;
 					let x3 = line1.endPoint.x;
 					let y3 = line1.endPoint.y;
-					if (Math.abs((x3 - x1) / (x2 - x1) - (y3 - y1) / (y2 - y1)) < 0.1) {
-						let yArr = [];
-						yArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
+					if(Math.abs((x3 - x1)/(x2 - x1) - (y3 - y1)/(y2 - y1))<0.1){
+						let yArr=[];
+						yArr.push(line0.startPoint.x , line0.startPoint.y , line0.endPoint.x , line0.endPoint.y);
 						areaStr.push(yArr);
 						continue;
 					}
@@ -327,23 +291,23 @@ ConfigFun = function () {
 						0].y, result.tangencyPoints[1].x, result.tangencyPoints[1].y, x1, y1, Config.angleRadius);
 
 					if (i > 0) {
-						let ctrlPoint1, ctrlPoint2, array = [];
+						let ctrlPoint1, ctrlPoint2, array=[];
 						ctrlPoint1 = ctrlPoint2 = new Config.Point(((bezierResult[0].x - line0.startPoint.x) / 2 + line0.startPoint.x) >> 0, ((
 							bezierResult[0].y - line0.startPoint.y) / 2 + line0.startPoint.y) >> 0); //控制点
-						array.push(line0.startPoint.x, line0.startPoint.y, ctrlPoint1.x, ctrlPoint1.y, ctrlPoint2.x, ctrlPoint2.y, bezierResult[0].x, bezierResult[0].y);
-						areaStr.push(array);
+							array.push(line0.startPoint.x, line0.startPoint.y, ctrlPoint1.x, ctrlPoint1.y, ctrlPoint2.x, ctrlPoint2.y, bezierResult[0].x, bezierResult[0].y );
+							areaStr.push(array);
 					} else {
 						lines[0].endPoint.x = bezierResult[0].x;
 						lines[0].endPoint.y = bezierResult[0].y;
 					}
-					let arr = [];
-					arr.push(bezierResult[0].x, bezierResult[0].y, bezierResult[1].x, bezierResult[1].y, bezierResult[2].x, bezierResult[2].y, bezierResult[3].x, bezierResult[3].y);
+					let arr=[];
+					arr.push(bezierResult[0].x , bezierResult[0].y, bezierResult[1].x, bezierResult[1].y, bezierResult[2].x, bezierResult[2].y, bezierResult[3].x, bezierResult[3].y);
 					areaStr.push(arr);
 					line1.startPoint.x = bezierResult[3].x;
 					line1.startPoint.y = bezierResult[3].y;
 				} else {   /////////////////////////////
 					if (i != 0) {
-						let pArr = [];
+						let pArr=[];
 						if (line0.isStrLine) {
 							pArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
 						} else {
@@ -353,22 +317,22 @@ ConfigFun = function () {
 					}
 				}
 				if (i == lines.length - 1) {
-					let ocPoint1, ocPoint2, oArr = [];
+					let ocPoint1, ocPoint2,oArr=[];
 					if (line1.isStrLine) {
 						oArr.push(line1.startPoint.x, line1.startPoint.y, line1.endPoint.x, line1.endPoint.y);
 					} else {
 						ocPoint1 = new Config.Point(line1.ctrlPoint1.x, line1.ctrlPoint1.y);
 						ocPoint2 = new Config.Point(line1.ctrlPoint2.x, line1.ctrlPoint2.y);
-						oArr.push(line1.startPoint.x, line1.startPoint.y, ocPoint1.x, ocPoint1.y, ocPoint2.x, ocPoint2.y, line1.endPoint.x, line1.endPoint.y);
+						oArr.push(line1.startPoint.x, line1.startPoint.y , ocPoint1.x, ocPoint1.y, ocPoint2.x, ocPoint2.y, line1.endPoint.x , line1.endPoint.y);
 					}
 					areaStr.push(oArr);
 				}
 			} else {
-				let yArr = [];
+				let yArr=[];
 				if (line0.isStrLine) {
-					yArr.push(line0.startPoint.x, line0.startPoint.y, line0.endPoint.x, line0.endPoint.y);
+					yArr.push(line0.startPoint.x , line0.startPoint.y , line0.endPoint.x , line0.endPoint.y);
 				} else {
-					yArr.push(line0.startPoint.x, line0.startPoint.y, line0.ctrlPoint1.x, line0.ctrlPoint1.y, line0.ctrlPoint2.x, line0.ctrlPoint2.y, line0.endPoint.x, line0.endPoint.y);
+					yArr.push(line0.startPoint.x , line0.startPoint.y , line0.ctrlPoint1.x , line0.ctrlPoint1.y , line0.ctrlPoint2.x , line0.ctrlPoint2.y, line0.endPoint.x, line0.endPoint.y);
 				}
 				areaStr.push(yArr);
 			}
@@ -554,27 +518,27 @@ ConfigFun = function () {
 		return n;
 	}
 
-	this.checkPointLiePath = function (point) {
-		let pathArea = Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path;
-		if (!pathArea) {
-			pathArea = Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path = new QM_PathLine();
+	this.checkPointLiePath = function(point){
+		let pathArea =  Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path;
+		if(!pathArea){
+			pathArea =  Config.allMap[Config.numBuild].buildArr[Config.numFloor].mapData.path = new QM_PathLine();
 		}
-		for (let i = 0; i < pathArea.nodes.length; i++) {
-			for (let j = 0; j < pathArea.nodes[i].list.length; j++) {
-				let getPoints = Config.getPointArrOnLine(pathArea.nodes[i].list[j].selfNode, pathArea.nodes[i].list[j].nextNode);
-				for (let k = 0; k < getPoints.length; k++) {
-					if (Math.abs(getPoints[k].x - point.x) < 5 && Math.abs(getPoints[k].y - point.y) < 5) {
-						return { "line": pathArea.nodes[i].list[j], "point": getPoints[k] };
+		for(let i=0;i<pathArea.nodes.length;i++){
+			for(let j=0;j<pathArea.nodes[i].list.length;j++){
+				let getPoints = Config.getPointArrOnLine(pathArea.nodes[i].list[j].selfNode,pathArea.nodes[i].list[j].nextNode);
+				for(let k=0; k<getPoints.length; k++){
+					if(Math.abs(getPoints[k].x-point.x)<5 && Math.abs(getPoints[k].y-point.y)<5){
+						return {"line":pathArea.nodes[i].list[j],"point":getPoints[k]};
 					}
 				}
 			}
 		}
 		return null;
 	}
-	this.deleteAssist = function (assistObj) {
-		for (let i = 0; i < Config.assistPoint.length; i++) {
-			if (assistObj == Config.assistPoint[i]) {
-				Config.assistPoint.splice(i, 1);
+	this.deleteAssist=function(assistObj){
+		for(let i=0;i<Config.assistPoint.length;i++){
+			if(assistObj == Config.assistPoint[i]){
+				Config.assistPoint.splice(i,1);
 			}
 		}
 	}
@@ -688,7 +652,7 @@ ConfigFun = function () {
 	}
 	//转换公共设施type值
 	this.getFacType = function (str) {
-		let typeObj = { ft: 0, mys: 3, xsj: 4, dt: 5, fwt: 7, tcc: 8, cjr: 10, xys: 11, dit: 21, czc: 22, atm: 23, jcfw: 24, sjcd: 25, bc: 26, cjc: 27, jtn: 28, jtv: 29, ksgj: 30, sjxsn: 31, sjxsv: 32, tcjf: 33, vip: 34, xsjn: 35, xsjv: 36, yszj: 37, xxt: 38, door: 39, pq: 40, upft: 0, downft: 0, ysp: 50, lt: 88 };
+		let typeObj = { ft: 0, mys: 3, xsj: 4, dt: 5, fwt: 7, tcc: 8, cjr: 10, xys: 11, dit: 21, czc: 22, atm: 23, jcfw: 24, sjcd: 25, bc: 26, cjc: 27, jtn: 28, jtv: 29, ksgj: 30, sjxsn: 31, sjxsv: 32, tcjf: 33, vip: 34, xsjn: 35, xsjv: 36, yszj: 37, xxt: 38, door: 39, pq: 40, upft:0, downft:0, ysp: 50, lt: 88 };
 		return typeObj[str];
 	}
 
@@ -877,24 +841,24 @@ ConfigFun = function () {
 		let y = ((y1 - y2) * (x3 * y4 - x4 * y3) - (x1 * y2 - x2 * y1) * (y3 - y4)) / ((y1 - y2) * (x3 - x4) - (x1 - x2) * (y3 - y4));
 		return new Config.Point(x, y);
 	}
-	//计算点到线段的距离
+//计算点到线段的距离
 	this.PointToLineDistance = function (xx, yy, x1, y1, x2, y2) {
 		let ang1, ang2, ang, m;
 		let result = 0;
 		// 分别计算三条边的长度
 		const a = Math.sqrt((x1 - xx) * (x1 - xx) + (y1 - yy) * (y1 - yy));
 		if (a === 0) {
-			return [0, { x: x1, y: y1 }];
+			return [0, {x: x1,y: y1}];
 		}
 		const b = Math.sqrt((x2 - xx) * (x2 - xx) + (y2 - yy) * (y2 - yy));
 		if (b === 0) {
-			return [0, { x: x2, y: y2 }];
+			return [0, {x: x2,y: y2}];
 		}
 		const c = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 		// 如果线段是一个点则退出函数并返回距离
 		if (c === 0) {
 			result = a;
-			return [result, { x: x1, y: y1 }];
+			return [result, {x: x1,y: y1}];
 		}
 		// 如果点(xx,yy到点x1,y1)这条边短
 		if (a < b) {
@@ -932,23 +896,23 @@ ConfigFun = function () {
 			}
 			// 如果是钝角则直接返回距离
 			if (ang > Math.PI / 2) {
-				return [a, { x: x1, y: y1 }];
+				return [a, {x: x1,y: y1}];
 			}
 			// 返回距离并且求得当前距离所在线段的坐标
 			if (x1 === x2) {
-				return [b * Math.sin(ang), { x: x1, y: yy }];
+				return [b * Math.sin(ang), {x: x1,y: yy}];
 			} else if (y1 === y2) {
-				return [b * Math.sin(ang), { x: xx, y: y1 }];
+				return [b * Math.sin(ang), {x: xx,y: y1}];
 			}
 			// 直线的斜率存在且不为0的情况下
-			let x = 0, y = 0;
+			let x = 0,y = 0;
 			const k1 = ((y2 - y1) / x2 - x1);
 			const kk = -1 / k1;
 			const bb = yy - xx * kk;
 			const b1 = y2 - x2 * k1;
 			x = (b1 - bb) / (kk - k1);
 			y = kk * x + bb;
-			return [a * Math.sin(ang), { x, y }];
+			return [a * Math.sin(ang), {x,y}];
 		}
 		// 如果两个点的纵坐标相同，则直接得到直线斜率的弧度
 		if (y1 === y2) {
@@ -984,34 +948,34 @@ ConfigFun = function () {
 		}// 交角的大小
 		// 如果是对角则直接返回距离
 		if (ang > Math.PI / 2) {
-			return [b, { x: x2, y: y2 }];
+			return [b, {x: x2,y: y2}];
 		}
 		// 如果是锐角，返回计算得到的距离,并计算出相应的坐标
 		if (x1 === x2) {
-			return [b * Math.sin(ang), { x: x1, y: yy }];
+			return [b * Math.sin(ang), {x: x1,y: yy}];
 		} else if (y1 === y2) {
-			return [b * Math.sin(ang), { x: xx, y: y1 }];
+			return [b * Math.sin(ang), {x: xx,y: y1}];
 		}
 		// 直线的斜率存在且不为0的情况下
-		let x = 0, y = 0;
+		let x = 0,y = 0;
 		const k1 = ((y2 - y1) / x2 - x1);
 		const kk = -1 / k1;
 		const bb = yy - xx * kk;
 		const b1 = y2 - x2 * k1;
 		x = (b1 - bb) / (kk - k1);
 		y = kk * x + bb;
-		return [b * Math.sin(ang), { x, y }];
+		return [b * Math.sin(ang), {x,y}];
 	}
-	//点到直线距离
+//点到直线距离
 	this.PointToLineDis = function (xx, yy, x1, y1, x2, y2) {
 		let len;
-		if (x1 - x2 == 0) {
-			len = Math.abs(xx - x1);
-		} else {
-			let A = (y1 - y2) / (x1 - x2);
-			let B = y1 - A * x1;
-			len = Math.abs((A * xx + B - yy) / Math.sqrt(A * A + 1))
-		}
+    	if(x1-x2==0){
+			len=Math.abs(xx-x1);
+    	}else {
+        	let A=(y1-y2)/(x1-x2);
+        	let B=y1-A*x1;
+        	len=Math.abs((A*xx+B-yy)/Math.sqrt(A*A+1))
+   	 	}
 		return len;
 	}
 
@@ -1032,8 +996,8 @@ ConfigFun = function () {
 			icons: [],
 			stairs: [],
 			parkArea: [],
-			devices: [],
-			wallArea: []
+			devices:[],
+			wallArea:[]
 		};
 		mapData.icons = fromData.icons;
 		mapData.stairs = fromData.stairs;
@@ -1065,16 +1029,16 @@ ConfigFun = function () {
 			mapData.parkArea[g] = new QM_Park(fromData.parkArea[g].name);
 			mapData.parkArea[g].initFromServe(fromData.parkArea[g]);
 		}
-		if (fromData.wallArea) {
+		if(fromData.wallArea){
 			for (let g = 0; g < fromData.wallArea.length; g++) {
 				mapData.wallArea[g] = new QM_Wall(fromData.wallArea[g].name);
 				mapData.wallArea[g].initFromServe(fromData.wallArea[g]);
 			}
 		}
-		if (fromData.path && Config.mapState == "path") {
+		if(fromData.path && Config.mapState=="path"){
 			mapData.path = new QM_PathLine();
 			mapData.path.initFromServe(fromData.path);
-		} else {
+		}else{
 			mapData.path = fromData.path;
 		}
 
@@ -1093,22 +1057,22 @@ ConfigFun = function () {
 			QM_PointList = QM_PointList.concat(bPoints);
 		}
 		for (let i = 0; i < mapData.buildArea.length; i++) {
-			if (!mapData.buildArea[i].isSelect) {
+			if(!mapData.buildArea[i].isSelect){
 				let bPoints = Config.getPointListByArea(mapData.buildArea[i]);
 				QM_PointList = QM_PointList.concat(bPoints);
 			}
 		}
 		if (Config.mapState == "shop") {
 			for (let k = 0; k < mapData.shopArea.length; k++) {
-				if (!mapData.shopArea[k].isSelect) {
+				if(!mapData.shopArea[k].isSelect){
 					let sPoints = Config.getPointListByArea(mapData.shopArea[k]);
 					QM_PointList = QM_PointList.concat(sPoints);
 				}
 			}
 		}
-		if (mapData.wallArea) {
+		if(mapData.wallArea){
 			for (let g = 0; g < mapData.wallArea.length; g++) {
-				if (!mapData.wallArea[g].isSelect) {
+				if(!mapData.wallArea[g].isSelect){
 					let sPoints = mapData.wallArea[g].getAllPoint();
 					QM_PointList = QM_PointList.concat(sPoints);
 					QM_PointList = QM_PointList.concat(mapData.wallArea[g].pathPoints);
@@ -1143,3 +1107,1162 @@ ConfigFun = function () {
 	}
 }
 const Config = new ConfigFun();
+
+! function (t, n) {
+	"object" == typeof exports ? module.exports = exports = n() : "function" == typeof define && define.amd ? define([], n) : t.CryptoJS = n()
+  }(this, function () {
+	var t = t || function (t, n) {
+	  var i = Object.create || function () {
+		  function t() {}
+		  return function (n) {
+			var i;
+			return t.prototype = n, i = new t, t.prototype = null, i
+		  }
+		}(),
+		e = {},
+		r = e.lib = {},
+		o = r.Base = function () {
+		  return {
+			extend: function (t) {
+			  var n = i(this);
+			  return t && n.mixIn(t), n.hasOwnProperty("init") && this.init !== n.init || (n.init = function () {
+				n.$super.init.apply(this, arguments)
+			  }), n.init.prototype = n, n.$super = this, n
+			},
+			create: function () {
+			  var t = this.extend();
+			  return t.init.apply(t, arguments), t
+			},
+			init: function () {},
+			mixIn: function (t) {
+			  for (var n in t) t.hasOwnProperty(n) && (this[n] = t[n]);
+			  t.hasOwnProperty("toString") && (this.toString = t.toString)
+			},
+			clone: function () {
+			  return this.init.prototype.extend(this)
+			}
+		  }
+		}(),
+		s = r.WordArray = o.extend({
+		  init: function (t, i) {
+			t = this.words = t || [], i != n ? this.sigBytes = i : this.sigBytes = 4 * t.length
+		  },
+		  toString: function (t) {
+			return (t || c).stringify(this)
+		  },
+		  concat: function (t) {
+			var n = this.words,
+			  i = t.words,
+			  e = this.sigBytes,
+			  r = t.sigBytes;
+			if (this.clamp(), e % 4)
+			  for (var o = 0; o < r; o++) {
+				var s = i[o >>> 2] >>> 24 - o % 4 * 8 & 255;
+				n[e + o >>> 2] |= s << 24 - (e + o) % 4 * 8
+			  } else
+				for (var o = 0; o < r; o += 4) n[e + o >>> 2] = i[o >>> 2];
+			return this.sigBytes += r, this
+		  },
+		  clamp: function () {
+			var n = this.words,
+			  i = this.sigBytes;
+			n[i >>> 2] &= 4294967295 << 32 - i % 4 * 8, n.length = t.ceil(i / 4)
+		  },
+		  clone: function () {
+			var t = o.clone.call(this);
+			return t.words = this.words.slice(0), t
+		  },
+		  random: function (n) {
+			for (var i, e = [], r = function (n) {
+				var n = n,
+				  i = 987654321,
+				  e = 4294967295;
+				return function () {
+				  i = 36969 * (65535 & i) + (i >> 16) & e, n = 18e3 * (65535 & n) + (n >> 16) & e;
+				  var r = (i << 16) + n & e;
+				  return r /= 4294967296, r += .5, r * (t.random() > .5 ? 1 : -1)
+				}
+			  }, o = 0; o < n; o += 4) {
+			  var a = r(4294967296 * (i || t.random()));
+			  i = 987654071 * a(), e.push(4294967296 * a() | 0)
+			}
+			return new s.init(e, n)
+		  }
+		}),
+		a = e.enc = {},
+		c = a.Hex = {
+		  stringify: function (t) {
+			for (var n = t.words, i = t.sigBytes, e = [], r = 0; r < i; r++) {
+			  var o = n[r >>> 2] >>> 24 - r % 4 * 8 & 255;
+			  e.push((o >>> 4).toString(16)), e.push((15 & o).toString(16))
+			}
+			return e.join("")
+		  },
+		  parse: function (t) {
+			for (var n = t.length, i = [], e = 0; e < n; e += 2) i[e >>> 3] |= parseInt(t.substr(e, 2), 16) << 24 - e % 8 * 4;
+			return new s.init(i, n / 2)
+		  }
+		},
+		u = a.Latin1 = {
+		  stringify: function (t) {
+			for (var n = t.words, i = t.sigBytes, e = [], r = 0; r < i; r++) {
+			  var o = n[r >>> 2] >>> 24 - r % 4 * 8 & 255;
+			  e.push(String.fromCharCode(o))
+			}
+			return e.join("")
+		  },
+		  parse: function (t) {
+			for (var n = t.length, i = [], e = 0; e < n; e++) i[e >>> 2] |= (255 & t.charCodeAt(e)) << 24 - e % 4 * 8;
+			return new s.init(i, n)
+		  }
+		},
+		f = a.Utf8 = {
+		  stringify: function (t) {
+			try {
+			  return decodeURIComponent(escape(u.stringify(t)))
+			} catch (t) {
+			  throw new Error("Malformed UTF-8 data")
+			}
+		  },
+		  parse: function (t) {
+			return u.parse(unescape(encodeURIComponent(t)))
+		  }
+		},
+		h = r.BufferedBlockAlgorithm = o.extend({
+		  reset: function () {
+			this._data = new s.init, this._nDataBytes = 0
+		  },
+		  _append: function (t) {
+			"string" == typeof t && (t = f.parse(t)), this._data.concat(t), this._nDataBytes += t.sigBytes
+		  },
+		  _process: function (n) {
+			var i = this._data,
+			  e = i.words,
+			  r = i.sigBytes,
+			  o = this.blockSize,
+			  a = 4 * o,
+			  c = r / a;
+			c = n ? t.ceil(c) : t.max((0 | c) - this._minBufferSize, 0);
+			var u = c * o,
+			  f = t.min(4 * u, r);
+			if (u) {
+			  for (var h = 0; h < u; h += o) this._doProcessBlock(e, h);
+			  var p = e.splice(0, u);
+			  i.sigBytes -= f
+			}
+			return new s.init(p, f)
+		  },
+		  clone: function () {
+			var t = o.clone.call(this);
+			return t._data = this._data.clone(), t
+		  },
+		  _minBufferSize: 0
+		}),
+		p = (r.Hasher = h.extend({
+		  cfg: o.extend(),
+		  init: function (t) {
+			this.cfg = this.cfg.extend(t), this.reset()
+		  },
+		  reset: function () {
+			h.reset.call(this), this._doReset()
+		  },
+		  update: function (t) {
+			return this._append(t), this._process(), this
+		  },
+		  finalize: function (t) {
+			t && this._append(t);
+			var n = this._doFinalize();
+			return n
+		  },
+		  blockSize: 16,
+		  _createHelper: function (t) {
+			return function (n, i) {
+			  return new t.init(i).finalize(n)
+			}
+		  },
+		  _createHmacHelper: function (t) {
+			return function (n, i) {
+			  return new p.HMAC.init(t, i).finalize(n)
+			}
+		  }
+		}), e.algo = {});
+	  return e
+	}(Math);
+	return t
+  });
+  //# sourceMappingURL=core.min.js.map
+  ! function (e, t, i) {
+	"object" == typeof exports ? module.exports = exports = t(require("./core.min"), require("./sha1.min"), require("./hmac.min")) : "function" == typeof define && define.amd ? define(["./core.min", "./sha1.min", "./hmac.min"], t) : t(e.CryptoJS)
+  }(this, function (e) {
+	return function () {
+	  var t = e,
+		i = t.lib,
+		r = i.Base,
+		n = i.WordArray,
+		o = t.algo,
+		a = o.MD5,
+		c = o.EvpKDF = r.extend({
+		  cfg: r.extend({
+			keySize: 4,
+			hasher: a,
+			iterations: 1
+		  }),
+		  init: function (e) {
+			this.cfg = this.cfg.extend(e)
+		  },
+		  compute: function (e, t) {
+			for (var i = this.cfg, r = i.hasher.create(), o = n.create(), a = o.words, c = i.keySize, f = i.iterations; a.length < c;) {
+			  s && r.update(s);
+			  var s = r.update(e).finalize(t);
+			  r.reset();
+			  for (var u = 1; u < f; u++) s = r.finalize(s), r.reset();
+			  o.concat(s)
+			}
+			return o.sigBytes = 4 * c, o
+		  }
+		});
+	  t.EvpKDF = function (e, t, i) {
+		return c.create(i).compute(e, t)
+	  }
+	}(), e.EvpKDF
+  });
+  //# sourceMappingURL=evpkdf.min.js.map
+  ! function (r, e) {
+	"object" == typeof exports ? module.exports = exports = e(require("./core.min")) : "function" == typeof define && define.amd ? define(["./core.min"], e) : e(r.CryptoJS)
+  }(this, function (r) {
+	return function () {
+	  function e(r, e, t) {
+		for (var n = [], i = 0, o = 0; o < e; o++)
+		  if (o % 4) {
+			var f = t[r.charCodeAt(o - 1)] << o % 4 * 2,
+			  c = t[r.charCodeAt(o)] >>> 6 - o % 4 * 2;
+			n[i >>> 2] |= (f | c) << 24 - i % 4 * 8, i++
+		  } return a.create(n, i)
+	  }
+	  var t = r,
+		n = t.lib,
+		a = n.WordArray,
+		i = t.enc;
+	  i.Base64 = {
+		stringify: function (r) {
+		  var e = r.words,
+			t = r.sigBytes,
+			n = this._map;
+		  r.clamp();
+		  for (var a = [], i = 0; i < t; i += 3)
+			for (var o = e[i >>> 2] >>> 24 - i % 4 * 8 & 255, f = e[i + 1 >>> 2] >>> 24 - (i + 1) % 4 * 8 & 255, c = e[i + 2 >>> 2] >>> 24 - (i + 2) % 4 * 8 & 255, s = o << 16 | f << 8 | c, h = 0; h < 4 && i + .75 * h < t; h++) a.push(n.charAt(s >>> 6 * (3 - h) & 63));
+		  var p = n.charAt(64);
+		  if (p)
+			for (; a.length % 4;) a.push(p);
+		  return a.join("")
+		},
+		parse: function (r) {
+		  var t = r.length,
+			n = this._map,
+			a = this._reverseMap;
+		  if (!a) {
+			a = this._reverseMap = [];
+			for (var i = 0; i < n.length; i++) a[n.charCodeAt(i)] = i
+		  }
+		  var o = n.charAt(64);
+		  if (o) {
+			var f = r.indexOf(o);
+			f !== -1 && (t = f)
+		  }
+		  return e(r, t, a)
+		},
+		_map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+	  }
+	}(), r.enc.Base64
+  });
+  //# sourceMappingURL=enc-base64.min.js.map
+  ! function (e, t, r) {
+	"object" == typeof exports ? module.exports = exports = t(require("./core.min"), require("./evpkdf.min")) : "function" == typeof define && define.amd ? define(["./core.min", "./evpkdf.min"], t) : t(e.CryptoJS)
+  }(this, function (e) {
+	e.lib.Cipher || function (t) {
+	  var r = e,
+		i = r.lib,
+		n = i.Base,
+		c = i.WordArray,
+		o = i.BufferedBlockAlgorithm,
+		s = r.enc,
+		a = (s.Utf8, s.Base64),
+		f = r.algo,
+		p = f.EvpKDF,
+		d = i.Cipher = o.extend({
+		  cfg: n.extend(),
+		  createEncryptor: function (e, t) {
+			return this.create(this._ENC_XFORM_MODE, e, t)
+		  },
+		  createDecryptor: function (e, t) {
+			return this.create(this._DEC_XFORM_MODE, e, t)
+		  },
+		  init: function (e, t, r) {
+			this.cfg = this.cfg.extend(r), this._xformMode = e, this._key = t, this.reset()
+		  },
+		  reset: function () {
+			o.reset.call(this), this._doReset()
+		  },
+		  process: function (e) {
+			return this._append(e), this._process()
+		  },
+		  finalize: function (e) {
+			e && this._append(e);
+			var t = this._doFinalize();
+			return t
+		  },
+		  keySize: 4,
+		  ivSize: 4,
+		  _ENC_XFORM_MODE: 1,
+		  _DEC_XFORM_MODE: 2,
+		  _createHelper: function () {
+			function e(e) {
+			  return "string" == typeof e ? B : x
+			}
+			return function (t) {
+			  return {
+				encrypt: function (r, i, n) {
+				  return e(i).encrypt(t, r, i, n)
+				},
+				decrypt: function (r, i, n) {
+				  return e(i).decrypt(t, r, i, n)
+				}
+			  }
+			}
+		  }()
+		}),
+		h = (i.StreamCipher = d.extend({
+		  _doFinalize: function () {
+			var e = this._process(!0);
+			return e
+		  },
+		  blockSize: 1
+		}), r.mode = {}),
+		u = i.BlockCipherMode = n.extend({
+		  createEncryptor: function (e, t) {
+			return this.Encryptor.create(e, t)
+		  },
+		  createDecryptor: function (e, t) {
+			return this.Decryptor.create(e, t)
+		  },
+		  init: function (e, t) {
+			this._cipher = e, this._iv = t
+		  }
+		}),
+		l = h.CBC = function () {
+		  function e(e, r, i) {
+			var n = this._iv;
+			if (n) {
+			  var c = n;
+			  this._iv = t
+			} else var c = this._prevBlock;
+			for (var o = 0; o < i; o++) e[r + o] ^= c[o]
+		  }
+		  var r = u.extend();
+		  return r.Encryptor = r.extend({
+			processBlock: function (t, r) {
+			  var i = this._cipher,
+				n = i.blockSize;
+			  e.call(this, t, r, n), i.encryptBlock(t, r), this._prevBlock = t.slice(r, r + n)
+			}
+		  }), r.Decryptor = r.extend({
+			processBlock: function (t, r) {
+			  var i = this._cipher,
+				n = i.blockSize,
+				c = t.slice(r, r + n);
+			  i.decryptBlock(t, r), e.call(this, t, r, n), this._prevBlock = c
+			}
+		  }), r
+		}(),
+		_ = r.pad = {},
+		v = _.Pkcs7 = {
+		  pad: function (e, t) {
+			for (var r = 4 * t, i = r - e.sigBytes % r, n = i << 24 | i << 16 | i << 8 | i, o = [], s = 0; s < i; s += 4) o.push(n);
+			var a = c.create(o, i);
+			e.concat(a)
+		  },
+		  unpad: function (e) {
+			var t = 255 & e.words[e.sigBytes - 1 >>> 2];
+			e.sigBytes -= t
+		  }
+		},
+		y = (i.BlockCipher = d.extend({
+		  cfg: d.cfg.extend({
+			mode: l,
+			padding: v
+		  }),
+		  reset: function () {
+			d.reset.call(this);
+			var e = this.cfg,
+			  t = e.iv,
+			  r = e.mode;
+			if (this._xformMode == this._ENC_XFORM_MODE) var i = r.createEncryptor;
+			else {
+			  var i = r.createDecryptor;
+			  this._minBufferSize = 1
+			}
+			this._mode && this._mode.__creator == i ? this._mode.init(this, t && t.words) : (this._mode = i.call(r, this, t && t.words), this._mode.__creator = i)
+		  },
+		  _doProcessBlock: function (e, t) {
+			this._mode.processBlock(e, t)
+		  },
+		  _doFinalize: function () {
+			var e = this.cfg.padding;
+			if (this._xformMode == this._ENC_XFORM_MODE) {
+			  e.pad(this._data, this.blockSize);
+			  var t = this._process(!0)
+			} else {
+			  var t = this._process(!0);
+			  e.unpad(t)
+			}
+			return t
+		  },
+		  blockSize: 4
+		}), i.CipherParams = n.extend({
+		  init: function (e) {
+			this.mixIn(e)
+		  },
+		  toString: function (e) {
+			return (e || this.formatter).stringify(this)
+		  }
+		})),
+		m = r.format = {},
+		k = m.OpenSSL = {
+		  stringify: function (e) {
+			var t = e.ciphertext,
+			  r = e.salt;
+			if (r) var i = c.create([1398893684, 1701076831]).concat(r).concat(t);
+			else var i = t;
+			return i.toString(a)
+		  },
+		  parse: function (e) {
+			var t = a.parse(e),
+			  r = t.words;
+			if (1398893684 == r[0] && 1701076831 == r[1]) {
+			  var i = c.create(r.slice(2, 4));
+			  r.splice(0, 4), t.sigBytes -= 16
+			}
+			return y.create({
+			  ciphertext: t,
+			  salt: i
+			})
+		  }
+		},
+		x = i.SerializableCipher = n.extend({
+		  cfg: n.extend({
+			format: k
+		  }),
+		  encrypt: function (e, t, r, i) {
+			i = this.cfg.extend(i);
+			var n = e.createEncryptor(r, i),
+			  c = n.finalize(t),
+			  o = n.cfg;
+			return y.create({
+			  ciphertext: c,
+			  key: r,
+			  iv: o.iv,
+			  algorithm: e,
+			  mode: o.mode,
+			  padding: o.padding,
+			  blockSize: e.blockSize,
+			  formatter: i.format
+			})
+		  },
+		  decrypt: function (e, t, r, i) {
+			i = this.cfg.extend(i), t = this._parse(t, i.format);
+			var n = e.createDecryptor(r, i).finalize(t.ciphertext);
+			return n
+		  },
+		  _parse: function (e, t) {
+			return "string" == typeof e ? t.parse(e, this) : e
+		  }
+		}),
+		g = r.kdf = {},
+		S = g.OpenSSL = {
+		  execute: function (e, t, r, i) {
+			i || (i = c.random(8));
+			var n = p.create({
+				keySize: t + r
+			  }).compute(e, i),
+			  o = c.create(n.words.slice(t), 4 * r);
+			return n.sigBytes = 4 * t, y.create({
+			  key: n,
+			  iv: o,
+			  salt: i
+			})
+		  }
+		},
+		B = i.PasswordBasedCipher = x.extend({
+		  cfg: x.cfg.extend({
+			kdf: S
+		  }),
+		  encrypt: function (e, t, r, i) {
+			i = this.cfg.extend(i);
+			var n = i.kdf.execute(r, e.keySize, e.ivSize);
+			i.iv = n.iv;
+			var c = x.encrypt.call(this, e, t, n.key, i);
+			return c.mixIn(n), c
+		  },
+		  decrypt: function (e, t, r, i) {
+			i = this.cfg.extend(i), t = this._parse(t, i.format);
+			var n = i.kdf.execute(r, e.keySize, e.ivSize, t.salt);
+			i.iv = n.iv;
+			var c = x.decrypt.call(this, e, t, n.key, i);
+			return c
+		  }
+		})
+	}()
+  });
+  //# sourceMappingURL=cipher-core.min.js.map
+  ! function (e, i) {
+	"object" == typeof exports ? module.exports = exports = i(require("./core.min")) : "function" == typeof define && define.amd ? define(["./core.min"], i) : i(e.CryptoJS)
+  }(this, function (e) {
+	! function () {
+	  var i = e,
+		t = i.lib,
+		n = t.Base,
+		s = i.enc,
+		r = s.Utf8,
+		o = i.algo;
+	  o.HMAC = n.extend({
+		init: function (e, i) {
+		  e = this._hasher = new e.init, "string" == typeof i && (i = r.parse(i));
+		  var t = e.blockSize,
+			n = 4 * t;
+		  i.sigBytes > n && (i = e.finalize(i)), i.clamp();
+		  for (var s = this._oKey = i.clone(), o = this._iKey = i.clone(), a = s.words, f = o.words, c = 0; c < t; c++) a[c] ^= 1549556828, f[c] ^= 909522486;
+		  s.sigBytes = o.sigBytes = n, this.reset()
+		},
+		reset: function () {
+		  var e = this._hasher;
+		  e.reset(), e.update(this._iKey)
+		},
+		update: function (e) {
+		  return this._hasher.update(e), this
+		},
+		finalize: function (e) {
+		  var i = this._hasher,
+			t = i.finalize(e);
+		  i.reset();
+		  var n = i.finalize(this._oKey.clone().concat(t));
+		  return n
+		}
+	  })
+	}()
+  });
+  //# sourceMappingURL=hmac.min.js.map
+  ! function (e, o, r) {
+	"object" == typeof exports ? module.exports = exports = o(require("./core.min"), require("./cipher-core.min")) : "function" == typeof define && define.amd ? define(["./core.min", "./cipher-core.min"], o) : o(e.CryptoJS)
+  }(this, function (e) {
+	return e.mode.ECB = function () {
+	  var o = e.lib.BlockCipherMode.extend();
+	  return o.Encryptor = o.extend({
+		processBlock: function (e, o) {
+		  this._cipher.encryptBlock(e, o)
+		}
+	  }), o.Decryptor = o.extend({
+		processBlock: function (e, o) {
+		  this._cipher.decryptBlock(e, o)
+		}
+	  }), o
+	}(), e.mode.ECB
+  });
+  //# sourceMappingURL=mode-ecb.min.js.map
+  ! function (e, r, i) {
+	"object" == typeof exports ? module.exports = exports = r(require("./core.min"), require("./cipher-core.min")) : "function" == typeof define && define.amd ? define(["./core.min", "./cipher-core.min"], r) : r(e.CryptoJS)
+  }(this, function (e) {
+	return e.pad.Pkcs7
+  });
+  //# sourceMappingURL=pad-pkcs7.min.js.map
+  ! function (e, r, i) {
+	"object" == typeof exports ? module.exports = exports = r(require("./core.min"), require("./enc-base64.min"), require("./md5.min"), require("./evpkdf.min"), require("./cipher-core.min")) : "function" == typeof define && define.amd ? define(["./core.min", "./enc-base64.min", "./md5.min", "./evpkdf.min", "./cipher-core.min"], r) : r(e.CryptoJS)
+  }(this, function (e) {
+	return function () {
+	  var r = e,
+		i = r.lib,
+		n = i.BlockCipher,
+		o = r.algo,
+		t = [],
+		c = [],
+		s = [],
+		f = [],
+		a = [],
+		d = [],
+		u = [],
+		v = [],
+		h = [],
+		y = [];
+	  ! function () {
+		for (var e = [], r = 0; r < 256; r++) r < 128 ? e[r] = r << 1 : e[r] = r << 1 ^ 283;
+		for (var i = 0, n = 0, r = 0; r < 256; r++) {
+		  var o = n ^ n << 1 ^ n << 2 ^ n << 3 ^ n << 4;
+		  o = o >>> 8 ^ 255 & o ^ 99, t[i] = o, c[o] = i;
+		  var p = e[i],
+			l = e[p],
+			_ = e[l],
+			k = 257 * e[o] ^ 16843008 * o;
+		  s[i] = k << 24 | k >>> 8, f[i] = k << 16 | k >>> 16, a[i] = k << 8 | k >>> 24, d[i] = k;
+		  var k = 16843009 * _ ^ 65537 * l ^ 257 * p ^ 16843008 * i;
+		  u[o] = k << 24 | k >>> 8, v[o] = k << 16 | k >>> 16, h[o] = k << 8 | k >>> 24, y[o] = k, i ? (i = p ^ e[e[e[_ ^ p]]], n ^= e[e[n]]) : i = n = 1
+		}
+	  }();
+	  var p = [0, 1, 2, 4, 8, 16, 32, 64, 128, 27, 54],
+		l = o.AES = n.extend({
+		  _doReset: function () {
+			if (!this._nRounds || this._keyPriorReset !== this._key) {
+			  for (var e = this._keyPriorReset = this._key, r = e.words, i = e.sigBytes / 4, n = this._nRounds = i + 6, o = 4 * (n + 1), c = this._keySchedule = [], s = 0; s < o; s++)
+				if (s < i) c[s] = r[s];
+				else {
+				  var f = c[s - 1];
+				  s % i ? i > 6 && s % i == 4 && (f = t[f >>> 24] << 24 | t[f >>> 16 & 255] << 16 | t[f >>> 8 & 255] << 8 | t[255 & f]) : (f = f << 8 | f >>> 24, f = t[f >>> 24] << 24 | t[f >>> 16 & 255] << 16 | t[f >>> 8 & 255] << 8 | t[255 & f], f ^= p[s / i | 0] << 24), c[s] = c[s - i] ^ f
+				} for (var a = this._invKeySchedule = [], d = 0; d < o; d++) {
+				var s = o - d;
+				if (d % 4) var f = c[s];
+				else var f = c[s - 4];
+				d < 4 || s <= 4 ? a[d] = f : a[d] = u[t[f >>> 24]] ^ v[t[f >>> 16 & 255]] ^ h[t[f >>> 8 & 255]] ^ y[t[255 & f]]
+			  }
+			}
+		  },
+		  encryptBlock: function (e, r) {
+			this._doCryptBlock(e, r, this._keySchedule, s, f, a, d, t)
+		  },
+		  decryptBlock: function (e, r) {
+			var i = e[r + 1];
+			e[r + 1] = e[r + 3], e[r + 3] = i, this._doCryptBlock(e, r, this._invKeySchedule, u, v, h, y, c);
+			var i = e[r + 1];
+			e[r + 1] = e[r + 3], e[r + 3] = i
+		  },
+		  _doCryptBlock: function (e, r, i, n, o, t, c, s) {
+			for (var f = this._nRounds, a = e[r] ^ i[0], d = e[r + 1] ^ i[1], u = e[r + 2] ^ i[2], v = e[r + 3] ^ i[3], h = 4, y = 1; y < f; y++) {
+			  var p = n[a >>> 24] ^ o[d >>> 16 & 255] ^ t[u >>> 8 & 255] ^ c[255 & v] ^ i[h++],
+				l = n[d >>> 24] ^ o[u >>> 16 & 255] ^ t[v >>> 8 & 255] ^ c[255 & a] ^ i[h++],
+				_ = n[u >>> 24] ^ o[v >>> 16 & 255] ^ t[a >>> 8 & 255] ^ c[255 & d] ^ i[h++],
+				k = n[v >>> 24] ^ o[a >>> 16 & 255] ^ t[d >>> 8 & 255] ^ c[255 & u] ^ i[h++];
+			  a = p, d = l, u = _, v = k
+			}
+			var p = (s[a >>> 24] << 24 | s[d >>> 16 & 255] << 16 | s[u >>> 8 & 255] << 8 | s[255 & v]) ^ i[h++],
+			  l = (s[d >>> 24] << 24 | s[u >>> 16 & 255] << 16 | s[v >>> 8 & 255] << 8 | s[255 & a]) ^ i[h++],
+			  _ = (s[u >>> 24] << 24 | s[v >>> 16 & 255] << 16 | s[a >>> 8 & 255] << 8 | s[255 & d]) ^ i[h++],
+			  k = (s[v >>> 24] << 24 | s[a >>> 16 & 255] << 16 | s[d >>> 8 & 255] << 8 | s[255 & u]) ^ i[h++];
+			e[r] = p, e[r + 1] = l, e[r + 2] = _, e[r + 3] = k
+		  },
+		  keySize: 8
+		});
+	  r.AES = n._createHelper(l)
+	}(), e.AES
+  });
+  //# sourceMappingURL=aes.min.js.map
+  ! function (e, n) {
+	"object" == typeof exports ? module.exports = exports = n(require("./core.min")) : "function" == typeof define && define.amd ? define(["./core.min"], n) : n(e.CryptoJS)
+  }(this, function (e) {
+	return e.enc.Utf8
+  });
+  //# sourceMappingURL=enc-utf8.min.js.map
+  
+  // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+  // This work is free. You can redistribute it and/or modify it
+  // under the terms of the WTFPL, Version 2
+  // For more information see LICENSE.txt or http://www.wtfpl.net/
+  //
+  // For more information, the home page:
+  // http://pieroxy.net/blog/pages/lz-string/testing.html
+  //
+  // LZ-based compression algorithm, version 1.4.4
+  var LZString = (function() {
+  
+  // private property
+  var f = String.fromCharCode;
+  var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+  var baseReverseDic = {};
+  
+  function getBaseValue(alphabet, character) {
+	if (!baseReverseDic[alphabet]) {
+	  baseReverseDic[alphabet] = {};
+	  for (var i=0 ; i<alphabet.length ; i++) {
+		baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+	  }
+	}
+	return baseReverseDic[alphabet][character];
+  }
+  
+  var LZString = {
+	compressToBase64 : function (input) {
+	  if (input == null) return "";
+	  var res = LZString._compress(input, 6, function(a){return keyStrBase64.charAt(a);});
+	  switch (res.length % 4) { // To produce valid Base64
+	  default: // When could this happen ?
+	  case 0 : return res;
+	  case 1 : return res+"===";
+	  case 2 : return res+"==";
+	  case 3 : return res+"=";
+	  }
+	},
+  
+	decompressFromBase64 : function (input) {
+	  if (input == null) return "";
+	  if (input == "") return null;
+	  return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+	},
+  
+	compressToUTF16 : function (input) {
+	  if (input == null) return "";
+	  return LZString._compress(input, 15, function(a){return f(a+32);}) + " ";
+	},
+  
+	decompressFromUTF16: function (compressed) {
+	  if (compressed == null) return "";
+	  if (compressed == "") return null;
+	  return LZString._decompress(compressed.length, 16384, function(index) { return compressed.charCodeAt(index) - 32; });
+	},
+  
+	//compress into uint8array (UCS-2 big endian format)
+	compressToUint8Array: function (uncompressed) {
+	  var compressed = LZString.compress(uncompressed);
+	  var buf=new Uint8Array(compressed.length*2); // 2 bytes per character
+  
+	  for (var i=0, TotalLen=compressed.length; i<TotalLen; i++) {
+		var current_value = compressed.charCodeAt(i);
+		buf[i*2] = current_value >>> 8;
+		buf[i*2+1] = current_value % 256;
+	  }
+	  return buf;
+	},
+  
+	//decompress from uint8array (UCS-2 big endian format)
+	decompressFromUint8Array:function (compressed) {
+	  if (compressed===null || compressed===undefined){
+		  return LZString.decompress(compressed);
+	  } else {
+		  var buf=new Array(compressed.length/2); // 2 bytes per character
+		  for (var i=0, TotalLen=buf.length; i<TotalLen; i++) {
+			buf[i]=compressed[i*2]*256+compressed[i*2+1];
+		  }
+  
+		  var result = [];
+		  buf.forEach(function (c) {
+			result.push(f(c));
+		  });
+		  return LZString.decompress(result.join(''));
+  
+	  }
+  
+	},
+  
+  
+	//compress into a string that is already URI encoded
+	compressToEncodedURIComponent: function (input) {
+	  if (input == null) return "";
+	  return LZString._compress(input, 6, function(a){return keyStrUriSafe.charAt(a);});
+	},
+  
+	//decompress from an output of compressToEncodedURIComponent
+	decompressFromEncodedURIComponent:function (input) {
+	  if (input == null) return "";
+	  if (input == "") return null;
+	  input = input.replace(/ /g, "+");
+	  return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+	},
+  
+	compress: function (uncompressed) {
+	  return LZString._compress(uncompressed, 16, function(a){return f(a);});
+	},
+	_compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+	  if (uncompressed == null) return "";
+	  var i, value,
+		  context_dictionary= {},
+		  context_dictionaryToCreate= {},
+		  context_c="",
+		  context_wc="",
+		  context_w="",
+		  context_enlargeIn= 2, // Compensate for the first entry which should not count
+		  context_dictSize= 3,
+		  context_numBits= 2,
+		  context_data=[],
+		  context_data_val=0,
+		  context_data_position=0,
+		  ii;
+  
+	  for (ii = 0; ii < uncompressed.length; ii += 1) {
+		context_c = uncompressed.charAt(ii);
+		if (!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)) {
+		  context_dictionary[context_c] = context_dictSize++;
+		  context_dictionaryToCreate[context_c] = true;
+		}
+  
+		context_wc = context_w + context_c;
+		if (Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)) {
+		  context_w = context_wc;
+		} else {
+		  if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+			if (context_w.charCodeAt(0)<256) {
+			  for (i=0 ; i<context_numBits ; i++) {
+				context_data_val = (context_data_val << 1);
+				if (context_data_position == bitsPerChar-1) {
+				  context_data_position = 0;
+				  context_data.push(getCharFromInt(context_data_val));
+				  context_data_val = 0;
+				} else {
+				  context_data_position++;
+				}
+			  }
+			  value = context_w.charCodeAt(0);
+			  for (i=0 ; i<8 ; i++) {
+				context_data_val = (context_data_val << 1) | (value&1);
+				if (context_data_position == bitsPerChar-1) {
+				  context_data_position = 0;
+				  context_data.push(getCharFromInt(context_data_val));
+				  context_data_val = 0;
+				} else {
+				  context_data_position++;
+				}
+				value = value >> 1;
+			  }
+			} else {
+			  value = 1;
+			  for (i=0 ; i<context_numBits ; i++) {
+				context_data_val = (context_data_val << 1) | value;
+				if (context_data_position ==bitsPerChar-1) {
+				  context_data_position = 0;
+				  context_data.push(getCharFromInt(context_data_val));
+				  context_data_val = 0;
+				} else {
+				  context_data_position++;
+				}
+				value = 0;
+			  }
+			  value = context_w.charCodeAt(0);
+			  for (i=0 ; i<16 ; i++) {
+				context_data_val = (context_data_val << 1) | (value&1);
+				if (context_data_position == bitsPerChar-1) {
+				  context_data_position = 0;
+				  context_data.push(getCharFromInt(context_data_val));
+				  context_data_val = 0;
+				} else {
+				  context_data_position++;
+				}
+				value = value >> 1;
+			  }
+			}
+			context_enlargeIn--;
+			if (context_enlargeIn == 0) {
+			  context_enlargeIn = Math.pow(2, context_numBits);
+			  context_numBits++;
+			}
+			delete context_dictionaryToCreate[context_w];
+		  } else {
+			value = context_dictionary[context_w];
+			for (i=0 ; i<context_numBits ; i++) {
+			  context_data_val = (context_data_val << 1) | (value&1);
+			  if (context_data_position == bitsPerChar-1) {
+				context_data_position = 0;
+				context_data.push(getCharFromInt(context_data_val));
+				context_data_val = 0;
+			  } else {
+				context_data_position++;
+			  }
+			  value = value >> 1;
+			}
+  
+  
+		  }
+		  context_enlargeIn--;
+		  if (context_enlargeIn == 0) {
+			context_enlargeIn = Math.pow(2, context_numBits);
+			context_numBits++;
+		  }
+		  // Add wc to the dictionary.
+		  context_dictionary[context_wc] = context_dictSize++;
+		  context_w = String(context_c);
+		}
+	  }
+  
+	  // Output the code for w.
+	  if (context_w !== "") {
+		if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+		  if (context_w.charCodeAt(0)<256) {
+			for (i=0 ; i<context_numBits ; i++) {
+			  context_data_val = (context_data_val << 1);
+			  if (context_data_position == bitsPerChar-1) {
+				context_data_position = 0;
+				context_data.push(getCharFromInt(context_data_val));
+				context_data_val = 0;
+			  } else {
+				context_data_position++;
+			  }
+			}
+			value = context_w.charCodeAt(0);
+			for (i=0 ; i<8 ; i++) {
+			  context_data_val = (context_data_val << 1) | (value&1);
+			  if (context_data_position == bitsPerChar-1) {
+				context_data_position = 0;
+				context_data.push(getCharFromInt(context_data_val));
+				context_data_val = 0;
+			  } else {
+				context_data_position++;
+			  }
+			  value = value >> 1;
+			}
+		  } else {
+			value = 1;
+			for (i=0 ; i<context_numBits ; i++) {
+			  context_data_val = (context_data_val << 1) | value;
+			  if (context_data_position == bitsPerChar-1) {
+				context_data_position = 0;
+				context_data.push(getCharFromInt(context_data_val));
+				context_data_val = 0;
+			  } else {
+				context_data_position++;
+			  }
+			  value = 0;
+			}
+			value = context_w.charCodeAt(0);
+			for (i=0 ; i<16 ; i++) {
+			  context_data_val = (context_data_val << 1) | (value&1);
+			  if (context_data_position == bitsPerChar-1) {
+				context_data_position = 0;
+				context_data.push(getCharFromInt(context_data_val));
+				context_data_val = 0;
+			  } else {
+				context_data_position++;
+			  }
+			  value = value >> 1;
+			}
+		  }
+		  context_enlargeIn--;
+		  if (context_enlargeIn == 0) {
+			context_enlargeIn = Math.pow(2, context_numBits);
+			context_numBits++;
+		  }
+		  delete context_dictionaryToCreate[context_w];
+		} else {
+		  value = context_dictionary[context_w];
+		  for (i=0 ; i<context_numBits ; i++) {
+			context_data_val = (context_data_val << 1) | (value&1);
+			if (context_data_position == bitsPerChar-1) {
+			  context_data_position = 0;
+			  context_data.push(getCharFromInt(context_data_val));
+			  context_data_val = 0;
+			} else {
+			  context_data_position++;
+			}
+			value = value >> 1;
+		  }
+  
+  
+		}
+		context_enlargeIn--;
+		if (context_enlargeIn == 0) {
+		  context_enlargeIn = Math.pow(2, context_numBits);
+		  context_numBits++;
+		}
+	  }
+  
+	  // Mark the end of the stream
+	  value = 2;
+	  for (i=0 ; i<context_numBits ; i++) {
+		context_data_val = (context_data_val << 1) | (value&1);
+		if (context_data_position == bitsPerChar-1) {
+		  context_data_position = 0;
+		  context_data.push(getCharFromInt(context_data_val));
+		  context_data_val = 0;
+		} else {
+		  context_data_position++;
+		}
+		value = value >> 1;
+	  }
+  
+	  // Flush the last char
+	  while (true) {
+		context_data_val = (context_data_val << 1);
+		if (context_data_position == bitsPerChar-1) {
+		  context_data.push(getCharFromInt(context_data_val));
+		  break;
+		}
+		else context_data_position++;
+	  }
+	  return context_data.join('');
+	},
+  
+	decompress: function (compressed) {
+	  if (compressed == null) return "";
+	  if (compressed == "") return null;
+	  return LZString._decompress(compressed.length, 32768, function(index) { return compressed.charCodeAt(index); });
+	},
+  
+	_decompress: function (length, resetValue, getNextValue) {
+	  var dictionary = [],
+		  next,
+		  enlargeIn = 4,
+		  dictSize = 4,
+		  numBits = 3,
+		  entry = "",
+		  result = [],
+		  i,
+		  w,
+		  bits, resb, maxpower, power,
+		  c,
+		  data = {val:getNextValue(0), position:resetValue, index:1};
+  
+	  for (i = 0; i < 3; i += 1) {
+		dictionary[i] = i;
+	  }
+  
+	  bits = 0;
+	  maxpower = Math.pow(2,2);
+	  power=1;
+	  while (power!=maxpower) {
+		resb = data.val & data.position;
+		data.position >>= 1;
+		if (data.position == 0) {
+		  data.position = resetValue;
+		  data.val = getNextValue(data.index++);
+		}
+		bits |= (resb>0 ? 1 : 0) * power;
+		power <<= 1;
+	  }
+  
+	  switch (next = bits) {
+		case 0:
+			bits = 0;
+			maxpower = Math.pow(2,8);
+			power=1;
+			while (power!=maxpower) {
+			  resb = data.val & data.position;
+			  data.position >>= 1;
+			  if (data.position == 0) {
+				data.position = resetValue;
+				data.val = getNextValue(data.index++);
+			  }
+			  bits |= (resb>0 ? 1 : 0) * power;
+			  power <<= 1;
+			}
+		  c = f(bits);
+		  break;
+		case 1:
+			bits = 0;
+			maxpower = Math.pow(2,16);
+			power=1;
+			while (power!=maxpower) {
+			  resb = data.val & data.position;
+			  data.position >>= 1;
+			  if (data.position == 0) {
+				data.position = resetValue;
+				data.val = getNextValue(data.index++);
+			  }
+			  bits |= (resb>0 ? 1 : 0) * power;
+			  power <<= 1;
+			}
+		  c = f(bits);
+		  break;
+		case 2:
+		  return "";
+	  }
+	  dictionary[3] = c;
+	  w = c;
+	  result.push(c);
+	  while (true) {
+		if (data.index > length) {
+		  return "";
+		}
+  
+		bits = 0;
+		maxpower = Math.pow(2,numBits);
+		power=1;
+		while (power!=maxpower) {
+		  resb = data.val & data.position;
+		  data.position >>= 1;
+		  if (data.position == 0) {
+			data.position = resetValue;
+			data.val = getNextValue(data.index++);
+		  }
+		  bits |= (resb>0 ? 1 : 0) * power;
+		  power <<= 1;
+		}
+  
+		switch (c = bits) {
+		  case 0:
+			bits = 0;
+			maxpower = Math.pow(2,8);
+			power=1;
+			while (power!=maxpower) {
+			  resb = data.val & data.position;
+			  data.position >>= 1;
+			  if (data.position == 0) {
+				data.position = resetValue;
+				data.val = getNextValue(data.index++);
+			  }
+			  bits |= (resb>0 ? 1 : 0) * power;
+			  power <<= 1;
+			}
+  
+			dictionary[dictSize++] = f(bits);
+			c = dictSize-1;
+			enlargeIn--;
+			break;
+		  case 1:
+			bits = 0;
+			maxpower = Math.pow(2,16);
+			power=1;
+			while (power!=maxpower) {
+			  resb = data.val & data.position;
+			  data.position >>= 1;
+			  if (data.position == 0) {
+				data.position = resetValue;
+				data.val = getNextValue(data.index++);
+			  }
+			  bits |= (resb>0 ? 1 : 0) * power;
+			  power <<= 1;
+			}
+			dictionary[dictSize++] = f(bits);
+			c = dictSize-1;
+			enlargeIn--;
+			break;
+		  case 2:
+			return result.join('');
+		}
+  
+		if (enlargeIn == 0) {
+		  enlargeIn = Math.pow(2, numBits);
+		  numBits++;
+		}
+  
+		if (dictionary[c]) {
+		  entry = dictionary[c];
+		} else {
+		  if (c === dictSize) {
+			entry = w + w.charAt(0);
+		  } else {
+			return null;
+		  }
+		}
+		result.push(entry);
+  
+		// Add w+entry[0] to the dictionary.
+		dictionary[dictSize++] = w + entry.charAt(0);
+		enlargeIn--;
+  
+		w = entry;
+  
+		if (enlargeIn == 0) {
+		  enlargeIn = Math.pow(2, numBits);
+		  numBits++;
+		}
+  
+	  }
+	}
+  };
+	return LZString;
+  })();
+  
+  if (typeof define === 'function' && define.amd) {
+	define(function () { return LZString; });
+  } else if( typeof module !== 'undefined' && module != null ) {
+	module.exports = LZString
+  } else if( typeof angular !== 'undefined' && angular != null ) {
+	angular.module('LZString', [])
+	.factory('LZString', function () {
+	  return LZString;
+	});
+  }
+  
