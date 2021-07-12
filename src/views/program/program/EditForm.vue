@@ -944,6 +944,31 @@
 
       <div v-if="isSelectNavPointShown" id="threeDiv"></div>
     </el-dialog>
+    <el-dialog append-to-body :visible.sync="isSelectPreviewDevice">
+      <el-form inline>
+        <el-form-item label="楼栋/楼层">
+          <el-cascader
+            :value="currentBF"
+            :options="bf"
+            @change="handleCurrentBfChange"
+            :props="{ value: 'order', label: 'name', children: 'floors' }"
+          ></el-cascader
+        ></el-form-item>
+        <el-form-item label="设备">
+          <el-input :value="deviceName" readonly></el-input
+        ></el-form-item>
+        <el-form-item
+          ><el-button
+            type="primary"
+            @click="submitDevice(deviceCode)"
+            :disabled="!deviceCode"
+            >确定</el-button
+          ></el-form-item
+        >
+      </el-form>
+
+      <div v-if="isSelectPreviewDevice" id="threeDiv"></div>
+    </el-dialog>
   </div>
 </template>
 
@@ -1134,6 +1159,10 @@ export default {
       bf: [],
       currentBF: null,
       navPointBindingCode: "",
+      isSelectPreviewDevice: false,
+      deviceCallback: null,
+      deviceName: null,
+      deviceCode: null,
     };
   },
   computed: {
@@ -1166,6 +1195,46 @@ export default {
     ...mapGetters(["config", "user"]),
   },
   methods: {
+    async submitDevice(deviceCode) {
+      this.isSelectPreviewDevice = false;
+      await this.$nextTick();
+      if (this.deviceCallback) this.deviceCallback(deviceCode);
+    },
+    selectDevice() {
+      return new Promise(async (resolve) => {
+        this.deviceCode = null;
+        this.deviceName = null;
+        this.deviceCallback = resolve;
+        if (!this.bf.length) {
+          const { data: buildings } = await ProgramApi.buildingFloor();
+          this.bf = buildings;
+        }
+        const validBuilding = this.bf.find((b) => b.floors && b.floors.length);
+        if (validBuilding)
+          this.currentBF = [validBuilding.order, validBuilding.floors[0].order];
+        this.isSelectPreviewDevice = true;
+        await this.$nextTick();
+        Config.getMapInfo(
+          (deviceSite) => {
+            if (deviceSite.type === "device") {
+              this.deviceCode = deviceSite.code;
+              this.deviceName = deviceSite.name;
+              var div = document.createElement("div");
+              div.style.width = "256px";
+              div.style.height = "75px";
+              div.style.position = "absolute";
+              div.style.backgroundColor = "#00ff00";
+              div.style.zIndex = 800;
+              Map_QM.addElementLabel(div);
+            }
+          },
+          this.user.mallCode,
+          this.currentBF[0],
+          this.currentBF[1],
+          this.config.url
+        );
+      });
+    },
     handleCurrentBfChange(v) {
       this.currentBF = v;
       if (v && v.length) {
@@ -1676,9 +1745,10 @@ export default {
             typeCode === "position"
         )
       ) {
+        const devCode = await this.selectDevice();
         const { code, data, msg } = await ProgramApi.preview({
           ...this.form2Body(),
-          devCode: "1640d451-fd3e-4ef5-9b85-40e1cd2a262f",
+          devCode,
         });
         if (code === "200") {
           this.previewForm = {
