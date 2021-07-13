@@ -245,11 +245,13 @@ export default {
         if (res.code === ERR_OK) {
           this.deviceInfo = res.data;
           Config.getMapInfo(
-            (deviceSite) => {
-              console.log(deviceSite);
-              if (deviceSite.navPoint >= 0) {
-                this.devCoordinate.yaxis = deviceSite.navPoint;
-                this.devCoordinate.angle = deviceSite.angle;
+            (res) => {
+              console.log(res);
+              if (res.type === "init") {
+                this.changeNavPoint();
+              } else if (res.type === "path" && res.navPoint >= 0) {
+                this.devCoordinate.yaxis = res.navPoint;
+                this.devCoordinate.angle = res.angle;
               }
             },
             this.user.mallCode,
@@ -257,7 +259,6 @@ export default {
             this.deviceInfo.floorOrder,
             this.config.url
           );
-          this.changeNavPoint();
         }
       });
     },
@@ -365,7 +366,7 @@ export default {
     },
     //修改设备点位
     changeNavPoint() {
-      Config.setDeviceSite({ navPoint: this.devCoordinate.yaxis });
+      Map_QM.setSite(this.devCoordinate.yaxis);
     },
     //修改设备角度
     changeAngle() {

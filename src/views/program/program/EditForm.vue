@@ -966,8 +966,36 @@
           ></el-form-item
         >
       </el-form>
-
-      <div v-if="isSelectPreviewDevice" id="threeDiv"></div>
+      <el-row>
+        <el-col :span="20">
+          <div v-if="isSelectPreviewDevice" id="threeDiv"></div>
+        </el-col>
+        <el-col :span="4">
+          <el-card v-if="device">
+            <div slot="header" class="clearfix">
+              <span>设备详情</span>
+            </div>
+            <el-form disabled>
+              <el-form-item label="设备名">
+                <el-input :value="device.devNum"></el-input>
+              </el-form-item>
+              <el-form-item label="IP">
+                <el-input :value="device.ip"></el-input>
+              </el-form-item>
+              <el-form-item label="所在编组">
+                <el-input
+                  :value="device.groupList.map(({ sname }) => sname).join(' ')"
+                ></el-input>
+              </el-form-item>
+              <el-form-item label="状态">
+                <el-input
+                  :value="device.deviceOnline ? '在线' : '离线'"
+                ></el-input>
+              </el-form-item>
+            </el-form>
+          </el-card>
+        </el-col>
+      </el-row>
     </el-dialog>
   </div>
 </template>
@@ -1163,6 +1191,7 @@ export default {
       deviceCallback: null,
       deviceName: null,
       deviceCode: null,
+      device: null,
     };
   },
   computed: {
@@ -1215,17 +1244,15 @@ export default {
         this.isSelectPreviewDevice = true;
         await this.$nextTick();
         Config.getMapInfo(
-          (deviceSite) => {
-            if (deviceSite.type === "device") {
-              this.deviceCode = deviceSite.code;
-              this.deviceName = deviceSite.name;
-              var div = document.createElement("div");
-              div.style.width = "256px";
-              div.style.height = "75px";
-              div.style.position = "absolute";
-              div.style.backgroundColor = "#00ff00";
-              div.style.zIndex = 800;
-              Map_QM.addElementLabel(div);
+          (e) => {
+            if (e.type === "init") {
+              Map_QM.showOrHidePoint(false);
+              Map_QM.showOrHideSite(false);
+            } else if (e.type === "device") {
+              console.log(e);
+              this.device = e.data;
+              this.deviceCode = e.code;
+              this.deviceName = e.name;
             }
           },
           this.user.mallCode,
@@ -1239,6 +1266,12 @@ export default {
       this.currentBF = v;
       if (v && v.length) {
         Map_QM.changeFloor(...v);
+        if (this.isSelectPreviewDevice) {
+          Map_QM.showOrHidePoint(false);
+        } else {
+          Map_QM.showOrHideDevice(false);
+        }
+        Map_QM.showOrHideSite(false);
         this.navPointBindingCode = null;
       }
     },
@@ -1250,7 +1283,7 @@ export default {
         this.bf = buildings;
       }
       if (bindings && bindings.length === 3) {
-        this.currentBF = [bindings[0], bindings[1]];
+        this.currentBF = [Number(bindings[0]), Number(bindings[1])];
         this.navPointBindingCode = bindingCode;
       } else {
         const validBuilding = this.bf.find((b) => b.floors && b.floors.length);
@@ -1261,7 +1294,14 @@ export default {
       await this.$nextTick();
       Config.getMapInfo(
         (deviceSite) => {
-          if (
+          if (deviceSite.type === "init") {
+            if (bindings && bindings.length === 3)
+              Map_QM.setSite(Number(bindings[2]));
+            else {
+              Map_QM.showOrHideSite(false);
+            }
+            Map_QM.showOrHideDevice(false);
+          } else if (
             deviceSite.type === "path" &&
             deviceSite.navPoint >= 0 &&
             this.currentBF
