@@ -159,9 +159,9 @@
                 @handleCurrentChange="handleCurrentChange" @handleSizeChange="handleSizeChange"></pagination>
 
     <!--  关机时间  -->
-    <el-dialog title="关机时间" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body>
+    <el-dialog title="开关机时间" :visible.sync="dialogVisible" width="50%" :before-close="handleClose" append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" :rules="rules1" ref="editForm">
-        <el-form-item label="开机时间" prop="bootTime">
+        <el-form-item label="开机时间" prop="bootTime" v-show="editForm.systemType != 'Windows'">
           <el-time-picker
                   v-model="editForm.bootTime"
                   :format="'HH:mm'"
@@ -266,7 +266,6 @@
           devNum: [{required: true, message: '请输入设备名称', trigger: 'blur'}]
         },
         rules1: {
-          bootTime: [{ required: true, message: "请选择开机时间", trigger: "blur" }],
           shutdownTime: [{required: true, message: '请选择关机时间', trigger: 'blur'}]
         },
         downType: 1,
