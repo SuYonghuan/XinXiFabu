@@ -944,7 +944,7 @@
 
       <div v-if="isSelectNavPointShown" id="threeDiv"></div>
     </el-dialog>
-    <el-dialog append-to-body :visible.sync="isSelectPreviewDevice">
+    <el-dialog append-to-body :visible.sync="isSelectPreviewDevice" width="80%">
       <el-form inline>
         <el-form-item label="楼栋/楼层">
           <el-cascader
@@ -967,10 +967,10 @@
         >
       </el-form>
       <el-row>
-        <el-col :span="20">
+        <el-col :span="18">
           <div v-if="isSelectPreviewDevice" id="threeDiv"></div>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="6">
           <el-card v-if="device">
             <div slot="header" class="clearfix">
               <span>设备详情</span>
@@ -982,11 +982,11 @@
               <el-form-item label="IP">
                 <el-input :value="device.ip"></el-input>
               </el-form-item>
-              <el-form-item label="所在编组">
+              <!-- <el-form-item label="所在编组">
                 <el-input
                   :value="device.groupList.map(({ sname }) => sname).join(' ')"
                 ></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="状态">
                 <el-input
                   :value="device.deviceOnline ? '在线' : '离线'"
@@ -1233,6 +1233,7 @@ export default {
       return new Promise(async (resolve) => {
         this.deviceCode = null;
         this.deviceName = null;
+        this.device = null;
         this.deviceCallback = resolve;
         if (!this.bf.length) {
           const { data: buildings } = await ProgramApi.buildingFloor();

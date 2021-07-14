@@ -183,7 +183,6 @@ MainMap_QM.prototype = {
 	 * 销毁标签
 	 */
 	elementDestroy(obj=null) {
-
 		if(obj){
 			Map_QM.CSSObject.remove(obj)
 		}else{
@@ -204,11 +203,20 @@ MainMap_QM.prototype = {
 
 		let raycaster = new THREE.Raycaster();
 		raycaster.setFromCamera(mouse, Map_QM.camera);
-
+		Map_QM.floor.devObj.traverse((obj) => {
+			obj.material = obj.userData.map;
+		});
+		
 		let interDevs = raycaster.intersectObjects(Map_QM.floor.devObj.children,true);
 		if (interDevs.length > 0) {
 			let selected = interDevs[0].object;//取第一个物体
-			Config.callBack({"type":selected.userData.type,"code":selected.userData.code,"name":selected.name,"x":parseInt(selected.position.x), "y":parseInt(selected.position.y), "floorOrder":deviceSite.floorOrder});
+			let texture = new THREE.Texture();
+			let color = 'rgba(255, 125, 0, 0.6)';
+			texture.image = Map_QM.createPointCanvas("",color);
+			texture.needsUpdate = true;
+			selected.material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide, depthTest: false, transparent: true});
+			
+			Config.callBack({"type":selected.userData.type,"code":selected.userData.code,"data":selected.userData.data,"name":selected.name,"x":parseInt(selected.position.x), "y":parseInt(selected.position.y), "floorOrder":deviceSite.floorOrder});
 		}
 		let intersects = raycaster.intersectObjects(Map_QM.floor.pathObj.children,true);
 		if (intersects.length > 0) {
@@ -454,7 +462,7 @@ FloorMap_QM.prototype.initDevice = function () {
 							plane.position.z = 2;
 							plane.renderOrder = 210;
 							plane.name = devArr[i].devNum;
-							plane.userData={"type":"device","code":devArr[i].code};
+							plane.userData={"type":"device","code":devArr[i].code,"data":devArr[i],"map":material};
 							this.devObj.add(plane);
 						}
 					}
