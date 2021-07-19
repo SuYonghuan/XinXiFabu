@@ -102,6 +102,8 @@ export default {
 }
 
 .logobox {
+  display: flex;
+  align-items: center;
   color: #9d9d9d;
   height: 80px;
   background: #171f46;
@@ -110,7 +112,6 @@ export default {
   overflow: hidden;
   border-bottom: 1px solid #e6e7ec;
   .svgi {
-    vertical-align: middle;
     margin-right: 17px;
     width: 24px;
     text-align: center;
@@ -118,8 +119,10 @@ export default {
   }
   .logoimg {
     display: inline-block;
+    flex: 1;
     height: 80px;
-    vertical-align: middle;
+    object-fit: contain;
+    object-position: center;
   }
 }
 .el-menu {
