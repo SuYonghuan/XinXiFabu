@@ -125,11 +125,11 @@
       </el-table-column>
       <el-table-column prop="progType" label="节目类型" min-width="80" column-key="progType" :filters=programType :filter-multiple="false"></el-table-column>
       <el-table-column prop="sName" label="屏幕属性" min-width="130"></el-table-column>
-      <el-table-column prop="name" label="有效期" min-width="300">
-        <template slot-scope="scope">
-          {{ scope.row.launchTime }} ~ {{ scope.row.expiryDate }}
-        </template>
-      </el-table-column>
+      <!--<el-table-column prop="name" label="有效期" min-width="300">-->
+        <!--<template slot-scope="scope">-->
+          <!--{{ scope.row.launchTime }} ~ {{ scope.row.expiryDate }}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column prop="status" label="节目状态" column-key="progStatus" :filters=programStatus :filter-multiple="false">
         <template slot-scope="scope">
           <span :style="scope.row.status == '排期中' ? 'color:#67C23A;' : 'color:#909399;'">{{ scope.row.status }}</span>
@@ -154,7 +154,7 @@
       </el-table-column>
       <el-table-column label="操作" width="240">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editprog">编辑</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editprog && scope.row.allowEdit">编辑</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delprog">删除</el-button>
           <el-dropdown style="margin-left: 15px">
             <el-button type="primary" size="small">
@@ -190,17 +190,17 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间范围" prop="time">
-          <el-date-picker
-                  v-model="editForm.time"
-                  type="datetimerange"
-                  format="yyyy-MM-dd HH:mm"
-                  value-format="yyyy-MM-dd HH:mm"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
+        <!--<el-form-item label="时间范围" prop="time">-->
+          <!--<el-date-picker-->
+                  <!--v-model="editForm.time"-->
+                  <!--type="datetimerange"-->
+                  <!--format="yyyy-MM-dd HH:mm"-->
+                  <!--value-format="yyyy-MM-dd HH:mm"-->
+                  <!--range-separator="至"-->
+                  <!--start-placeholder="开始日期"-->
+                  <!--end-placeholder="结束日期">-->
+          <!--</el-date-picker>-->
+        <!--</el-form-item>-->
         <el-form-item label="上传素材" prop="progFiles">
           <el-upload
                   class="upload-demo"
@@ -231,7 +231,7 @@
                              class="el-progress"></el-progress>
               </div>
             </el-card>
-            <div slot="tip" class="el-upload__tip">支持最多5个素材文件;建议每个图片大小不超过5M，最大尺寸不超过5000x5000分辨率;视频大小不大于500M</div>
+            <div slot="tip" class="el-upload__tip">支持最多5个素材文件;建议每个图片大小不超过5M，最大尺寸不超过5000x5000分辨率;视频大小不大于500M;视频时长不能大于30秒;</div>
           </el-upload>
         </el-form-item>
         <el-form-item label="屏幕设置">
@@ -252,7 +252,7 @@
         </el-form-item>
         <el-form-item label="切换时间">
           <p style="display: flex;justify-content: space-between">
-            <el-input-number v-model="editForm.switchTime" @change="handleChange" :min="1" :max="3600"
+            <el-input-number v-model="editForm.switchTime" @change="handleChange" :disabled="!user.isAdmin" :min="1" :max="3600"
                              label="切换时间"></el-input-number>
           </p>
         </el-form-item>
@@ -276,17 +276,17 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="时间范围" prop="time">
-          <el-date-picker
-                  v-model="updateForm.time"
-                  type="datetimerange"
-                  format="yyyy-MM-dd HH:mm"
-                  value-format="yyyy-MM-dd HH:mm"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期">
-          </el-date-picker>
-        </el-form-item>
+        <!--<el-form-item label="时间范围" prop="time">-->
+          <!--<el-date-picker-->
+                  <!--v-model="updateForm.time"-->
+                  <!--type="datetimerange"-->
+                  <!--format="yyyy-MM-dd HH:mm"-->
+                  <!--value-format="yyyy-MM-dd HH:mm"-->
+                  <!--range-separator="至"-->
+                  <!--start-placeholder="开始日期"-->
+                  <!--end-placeholder="结束日期">-->
+          <!--</el-date-picker>-->
+        <!--</el-form-item>-->
         <el-form-item label="上传素材" prop="file">
           <el-upload
                   class="upload-demo"
@@ -329,7 +329,7 @@
         </el-form-item>
         <el-form-item label="切换时间">
           <p style="display: flex;justify-content: space-between">
-            <el-input-number v-model="updateForm.switchTime" @change="handleChange" :min="1" :max="3600"
+            <el-input-number v-model="updateForm.switchTime" @change="handleChange" :disabled="!user.isAdmin" :min="1" :max="3600"
                              label="切换时间"></el-input-number>
           </p>
         </el-form-item>
@@ -558,7 +558,7 @@
           if (res.code === ERR_OK) {
             this.tableData = res.data.list
             this.total = res.data.allCount
-            // console.log(this.tableData)
+            console.log(this.tableData)
           }
         })
       },
@@ -742,7 +742,7 @@
           "launchTime": "",
           "expiryDate": "",
           "switchMode": "随机",
-          "switchTime": "15",
+          "switchTime": "30",
           "screenMatch": "无",
           "groupName": "",
           "progFiles": []
@@ -759,9 +759,9 @@
         this.dialogTitle = '新增素材'
         this.releaseType = 2
         this.editForm = {
-          "time": [item.launchTime, item.expiryDate],
+          // "time": [item.launchTime, item.expiryDate],
           "screenInfo": item.progScreenInfo,
-          "launchTime": item.launchTime,
+          // "launchTime": item.launchTime,
           "expiryDate": item.expiryDate,
           "switchMode": item.switchMode,
           "switchTime": item.switchTime,
@@ -773,7 +773,7 @@
       //打开编辑弹窗
       handleEdit(item) {
         let data = JSON.parse(JSON.stringify(item));
-        data.time = [data.launchTime, data.expiryDate]
+        // data.time = [data.launchTime, data.expiryDate]
         this.updateForm = data
         this.dialogVisibleDetails = true
         console.log(this.updateForm)
@@ -815,8 +815,8 @@
             this.loading = true
             const param = {
               "ScreenInfo": this.editForm.screenInfo,
-              "LaunchTime": this.editForm.time[0],
-              "ExpiryDate": this.editForm.time[1],
+              // "LaunchTime": this.editForm.time[0],
+              // "ExpiryDate": this.editForm.time[1],
               "SwitchMode": this.editForm.switchMode,
               "SwitchTime": this.editForm.switchTime,
               "ScreenMatch": this.editForm.screenMatch,
@@ -842,8 +842,8 @@
             const param = {
               "Code": this.updateForm.code,
               "ScreenInfo": this.updateForm.progScreenInfo,
-              "LaunchTime": this.updateForm.time[0],
-              "ExpiryDate": this.updateForm.time[1],
+              // "LaunchTime": this.updateForm.time[0],
+              // "ExpiryDate": this.updateForm.time[1],
               "SwitchMode": this.updateForm.switchMode,
               "SwitchTime": this.updateForm.switchTime,
               "ScreenMatch": this.updateForm.screenMatch,
@@ -932,6 +932,7 @@
         this.editForm.progFiles[index].programName = name
       },
       handleProgress(file) {
+        console.log(file)
         const isLt2M = file.size / 1024 / 1024 < 500;
         const type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4', 'video/avi', 'video/flv', 'video/3gpp']
 
@@ -942,6 +943,17 @@
         if (!isLt2M) {
           this.$message.error('上传文件大小不能超过 500MB!');
           return false
+        }
+
+        var url = URL.createObjectURL(file);
+        var oVideo = document.createElement('video');
+        oVideo.setAttribute('src',url);
+        oVideo.oncanplay = ()=>{
+          if ( Math.ceil(oVideo.duration) > 30 ) {
+            this.$message.error('视频时长不能大于30秒');
+            return false
+          }
+          console.log('视频时长：'+oVideo.duration+'秒');
         }
       },
       changeProgress(file, fileList) {
@@ -1025,7 +1037,7 @@
       },
     },
     computed: {
-      ...mapGetters(['presentMenu', 'config'])
+      ...mapGetters(['presentMenu', 'config','user'])
     },
     components: {
       pagination,

@@ -243,6 +243,66 @@
                     :pageSize="pageSize"></pagination>
 
       </el-tab-pane>
+      <el-tab-pane label="日程">
+        <!--  搜索  -->
+        <el-form :inline="true" :model="search" class="demo-form-inline">
+          <el-form-item label="日程名称">
+            <el-input v-model="search.SearchKey" placeholder="日程名称"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="onSearchStr">查询</el-button>
+            <el-button @click="replaySearchStr">清空</el-button>
+          </el-form-item>
+          <el-form-item class="right-button">
+            <el-button type="success" @click="handleStroke({})" v-if="pageMenu.addinsschedule">新增日程</el-button>
+            <el-button type="danger" @click="batchDelete(tableChecked,3)" v-if="pageMenu.deleteinsschedule">删除</el-button>
+          </el-form-item>
+        </el-form>
+
+        <!--  表格  -->
+        <el-table
+                :data="tableData"
+                @selection-change="handleDeletion"
+                ref="table2"
+                @filter-change="filterTag1"
+                height="560"
+                style="width: 100%">
+          <el-table-column align="center" type="selection" width="60">
+          </el-table-column>
+          <el-table-column prop="name" label="名称"></el-table-column>
+          <el-table-column label="设备数量">
+            <template slot-scope="scope">
+              <el-link type="primary" @click="handleDeviceDetail(scope.row)">{{ scope.row.deviceCount }}</el-link>
+            </template>
+          </el-table-column>
+          <el-table-column prop="resolution" label="广告分辨率"></el-table-column>
+          <el-table-column prop="creator" label="上传人"></el-table-column>
+          <el-table-column prop="period" label="有效期"></el-table-column>
+          <el-table-column prop="updateTime" label="更新时间"></el-table-column>
+          <el-table-column prop="isActivity" label="状态">
+            <template slot-scope="scope">
+              {{ scope.row.isActivity ? '已发布' : '待发布' }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="280px">
+            <template slot-scope="scope">
+              <el-button type="primary" size="small" :disabled="scope.row.isActivity"
+                         @click="handleEditStoke(scope.row)" v-if="pageMenu.editinsschedule">编辑
+              </el-button>
+              <el-button type="primary" size="small" @click="handleEditStoke(scope.row,1)" v-if="pageMenu.insscheduleinfo">查看</el-button>
+              <el-button type="danger" size="small" @click="handleDelete(scope.row,3)" v-if="pageMenu.deleteinsschedule">删除</el-button>
+              <el-button type="primary" v-show="!scope.row.isActivity" @click="handlePublish(scope.row)" size="small" v-if="pageMenu.changeschestate">发布</el-button>
+              <el-button type="danger" v-show="scope.row.isActivity" @click="handlePublish(scope.row)" size="small" v-if="pageMenu.changeschestate">停止</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!--  分页  -->
+        <pagination class="page-div" :list="tableData" :total="total" :page="currentPage"
+                    @handleCurrentChange="handleCurrentChange1" @handleSizeChange="handleSizeChange1"
+                    :pageSize="pageSize"></pagination>
+
+      </el-tab-pane>
     </el-tabs>
 
     <!--  新增  -->
@@ -491,6 +551,120 @@
         <el-button type="primary" @click="submitDesForm('editForm')">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!--  新增  -->
+    <el-dialog title="新增日程" :visible.sync="dialogVisibleStroke" width="50%" :before-close="handleClose"
+               :close-on-click-modal="false" class="dialog" append-to-body>
+      <el-form :label-width="formLabelWidth" :model="strokeForm" :rules="rulesStroke" ref="strokeForm">
+        <el-form-item label="分辨率" prop="screenInfo">
+          <el-select v-model="strokeForm.screenInfo" placeholder="分辨率" @change="changeDevice">
+            <el-option
+                    v-for="item in searchDeviceList"
+                    :label="item.sName"
+                    :value="item.code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="时间范围" prop="time">
+          <el-date-picker
+                  v-model="strokeForm.time"
+                  type="datetimerange"
+                  format="yyyy-MM-dd HH:mm"
+                  value-format="yyyy-MM-dd HH:mm"
+                  range-separator="至"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="选择设备" prop="Devices">
+          <el-select v-model="strokeForm.Devices" multiple placeholder="选择设备">
+            <el-option
+                    v-for="item in deviceData"
+                    :label="item.devNum"
+                    :value="item.code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose('strokeForm')">取 消</el-button>
+        <el-button type="primary" @click="submitUpFormStroke('strokeForm')" :loading="loading">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!--  详情  -->
+    <el-dialog title="日程管理" :visible.sync="dialogVisibleAdd" width="50%" :before-close="handleClose"
+               :close-on-click-modal="false" class="dialog" append-to-body>
+      <el-form :model="editForm" :rules="rules1" ref="editForm">
+        <div class="stroke-div">
+          <p>时间段：{{ editForm.period }}</p>
+          <p>分辨率：{{ editForm.resolution }}</p>
+          <p>设备：
+            <span v-for="(item,index) of editForm.devices">{{ item }}<span v-show="index < editForm.devices.length - 1">、</span></span>
+          </p>
+        </div>
+        <el-form-item label="日程名称" prop="name">
+          <el-input type="text" v-model="editForm.name" :disabled="editForm.isActivity" placeholder="请输入日程名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-table :data="editForm.programs" style="width: 100%" height="620" ref="programsTab" v-if="isTable">
+            <el-table-column type="index" label="广告位" width="200"></el-table-column>
+            <el-table-column prop="alreadyCount" label="广告数量">
+              <template slot-scope="scope">
+                <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" v-show="scope.row.previewSrc" @click="handleEditProgram(scope.row)">
+                <div v-show="!scope.row.previewSrc">
+                  <el-button type="primary" size="small" v-if="scope.row.allowEdit" :disabled="editForm.isActivity" @click="handleEditProgram(scope.row)">设置广告</el-button>
+                  <span v-else>
+                    <el-link type="primary" @click="handleProgram(scope.row)">{{scope.row.alreadyCount}}</el-link>
+                  </span>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose('editForm')">取 消</el-button>
+        <el-button type="primary" @click="submitUpFormAbd('editForm')" :loading="loading">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!--  节目选择列表  -->
+    <el-dialog title="节目选择" :visible.sync="dialogVisibleProgram1" width="50%" :before-close="handleClosePro"
+               :close-on-click-modal="false" class="dialog" append-to-body>
+      <el-form :label-width="formLabelWidth" :model="editForm" ref="editForm">
+        <el-table :data="programList" style="width: 100%" height="620" @current-change="handleTable">
+          <el-table-column prop="name" label="预览">
+            <template slot-scope="scope">
+              <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" @click="clickImage(scope.row)">
+            </template>
+          </el-table-column>
+          <el-table-column prop="programName" label="节目名称" min-width="180"></el-table-column>
+        </el-table>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClosePro('editForm')">取 消</el-button>
+        <el-button type="primary" @click="handleClosePro('editForm')" :loading="loading">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!--  节目选择列表  -->
+    <el-dialog title="查看广告" :visible.sync="dialogVisibleProgramDetail" width="50%" :before-close="handleCloseProDei"
+               :close-on-click-modal="false" class="dialog" append-to-body>
+      <el-form :label-width="formLabelWidth" :model="selectAbd" ref="editForm">
+        <el-table :data="selectAbd.already" style="width: 100%" height="620">
+          <el-table-column prop="programName" label="节目名称" min-width="180"></el-table-column>
+          <el-table-column prop="creator" label="上传人" min-width="180"></el-table-column>
+          <el-table-column prop="devNum" label="设备名称" min-width="180"></el-table-column>
+          <el-table-column prop="period" label="时间段" min-width="180"></el-table-column>
+        </el-table>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleCloseProDei('editForm')">取 消</el-button>
+        <el-button type="primary" @click="handleCloseProDei('editForm')" :loading="loading">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -524,6 +698,13 @@
     PublishSubtitle,
     SubtitleStop,
     GetDevicesBySubtitleCode,
+    InsScheduleList,
+    AddInsSchedule,
+    EditInsSchedule,
+    InsScheduleInfo,
+    DeleteInsSchedule,
+    ChangeScheduleState,
+    GetProgramList,
   } from 'http/api/program'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
@@ -542,9 +723,13 @@
         dialogVisibleDevice: false,
         dialogVisibleDeviceGroup: false,
         dialogVisibleProgram: false,
+        dialogVisibleProgram1: false,
         dialogVisibleDeviceDetails: false,
         dialogVisibleSubtitle: false,
         dialogVisibleSubtitleDeviceGroup: false,
+        dialogVisibleAdd: false,
+        dialogVisibleProgramDetail: false,
+        dialogVisibleStroke: false,
         dialogTitle: '新增',
         editForm: {},
         newsForm: {},
@@ -558,6 +743,14 @@
           name: [{required: true, message: '请输入字幕名称', trigger: 'blur'}],
           endTime: [{required: true, message: '请选择下线时间', trigger: 'blur'}],
           fontColor: [{required: true, message: '请选择字体颜色', trigger: 'blur'}],
+        },
+        rulesStroke: {
+          screenInfo: [{required: true, message: '请选择分辨率', trigger: 'blur'}],
+          time: [{required: true, message: '请选择时间范围', trigger: 'blur'}],
+          Devices: [{required: true, message: '请选择素材', trigger: 'blur'}],
+        },
+        rules1: {
+          name: [{required: true, message: '请输入字幕名称', trigger: 'blur'}],
         },
         tableChecked: [],
         deviceForm: {},
@@ -611,6 +804,11 @@
         },
         otherSearch: false,
         loading: false,
+        isTable: true,
+        deviceData: [],
+        programList: [],
+        strokeForm: {time:[]},
+        selectAbd: {},
       }
     },
     created() {
@@ -633,7 +831,7 @@
               this.pageMenu[res.data[a].actionId] = true;
             }
             this.getList(this.pageSize, this.currentPage)
-            // console.log(this.pageMenu)
+            console.log(this.pageMenu)
           }
         })
       },
@@ -900,6 +1098,100 @@
           this.$message.error(res.msg);
         })
       },
+      GetDeviceByGroupCode1(GroupCode, ScreenCode) {
+        const param = {
+          "GroupCode": GroupCode,
+          "ScreenCode": ScreenCode
+        }
+        GetDeviceByGroupCode(param).then(res => {
+          if (res.code === ERR_OK) {
+            console.log(res.data.unGroupDevice)
+            this.deviceData = res.data.unGroupDevice
+          }
+        })
+      },
+      //插播日程
+      InsScheduleList(pageSize, page) {
+        const param = {
+          "Name": this.search.SearchKey,
+          "Paging": 1,
+          "PageIndex": page,
+          "PageSize": pageSize
+        }
+        InsScheduleList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.tableData = res.data.list
+            this.total = res.data.allCount
+            console.log(this.tableData)
+          }
+        })
+      },
+      InsScheduleInfo(param,type) {
+        InsScheduleInfo(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.dialogVisibleStroke = false
+            this.dialogVisibleAdd = true
+            this.editForm = res.data
+            this.editForm.isActivity = type == 1 ? true : false
+            console.log(res.data)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      AddInsSchedule(param) {
+        AddInsSchedule(param).then(res => {
+          this.loading = false
+          if (res.code === ERR_OK) {
+            this.InsScheduleList(this.pageSize, this.currentPage)
+            this.InsScheduleInfo({Code:res.data})
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      EditInsSchedule(param) {
+        EditInsSchedule(param).then(res => {
+          this.loading = false
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.InsScheduleList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      GetProgramList(Resolution) {
+        const param = {
+          "Resolution": Resolution
+        }
+        GetProgramList(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.programList = res.data
+            console.log(res.data)
+          }
+        })
+      },
+      DeleteInsSchedule(param) {
+        DeleteInsSchedule(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+            this.InsScheduleList()
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
+      ChangeScheduleState(param) {
+        ChangeScheduleState(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+            this.InsScheduleList()
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
       /**
        * End
        * @param val
@@ -940,6 +1232,11 @@
         this.currentPage = 1
         this.GetSubtitleList(this.pageSize, this.currentPage)
       },
+      //搜索字幕
+      onSearchStr() {
+        this.currentPage = 1
+        this.InsScheduleList(this.pageSize, this.currentPage)
+      },
       //重置搜索
       replaySearch() {
         this.search = {
@@ -957,6 +1254,15 @@
         this.currentPage = 1
         this.$refs.table1.clearFilter()
         this.GetSubtitleList(this.pageSize, this.currentPage)
+      },
+      //重置搜索字幕
+      replaySearchStr() {
+        this.search = {
+          "SearchKey": "", "Order": "", "NameOrder": "", "State": "", "NewsOrder": ""
+        }
+        this.currentPage = 1
+        this.$refs.table2.clearFilter()
+        this.InsScheduleList(this.pageSize, this.currentPage)
       },
       //表格筛选
       filterTag(value) {
@@ -1077,10 +1383,21 @@
         this.dialogVisibleSubtitle = false
         this.dialogVisibleSubtitleDeviceGroup = false
         this.transferStatus = false
+        this.dialogVisibleAdd = false
+        this.dialogVisibleStroke = false
         this.$refs["editForm"] && this.$refs["editForm"].resetFields()
         this.newsForm = {}
         this.fileList = []
         this.loading = false
+        this.strokeForm = {time:[]}
+      },
+      //关闭节目
+      handleClosePro() {
+        this.dialogVisibleProgram1 = false
+      },
+      //关闭节目详情
+      handleCloseProDei() {
+        this.dialogVisibleProgramDetail = false
       },
       //提交插播
       submitUpForm(item) {
@@ -1181,9 +1498,13 @@
           if (type == 1) {
             this.DelNewsGroup(param)
             return
+          } else if( type == 2 ) {
+            //删除字幕
+            this.DelSubtitle({"Code": [item.code]})
+          } else if( type == 3 ) {
+            //删除日程
+            this.DeleteInsSchedule(param)
           }
-          //删除字幕
-          this.DelSubtitle({"Code": [item.code]})
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -1206,26 +1527,31 @@
             cancelButtonText: "取消",
             type: "warning"
           }).then(() => {
+            let ids = []
+            for (let i = 0; i < row.length; i++) {
+              ids.push(row[i].code)
+            }
             if (type == 1) {
-              let ids = []
-              for (let i = 0; i < row.length; i++) {
-                ids.push(row[i].code)
-              }
               const param = {
                 Codes: ids
               }
               this.DelNewsGroup(param)
               return
+            } else if( type == 2 ) {
+              //删除字幕
+              const param = {
+                Code: ids
+              }
+              this.DelSubtitle(param)
+            } else if( type == 3 ) {
+              //删除字幕
+              const param = {
+                Codes: ids
+              }
+              //删除日程
+              this.DeleteInsSchedule(param)
             }
-            //删除字幕
-            let ids = []
-            for (let i = 0; i < row.length; i++) {
-              ids.push(row[i].code)
-            }
-            const param = {
-              Code: ids
-            }
-            this.DelSubtitle(param)
+
           }).catch(() => {
             this.$message({
               type: 'info',
@@ -1281,9 +1607,12 @@
           this.getList(this.pageSize, this.currentPage)
         } else if (this.tabName == '字幕') {
           this.GetSubtitleList(this.pageSize, this.currentPage)
+        } else if (this.tabName == '日程') {
+          this.InsScheduleList(this.pageSize, this.currentPage)
         }
         this.$refs.table.clearFilter()
         this.$refs.table1.clearFilter()
+        this.$refs.table2.clearFilter()
       },
       /**
        * 上传素材
@@ -1366,6 +1695,89 @@
       clickSearchOther() {
         this.otherSearch = !this.otherSearch
       },
+      //点击搜索设备
+      changeDevice() {
+        this.GetDeviceByGroupCode1('', this.strokeForm.screenInfo)
+      },
+      //分辨率筛选
+      resolutionToName(code) {
+        return this.searchDeviceList.filter(val=>{
+          return val.code === code
+        })[0].sName
+      },
+      //设置节目
+      handleEditProgram(item) {
+        if ( this.editForm.isActivity ) return
+        this.selectAbd = item
+        this.GetProgramList(this.editForm.resolution)
+        this.dialogVisibleProgram1 = true
+      },
+      //点击素材
+      handleTable(item) {
+        this.selectAbd.programCode = item.code
+        this.selectAbd.previewSrc = item.previewSrc
+        this.handleClosePro()
+        this.isTable = false
+        this.$nextTick(()=>{
+          this.isTable = true
+        })
+      },
+      //编辑日程
+      handleStroke(item) {
+        this.dialogVisibleStroke = true
+        this.editForm = {}
+        if (JSON.stringify(item) != '{}') {
+          this.InsScheduleInfo(item.code)
+        }
+      },
+      //新增日程1
+      submitUpFormStroke(item) {
+        this.$refs[item].validate(valid => {
+          if (valid) {
+            this.loading = true
+            const param = {
+              "Resolution": this.resolutionToName(this.strokeForm.screenInfo),
+              "BeginTime": this.strokeForm.time[0],
+              "EndTime": this.strokeForm.time[1],
+              "Devices": this.strokeForm.Devices,
+            }
+
+            console.log(param)
+            this.AddInsSchedule(param)
+          }
+        })
+      },
+      //编辑
+      handleEditStoke(item,type) {
+        this.InsScheduleInfo({Code:item.code},type)
+      },
+      //保存日程
+      submitUpFormAbd(item) {
+        console.log(this.editForm)
+        this.$refs[item].validate(valid => {
+          if (valid) {
+            const param = {
+              code: this.editForm.code,
+              name: this.editForm.name,
+              Programs: this.editForm.programs,
+            }
+            this.EditInsSchedule(param)
+          }
+        })
+      },
+      //发布停止
+      handlePublish(item) {
+        const param = {
+          Code: item.code,
+          IsActivity: !item.isActivity
+        }
+        this.ChangeScheduleState(param)
+      },
+      //广告详情
+      handleProgram(item) {
+        this.dialogVisibleProgramDetail = true
+        this.selectAbd = item
+      },
     },
     components: {
       pagination,
@@ -1432,5 +1844,17 @@
     position: absolute;
     width: 100%;
     bottom: -3px;
+  }
+
+  .stroke-div{
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 16px;
+    line-height: 25px;
+    color: #606266;
+    margin-bottom: 20px;
+    p{
+      margin-right: 30px;
+    }
   }
 </style>

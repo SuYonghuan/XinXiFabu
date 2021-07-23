@@ -121,3 +121,7 @@ export const KillExplorer = (param) =>
 //开启Explorer
 export const StartExplorer = (param) =>
 	post(`${store.state.config.url}/api/dev/StartExplorer?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/dev/StartExplorer"))}&time=${timeStamp()}`,param)
+
+//设备排期
+export const ScheduleDetail = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/ScheduleDetail?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/ScheduleDetail"))}&time=${timeStamp()}`,param)

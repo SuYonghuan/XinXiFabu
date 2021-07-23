@@ -14,7 +14,7 @@
     <div class="logobox">
       <img
               class="logoimg"
-              :src="website.logo ? website.logo : '../../common/images/logo.png'"
+              :src="website.logo ? website.logo : require('../../common/images/logo.png')"
               alt=""
       />
     </div>

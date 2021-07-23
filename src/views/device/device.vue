@@ -139,6 +139,7 @@
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.startexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,2)">开启Explorer</p></el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.killexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,1)">关闭Explorer</p></el-dropdown-item>
+              <el-dropdown-item v-if="pageMenu.killexplorer"><p @click="handleSchedule(scope.row)">查看排期</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -189,6 +190,15 @@
       </span>
     </el-dialog>
 
+    <!--  设备名排期  -->
+    <el-dialog title="查看排期" :visible.sync="dialogVisibleSchedule" width="50%" class="dialog" :before-close="handleClose" append-to-body>
+      <fullcalendar :events="eventsData" :lang="'zh'" v-if="dialogVisibleSchedule" @changeMonth="changeMonth"></fullcalendar>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleClose()">取 消</el-button>
+        <el-button type="primary" @click="submitUpForm()">确 定</el-button>
+      </span>
+    </el-dialog>
+
     <div class="max-div" v-show="shotImg" @click="clickMaxImg">
       <img :src="shotImg" alt="" style="max-width: 1920px;max-height: 900px;">
     </div>
@@ -213,9 +223,11 @@
     DeviceScreenshot,
     KillExplorer,
     StartExplorer,
+    ScheduleDetail,
   } from 'http/api/device'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
+  import fullcalendar from 'vue-fullcalendar'
 
   export default {
     name: "deptManager",
@@ -234,6 +246,7 @@
         pageSize: 10,
         dialogVisible: false,
         nameDialogVisible: false,
+        dialogVisibleSchedule: false,
         dialogTitle: '新增',
         editForm: {shutdownTime: ''},
         formLabelWidth: "120px",
@@ -261,6 +274,50 @@
         downType: 1,
         shotImg: '',
         loadingStatus: null,
+        deviceInfo: {},
+        eventsData: [
+          {
+            title : 'event2',
+            start : '2021-07-02',
+            end : '2021-07-21',
+            YOUR_DATA : {}
+          },
+          {
+            title : 'event2',
+            start : '2021-06-1',
+            end : '2021-07-15',
+            YOUR_DATA : {}
+          },
+          {
+            title : 'event2',
+            start : '2021-07-10',
+            end : '2021-07-15',
+            YOUR_DATA : {}
+          },
+          {
+            title : 'event2',
+            start : '2021-07-18',
+            end : '2021-07-19',
+            YOUR_DATA : {}
+          },
+          {
+            title :  'event1',
+            start: '2021-07-21',
+            YOUR_DATA : {}
+          },
+          {
+            title : 'event2',
+            start : '2021-07-21',
+            end : '2021-07-25',
+            YOUR_DATA : {}
+          },
+          {
+            title : 'event2',
+            start : '2021-07-21',
+            end : '2021-07-25',
+            YOUR_DATA : {}
+          }
+        ]
       }
     },
     created() {
@@ -460,6 +517,15 @@
           this.$message.error(res.msg);
         })
       },
+      ScheduleDetail(param) {
+        ScheduleDetail(param).then(res => {
+          if (res.code === ERR_OK) {
+            console.log(res.data)
+            this.eventsData = res.data
+          }
+        })
+      },
+      // ScheduleDetail
       /**
        * End
        * @param val
@@ -523,7 +589,8 @@
       handleClose() {
         this.dialogVisible = false
         this.nameDialogVisible = false
-        this.$refs["editForm"].resetFields()
+        this.dialogVisibleSchedule = false
+        this.$refs["editForm"] && this.$refs["editForm"].resetFields()
         this.editForm = {shutdownTime: ''}
       },
       //提交
@@ -833,12 +900,44 @@
           });
         });
       },
+      //查看排期
+      handleSchedule(item) {
+        this.deviceInfo = item
+        this.dialogVisibleSchedule = true
+        // let myDate = new Date()
+        // let month = myDate.getMonth()+1
+        // console.log(myDate)
+        // const param = {
+        //   DevCode: item.code,
+        //   BeginTime: myDate.getFullYear()+ '-' + month +'-1',
+        //   EndTime: myDate.getFullYear()+ '-' + month + this.getDays(myDate.getFullYear(),month)
+        // }
+        // this.ScheduleDetail(param)
+      },
+      //切换月份
+      changeMonth(start, end,current) {
+        const param = {
+          DevCode: this.deviceInfo.code,
+          BeginTime: current,
+          EndTime: current.substring(0,current.length-2) + this.getDays(current.substring(0,4),Number(current.substring(5,7))-1)
+        }
+        this.ScheduleDetail(param)
+      },
+      //获取每月天数
+      getDays(year, month) {
+        let days = [31,28,31,30,31,30,31,31,30,31,30,31]
+        if ( (year % 4 ===0) && (year % 100 !==0 || year % 400 ===0) ) {
+          days[1] = 29
+        }
+        return days[month]
+      }
     },
     computed: {
       ...mapGetters(['presentMenu'])
     },
     components: {
       pagination,
+      fullcalendar,
     },
 
   }
@@ -877,5 +976,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  ::v-deep .week-row{
+    height: 109px;
+  }
+  ::v-deep .more-body{
+    background-color: #fff;
+  }
+</style>
+<style lang="scss">
+  .dialog .el-dialog {
+    margin-top: 2vh !important;
   }
 </style>

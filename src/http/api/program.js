@@ -173,3 +173,55 @@ export const PublishSubtitle = (param) =>
 //字幕停止
 export const SubtitleStop = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/SubtitleStop?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/SubtitleStop"))}&time=${timeStamp()}`,param)
+
+//添加日程
+export const AddSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/AddSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/AddSchedule"))}&time=${timeStamp()}`,param)
+
+//编辑日程
+export const EditSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/EditSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/EditSchedule"))}&time=${timeStamp()}`,param)
+
+//日程列表
+export const ScheduleList = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/ScheduleList?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/ScheduleList"))}&time=${timeStamp()}`,param)
+
+//日程详情
+export const ScheduleInfo = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/ScheduleInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/ScheduleInfo"))}&time=${timeStamp()}`,param)
+
+//删除日程
+export const DeleteSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/DeleteSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/DeleteSchedule"))}&time=${timeStamp()}`,param)
+
+//日程发布
+export const PublishSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/PublishSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/PublishSchedule"))}&time=${timeStamp()}`,param)
+
+//日程节目
+export const GetProgramList = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/GetProgramList?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/GetProgramList"))}&time=${timeStamp()}`,param)
+
+//新增插播日程
+export const AddInsSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/AddInsSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/AddInsSchedule"))}&time=${timeStamp()}`,param)
+
+//编辑插播日程
+export const EditInsSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/EditInsSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/EditInsSchedule"))}&time=${timeStamp()}`,param)
+
+//插播日程详情
+export const InsScheduleInfo = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/InsScheduleInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/InsScheduleInfo"))}&time=${timeStamp()}`,param)
+
+//删除插播日程
+export const DeleteInsSchedule = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/DeleteInsSchedule?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/DeleteInsSchedule"))}&time=${timeStamp()}`,param)
+
+//暂停插播日程
+export const ChangeScheduleState = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/ChangeScheduleState?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/ChangeScheduleState"))}&time=${timeStamp()}`,param)
+
+//插播日程列表
+export const InsScheduleList = (param) =>
+	post(`${store.state.config.url}/Api/Schedule/InsScheduleList?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Schedule/InsScheduleList"))}&time=${timeStamp()}`,param)

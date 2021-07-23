@@ -114,6 +114,11 @@ const routes = [
         component: () => import('views/program/program-group'),
       },
       {
+        path: '/program/stroke-list',
+        name: '日程管理',
+        component: () => import('views/program/stroke-list'),
+      },
+      {
         path: '/program/news',
         name: '插播管理',
         component: () => import('views/program/news'),
