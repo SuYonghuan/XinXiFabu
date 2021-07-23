@@ -121,6 +121,7 @@
 				maxImg: '',
 				buildingCode: '',
 				pageMenu: {},
+        loading: false,
 			}
 		},
 		created() {
@@ -275,7 +276,7 @@
 
 						if (this.editForm.floorCode) {
 							param.code = this.editForm.floorCode
-							param.FileGUID = this.editForm.map
+							param.FileGUID = this.editForm.fileGuid ? this.editForm.fileGuid : ''
 							this.FloorEdit(param)
 							return
 						}
@@ -320,6 +321,7 @@
 				if (res.code === '200') {
 					this.imageUrl = URL.createObjectURL(file.raw);
 					this.editForm.map = res.data.fileGuid;
+					this.editForm.fileGuid = res.data.fileGuid;
 				} else {
 					this.$message.error('上传失败!');
 				}
