@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="cl">
     <div
       :class="(activeComponent ? '' : 'selected') + ' component-item bold'"
       @click="$emit('selectBg')"
@@ -128,6 +128,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.cl {
+  overflow-y: auto;
+  overflow-x: none;
+  &::-webkit-scrollbar {
+    width: 4px;
+    border-radius: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    width: 4px;
+    background: #f6f6f6;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #2f6bff;
+    border-radius: 6px;
+  }
+  &::-webkit-scrollbar-track-piece:start {
+    background: #e6eaf0;
+  }
+  &::-webkit-scrollbar-track-piece:end {
+    background: #e6eaf0;
+  }
+}
 .component-item {
   position: relative;
   display: flex;
