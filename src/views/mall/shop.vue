@@ -212,6 +212,7 @@
 	} from 'http/api/mall'
 	import {ERR_OK} from 'http/config'
 	import {mapGetters} from 'vuex'
+  import table2excel from 'js-table2excel'
 
 	export default {
 		name: "deptManager",
@@ -424,7 +425,8 @@
 				QueryShopList(param).then(res => {
 					if (res.code === ERR_OK) {
 						this.excelData = res.data
-						this.export2Excel()
+            this.exportExcelImg()
+						// this.export2Excel()
 					}
 				})
 			},
@@ -729,6 +731,47 @@
 			formatJson(filterVal, jsonData) {
 				return jsonData.map(v => filterVal.map(j => v[j]))
 			},
+      //导出带logo店铺
+      exportExcelImg() {
+        const column = [
+          {
+            title: '店铺名称',
+            key: 'name',
+            type: 'text'
+          },
+          {
+            title: 'LOGO',
+            key: 'logoFilePath',
+            type: 'image',
+            width: 50,
+            height: 50
+          },
+          {
+            title: '所属业态',
+            key: 'shopFormat',
+            type: 'text'
+          },
+          {
+            title: '所属楼层',
+            key: 'floorName',
+            type: 'text'
+          },
+          {
+            title: '门牌号',
+            key: 'houseNum',
+            type: 'text'
+          },
+          {
+            title: '联系方式',
+            key: 'phone',
+            type: 'text'
+          },
+        ]
+        const data = this.excelData
+        const excelName = '店铺数据'
+
+        table2excel(column, data, excelName)
+      },
       //导出excel模板
       handleExcelExport() {
         this.ExportTemplate()
