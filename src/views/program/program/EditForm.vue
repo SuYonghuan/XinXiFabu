@@ -1537,11 +1537,11 @@ export default {
         case "image":
           if (
             this.form.components.filter(({ typeCode }) => typeCode === "image")
-              .length >= 4
+              .length >= 16
           )
             return this.$message({
               type: "warning",
-              message: "一个节目只能有4个图片控件。",
+              message: "一个节目只能有16个图片控件。",
             });
           break;
         case "video":
