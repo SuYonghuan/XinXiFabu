@@ -47,7 +47,7 @@ export class ProgramApi {
     static async getFacilities() {
         if (ProgramApi.facilities) return ProgramApi.facilities
         const { data } = await cPost(`/Api/Programme/GroupDataList`)({ dataKey: "facility" })
-        ProgramApi.subComponentTypes = data
+        ProgramApi.facilities = data
         return data;
     }
     static async getLogoThemes() {
