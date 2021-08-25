@@ -5,7 +5,7 @@ const resolve = dir => {
 }
 
 module.exports = {
-  outputDir: resolve('./qianmu_big_backstage_local'),
+  outputDir: resolve('./本地大后台'),
   devServer: {
     proxy: {
       '/api': {

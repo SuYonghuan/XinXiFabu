@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-/qianmu_big_backstage_local
+/本地大后台
 
 # local env files
 .env.local
