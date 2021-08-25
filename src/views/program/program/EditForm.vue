@@ -1051,6 +1051,12 @@ const componentKeys = [
   "bindingName",
   "subComponents",
 ];
+const limits = {
+  total: 16,
+  image: 16,
+  video: 2,
+  audio: 1,
+};
 
 const flatenComponent = ({ config, subComponents, ...component }) => {
   let result = !config ? { ...component } : { ...component, ...config };
@@ -1143,9 +1149,9 @@ export default {
         "position",
       ],
       componentTypeTip: {
-        video: "一个节目只能由2个视频控件。",
-        image: "一个节目只能有4个图片控件。",
-        audio: "一个节目只能有一个音频控件，音频和流媒体不能共存。",
+        video: `一个节目最多${limits.video}个视频控件。`,
+        image: `一个节目最多${limits.image}个图片控件。`,
+        audio: `一个节目最多${limits.audio}个音频控件，音频和流媒体不能共存。`,
         stream: "一个节目音频和流媒体不能共存。",
       },
       weatherStyles,
@@ -1528,40 +1534,40 @@ export default {
     },
     appendComponent(typeCode) {
       if (!this.form.components) this.form.components = [];
-      if (this.form.components.length >= 16)
+      if (this.form.components.length >= limits.total)
         return this.$message({
           type: "warning",
-          message: "最多添加16个控件。",
+          message: `最多添加${limits.total}个控件。`,
         });
       switch (typeCode) {
         case "image":
           if (
             this.form.components.filter(({ typeCode }) => typeCode === "image")
-              .length >= 16
+              .length >= limits.image
           )
             return this.$message({
               type: "warning",
-              message: "一个节目只能有16个图片控件。",
+              message: `一个节目最多${limits.image}个图片控件。`,
             });
           break;
         case "video":
           if (
             this.form.components.filter(({ typeCode }) => typeCode === "video")
-              .length >= 2
+              .length >= limits.video
           )
             return this.$message({
               type: "warning",
-              message: "一个节目只能由2个视频控件。",
+              message: `一个节目最多${limits.video}个视频控件。`,
             });
           break;
         case "audio":
           if (
             this.form.components.filter(({ typeCode }) => typeCode === "audio")
-              .length >= 1
+              .length >= limits.audio
           )
             return this.$message({
               type: "warning",
-              message: "一个节目只能有一个音频控件。",
+              message: `一个节目最多${limits.audio}个音频控件。`,
             });
           if (
             this.form.components.filter(({ typeCode }) => typeCode === "stream")
