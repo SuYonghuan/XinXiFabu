@@ -22,7 +22,7 @@
 		},
 		created() {
 			if (this.$route != '/login') {
-				this._getLogin()
+				// this._getLogin()
 			}
 		},
 		methods: {

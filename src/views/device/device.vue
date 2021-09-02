@@ -2,11 +2,11 @@
   <div class="deptManager-content">
 
     <!--  面包屑  -->
-    <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>设备管理</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>
-    </el-breadcrumb>
+    <!--<el-breadcrumb separator="/">-->
+      <!--<el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>-->
+      <!--<el-breadcrumb-item>设备管理</el-breadcrumb-item>-->
+      <!--<el-breadcrumb-item>{{ $route.name }}</el-breadcrumb-item>-->
+    <!--</el-breadcrumb>-->
 
     <!--  搜索  -->
     <el-form :inline="true" :model="search" class="demo-form-inline">
@@ -52,8 +52,8 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <p class="right-button">
-        <el-button type="success" @click="handleDeviceExcel({})" v-if="pageMenu.exportDevice">导出设备</el-button>
-        <el-button type="success" @click="handleExcel({})" v-if="pageMenu.devexport">导出设备节目</el-button>
+        <el-button type="success" @click="handleDeviceExcel({})">导出设备</el-button>
+        <el-button type="success" @click="handleExcel({})">导出设备节目</el-button>
         <el-button type="success" @click="refresh()">刷新</el-button>
       </p>
     </el-form>
@@ -80,7 +80,7 @@
                       trigger="hover">
             <p>
               触摸状态：
-              <el-switch v-model="scope.row.operable" :disabled="!pageMenu.devscreenoper"
+              <el-switch v-model="scope.row.operable"
                          @change="changScreenOper(scope.row)"></el-switch>
             </p>
             <img slot="reference" src="../../common/images/hand.png" width="25" alt="">
@@ -90,11 +90,11 @@
       </el-table-column>
       <el-table-column prop="sName" label="屏幕属性"></el-table-column>
       <el-table-column prop="floor" label="楼栋/楼层"></el-table-column>
-      <el-table-column label="设备所在组">
-        <template slot-scope="scope">
-          {{ scope.row.groupList.length }}
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="设备所在组">-->
+        <!--<template slot-scope="scope">-->
+          <!--{{ scope.row.groupList.length }}-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column prop="bootTime" label="开机时间"></el-table-column>
       <el-table-column prop="shutdownTime" label="关机时间"></el-table-column>
       <el-table-column prop="name" label="设备状态" column-key="deviceOnline" :filters=status :filter-multiple="false">
@@ -116,42 +116,40 @@
           </el-tooltip>
         </template>
       </el-table-column>
-      <el-table-column label="同屏设备">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isSyn" @change="changeSyn(scope.row)"></el-switch>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="同屏设备">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-switch v-model="scope.row.isSyn" @change="changeSyn(scope.row)"></el-switch>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
       <el-table-column label="操作" width="250">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleDetail(scope.row)" v-if="pageMenu.devoper">管理</el-button>
-          <el-button type="warning" size="small" @click="screenshot(scope.row,scope.$index)" v-if="pageMenu.devicescreenshot" :ref="'shotRef'+scope.$index" :loading="false">截图
+          <!--<el-button type="primary" size="small" @click="handleDetail(scope.row)">管理</el-button>-->
+          <el-button type="warning" size="small" @click="screenshot(scope.row,scope.$index)" :ref="'shotRef'+scope.$index" :loading="false">截图
           </el-button>
           <el-dropdown style="margin-left: 15px">
             <el-button type="primary" size="small">
               更多<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item><p @click="reboot(scope.row)" v-if="pageMenu.devrestart">重启</p></el-dropdown-item>
-              <el-dropdown-item><p @click="shut(scope.row)" v-if="pageMenu.devshutdown">关机</p></el-dropdown-item>
-              <el-dropdown-item><p @click="handleEdit(scope.row,2)" v-if="pageMenu.devsetshutdowntime">开关机时间</p>
+              <el-dropdown-item><p @click="reboot(scope.row)">重启</p></el-dropdown-item>
+              <el-dropdown-item><p @click="shut(scope.row)">关机</p></el-dropdown-item>
+              <el-dropdown-item><p @click="handleEdit(scope.row,2)">开关机时间</p>
               </el-dropdown-item>
-              <el-dropdown-item><p @click="cleanShutTime(scope.row)" v-if="pageMenu.devclearshutdowntime">清除开关机时间</p>
+              <el-dropdown-item><p @click="cleanShutTime(scope.row)">清除开关机时间</p>
               </el-dropdown-item>
-              <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
-              <el-dropdown-item v-if="pageMenu.startexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,2)">开启Explorer</p></el-dropdown-item>
-              <el-dropdown-item v-if="pageMenu.killexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,1)">关闭Explorer</p></el-dropdown-item>
+              <el-dropdown-item ><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
     <div class="bottom-button">
-      <el-button size="small" @click="shut(tableChecked,1)" v-if="pageMenu.devshutdown">关机</el-button>
-      <el-button size="small" @click="reboot(tableChecked,1)" v-if="pageMenu.devrestart">重启</el-button>
-      <el-button size="small" @click="handleEdit(tableChecked,1)" v-if="pageMenu.devsetshutdowntime">开关机时间</el-button>
-      <el-button size="small" @click="cleanShutTime(tableChecked,1)" v-if="pageMenu.devclearshutdowntime">清除开关机时间
+      <el-button size="small" @click="shut(tableChecked,1)" >关机</el-button>
+      <el-button size="small" @click="reboot(tableChecked,1)">重启</el-button>
+      <el-button size="small" @click="handleEdit(tableChecked,1)" >开关机时间</el-button>
+      <el-button size="small" @click="cleanShutTime(tableChecked,1)" >清除开关机时间
       </el-button>
-      <el-button size="small" @click="batchDelete(tableChecked)" v-if="pageMenu.devdel">删除</el-button>
+      <el-button size="small" @click="batchDelete(tableChecked)" >删除</el-button>
     </div>
 
     <!--  分页  -->
@@ -274,7 +272,8 @@
       }
     },
     created() {
-      this.GetRolePermissions()
+      // this.GetRolePermissions()
+      this.getList(this.pageSize, this.currentPage)
       this.GetDeviceOptionsNew()
     },
     methods: {

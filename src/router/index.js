@@ -7,7 +7,7 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: "/",
-    redirect: '/index/home'
+    redirect: '/device/device'
   },
   {
     path: '/login',
@@ -174,22 +174,23 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if ((to.path === '/login' && !getCookie('autoauth')) || to.path === '/mallregister') {
-    next()
-  } else {
-    if ( getCookie('autoauth') ) {
-      let userInfo = decodeURIComponent(getCookie('userInfo'))
-      setCookie(userInfo, 'userInfo', 1)
-      next()
-      return
-    }
-    let userInfo = JSON.parse(getCookie('userInfo'))
-    if (userInfo.userCode) {
-      next()
-    } else {
-      next('/login')
-    }
-  }
+  next()
+  // if ((to.path === '/login' && !getCookie('autoauth')) || to.path === '/mallregister') {
+  //   next()
+  // } else {
+  //   if ( getCookie('autoauth') ) {
+  //     let userInfo = decodeURIComponent(getCookie('userInfo'))
+  //     setCookie(userInfo, 'userInfo', 1)
+  //     next()
+  //     return
+  //   }
+  //   let userInfo = JSON.parse(getCookie('userInfo'))
+  //   if (userInfo.userCode) {
+  //     next()
+  //   } else {
+  //     next('/login')
+  //   }
+  // }
 })
 
 export default router

@@ -1,7 +1,7 @@
 <template>
   <div class="index-content">
-    <leftNav></leftNav>
-    <topNav></topNav>
+    <!--<leftNav></leftNav>-->
+    <!--<topNav></topNav>-->
     <router-view class="child-view"/>
   </div>
 </template>
@@ -23,8 +23,8 @@
   position: relative;
   z-index: 5;
   .child-view{
-    margin-left: 170px;
-    padding: 40px 40px 0px 40px;
+    /*margin-left: 170px;*/
+    /*padding: 40px 40px 0px 40px;*/
   }
 }
 </style>

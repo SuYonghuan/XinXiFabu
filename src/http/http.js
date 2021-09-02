@@ -34,15 +34,15 @@ axios.interceptors.response.use(response => {
   const data = JSON.parse(decrypt(response.data))
 
   //401 重新登录
-  if (data.code === ERR_LOGIN) {
-    // Message.error(data.msg)
-    //清除存储在cookie和store中的用户信息 重新跳转到登陆页
-    store.dispatch('delUser')
-    delCookie('userInfo')
-    delCookie('presentMenu')
-    router.replace('/login')
-    return
-  }
+  // if (data.code === ERR_LOGIN) {
+  //   // Message.error(data.msg)
+  //   //清除存储在cookie和store中的用户信息 重新跳转到登陆页
+  //   store.dispatch('delUser')
+  //   delCookie('userInfo')
+  //   delCookie('presentMenu')
+  //   router.replace('/login')
+  //   return
+  // }
 
   return Promise.resolve(data)
 })
