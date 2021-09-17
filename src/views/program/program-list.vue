@@ -782,6 +782,7 @@
       handleDevice(item) {
         this.dialogVisibleDevice = true
         const param = {"Code": item.code}
+        this.postionList = []
         this.GetPostionList(param)
       },
       //关联店铺
