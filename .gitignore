@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-/永旺大后台
+/永旺本地大后台
 
 # local env files
 .env.local
