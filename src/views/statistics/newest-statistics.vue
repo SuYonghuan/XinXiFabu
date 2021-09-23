@@ -88,8 +88,12 @@ export default {
     };
   },
   created() {
+    const date = new Date();
     this.search.time = [
-      this.dateFormat("y-m-d", new Date()),
+      this.dateFormat(
+        "y-m-d",
+        new Date(date.getFullYear(), date.getMonth(), 1)
+      ),
       this.dateFormat("y-m-d", new Date()),
     ];
     this.GetDeptPublishProgram();
