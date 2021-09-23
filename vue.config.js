@@ -5,6 +5,7 @@ const resolve = dir => {
 }
 
 module.exports = {
+  outputDir: resolve('./永乐大后台'),
   devServer: {
     proxy: {
       '/api': {
