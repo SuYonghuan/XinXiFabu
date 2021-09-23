@@ -184,28 +184,6 @@
         :filters="screenAdapt"
         :filter-multiple="false"
       ></el-table-column>
-      <el-table-column label="关联店铺">
-        <template slot-scope="scope">
-          <el-link
-            type="primary"
-            @click="handleEditShop(scope.row)"
-            :disabled="!pageMenu.setprogshop"
-          >
-            {{ scope.row.shopInfo ? scope.row.shopInfo : "未关联" }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column label="设置标签">
-        <template slot-scope="scope">
-          <el-link
-            type="primary"
-            @click="handleEditLabel(scope.row)"
-            :disabled="!pageMenu.setproglabel"
-          >
-            {{ scope.row.labels ? scope.row.labels : "未关联" }}
-          </el-link>
-        </template>
-      </el-table-column>
       <el-table-column label="操作" width="240">
         <template slot-scope="scope">
           <el-button
