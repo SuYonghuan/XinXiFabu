@@ -288,7 +288,7 @@
 import transferView from "components/transfer-view/transfer-view";
 import {
   GetDevGroupList,
-  GetDeviceOptionsNew,
+  GetDeviceOptions,
   GetRolePermissions,
   GetDeviceByGroupCode,
   AddDeviceGroup,
@@ -349,7 +349,7 @@ export default {
   },
   created() {
     this.GetRolePermissions();
-    this.GetDeviceOptionsNew();
+    this.GetDeviceOptions();
   },
   methods: {
     /**
@@ -375,8 +375,8 @@ export default {
       this.currentPage = 1;
       this.getList(this.pageSize, this.currentPage);
     },
-    GetDeviceOptionsNew() {
-      GetDeviceOptionsNew({}).then((res) => {
+    GetDeviceOptions() {
+      GetDeviceOptions({}).then((res) => {
         if (res.code === ERR_OK) {
           this.searchDeviceList = res.data.screenInfos;
         }

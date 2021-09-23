@@ -66,7 +66,7 @@
           <template slot-scope="scope">
             <el-checkbox
               size="mini"
-              v-for="(item, index) of timeInfo.timeRelateList"
+              v-for="item of timeInfo.timeRelateList"
               v-show="editForm[scope.$index].Default == 0"
               v-model="editForm[scope.$index].TimeSlot"
               :label="item.timeSlotCode"

@@ -88,8 +88,12 @@ export default {
     };
   },
   created() {
+    const date = new Date();
     this.search.time = [
-      this.dateFormat("y-m-d", new Date()),
+      this.dateFormat(
+        "y-m-d",
+        new Date(date.getFullYear(), date.getMonth(), 1)
+      ),
       this.dateFormat("y-m-d", new Date()),
     ];
     this.GetProgramPlayRecord();
@@ -103,7 +107,7 @@ export default {
       const param = {
         BeginTime: this.search.time[0],
         EndTime: this.search.time[1] + " 23:59:59",
-        TakeNum: 5,
+        TakeNum: 10,
       };
       GetProgramPlayRecord(param).then((res) => {
         if (res.code === ERR_OK) {
@@ -180,8 +184,15 @@ export default {
             data: this.chartData,
             // barWidth: '10%',
             type: "bar",
+            color: "#2F6BFF",
+            label: { show: true },
           },
         ],
+        tooltip: {
+          formatter({ name }) {
+            return name;
+          },
+        },
       });
     },
     //导出excel

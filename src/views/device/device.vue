@@ -394,7 +394,7 @@
 <script>
 import {
   GetDeviceList,
-  GetDeviceOptionsNew,
+  GetDeviceOptions,
   GetRolePermissions,
   DeviceCommandReStart,
   DeviceCommandShutDown,
@@ -467,7 +467,7 @@ export default {
   },
   created() {
     this.GetRolePermissions();
-    this.GetDeviceOptionsNew();
+    this.GetDeviceOptions();
   },
   methods: {
     /**
@@ -523,8 +523,8 @@ export default {
         }
       });
     },
-    GetDeviceOptionsNew() {
-      GetDeviceOptionsNew({}).then((res) => {
+    GetDeviceOptions() {
+      GetDeviceOptions({}).then((res) => {
         if (res.code === ERR_OK) {
           this.searchDeviceList = res.data.screenInfos;
           this.floorData = res.data.buildings;

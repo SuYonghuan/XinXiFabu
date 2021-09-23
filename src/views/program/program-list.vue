@@ -635,7 +635,7 @@
 import transferView from "components/transfer-view/transfer-view";
 import { timeFormatting } from "common/js/mixins";
 import {
-  GetDeviceOptionsNew,
+  GetDeviceOptions,
   GetRolePermissions,
   GetList,
   ProgAddFast,
@@ -736,7 +736,7 @@ export default {
   },
   created() {
     this.GetRolePermissions();
-    this.GetDeviceOptionsNew();
+    this.GetDeviceOptions();
   },
   methods: {
     /**
@@ -757,8 +757,8 @@ export default {
         }
       });
     },
-    GetDeviceOptionsNew() {
-      GetDeviceOptionsNew({}).then((res) => {
+    GetDeviceOptions() {
+      GetDeviceOptions({}).then((res) => {
         if (res.code === ERR_OK) {
           this.searchDeviceList = res.data.screenInfos;
         }
