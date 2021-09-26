@@ -11,7 +11,7 @@
       <p class="from-p">
         屏保时间
         <span>
-          <el-input-number v-model="list.time" :min="15" :max="3600" label="描述文字"></el-input-number>
+          <el-input-number v-model="list.time" :min="0" :max="3600" label="描述文字"></el-input-number>
           秒
         </span>
       </p>
