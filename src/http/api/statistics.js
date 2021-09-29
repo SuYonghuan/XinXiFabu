@@ -14,3 +14,15 @@ export const GetDeptPublishProgram = (param) =>
 export const GetProgramPlayRecord = (param) =>
 	post(`${store.state.config.url}/api/ProgramStatistics/GetProgramPlayRecord?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/ProgramStatistics/GetProgramPlayRecord"))}&time=${timeStamp()}`,param)
 
+//获取业态导航统计
+export const QueryFormatGuide = (param) =>
+	post(`${store.state.config.url}/Api/Statistics/QueryFormatGuide?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Statistics/QueryFormatGuide"))}&time=${timeStamp()}`,param)
+
+//获取店铺导航统计
+export const QueryShopGuide = (param) =>
+	post(`${store.state.config.url}/Api/Statistics/QueryShopGuide?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Statistics/QueryShopGuide"))}&time=${timeStamp()}`,param)
+
+//获取导航统计
+export const QueryGuideRecord = (param) =>
+	post(`${store.state.config.url}/Api/Statistics/QueryGuideRecord?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Statistics/QueryGuideRecord"))}&time=${timeStamp()}`,param)
+

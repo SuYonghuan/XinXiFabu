@@ -6,6 +6,10 @@ import store from '../../store'
 export const login = (param) =>
 	post(`${store.state.config.url}/api/Account/Login?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Account/Login"))}&time=${timeStamp()}`,param)
 
+//退出登陆
+export const LoginOut = (param) =>
+	post(`${store.state.config.url}/api/Account/LoginOut?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Account/LoginOut"))}&time=${timeStamp()}`,param)
+
 //获取菜单
 export const getMenu = (param) =>
 	post(`${store.state.config.url}/api/menu/GetMenuInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/menu/GetMenuInfo"))}&time=${timeStamp()}`,param)

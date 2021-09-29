@@ -1,78 +1,80 @@
 <template>
   <div class="home-content">
-    <div class="welcome-div">
-      <p class="text">欢迎你来，{{ user.nickName }}</p>
-      <p class="time">今天是 {{ newTime }}</p>
-    </div>
-    <div class="device-div">
-      <p>设备运行状态</p>
-      <div class="echart-div">
-        <div id="lineChart"></div>
-        <div class="right-div">
-          <div class="device-num">
-            <p>设备总数</p>
-            <p style="color: #E6A23C;font-size: 30px">{{ deviceData.totalDev }}</p>
-          </div>
-          <div class="device-run">
-            <p>当前运行数量</p>
-            <p style="color: #67C23A;font-size: 30px">{{ deviceData.runDev }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="bottom-table">
-      <div class="table1">
-        <div class="table-title">
-          <p>排期订单</p>
-          <el-link type="primary">更多</el-link>
-        </div>
-        <el-table
-                :data="tableData"
-                stripe
-                style="width: 100%">
-          <el-table-column
-                  prop="date"
-                  label="日期"
-                  width="180">
-          </el-table-column>
-          <el-table-column
-                  prop="name"
-                  label="姓名"
-                  width="180">
-          </el-table-column>
-          <el-table-column
-                  prop="address"
-                  label="地址">
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="table2">
-        <div class="table-title">
-          <p>素材订单</p>
-          <el-link type="primary">更多</el-link>
-        </div>
-        <el-table
-                :data="tableData"
-                stripe
-                style="width: 100%">
-          <el-table-column
-                  prop="date"
-                  label="日期"
-                  width="180">
-          </el-table-column>
-          <el-table-column
-                  prop="name"
-                  label="姓名"
-                  width="180">
-          </el-table-column>
-          <el-table-column
-                  prop="address"
-                  label="地址">
-          </el-table-column>
-        </el-table>
-      </div>
+    <p class="text">欢迎你来，{{ user.nickName }}</p>
+    <p class="time">今天是 {{ newTime }}</p>
+    <!--<div class="welcome-div">-->
+      <!--<p class="text">欢迎你来，{{ user.nickName }}</p>-->
+      <!--<p class="time">今天是 {{ newTime }}</p>-->
+    <!--</div>-->
+    <!--<div class="device-div">-->
+      <!--<p>设备运行状态</p>-->
+      <!--<div class="echart-div">-->
+        <!--<div id="lineChart"></div>-->
+        <!--<div class="right-div">-->
+          <!--<div class="device-num">-->
+            <!--<p>设备总数</p>-->
+            <!--<p style="color: #E6A23C;font-size: 30px">{{ deviceData.totalDev }}</p>-->
+          <!--</div>-->
+          <!--<div class="device-run">-->
+            <!--<p>当前运行数量</p>-->
+            <!--<p style="color: #67C23A;font-size: 30px">{{ deviceData.runDev }}</p>-->
+          <!--</div>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+    <!--<div class="bottom-table">-->
+      <!--<div class="table1">-->
+        <!--<div class="table-title">-->
+          <!--<p>排期订单</p>-->
+          <!--<el-link type="primary">更多</el-link>-->
+        <!--</div>-->
+        <!--<el-table-->
+                <!--:data="tableData"-->
+                <!--stripe-->
+                <!--style="width: 100%">-->
+          <!--<el-table-column-->
+                  <!--prop="date"-->
+                  <!--label="日期"-->
+                  <!--width="180">-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+                  <!--prop="name"-->
+                  <!--label="姓名"-->
+                  <!--width="180">-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+                  <!--prop="address"-->
+                  <!--label="地址">-->
+          <!--</el-table-column>-->
+        <!--</el-table>-->
+      <!--</div>-->
+      <!--<div class="table2">-->
+        <!--<div class="table-title">-->
+          <!--<p>素材订单</p>-->
+          <!--<el-link type="primary">更多</el-link>-->
+        <!--</div>-->
+        <!--<el-table-->
+                <!--:data="tableData"-->
+                <!--stripe-->
+                <!--style="width: 100%">-->
+          <!--<el-table-column-->
+                  <!--prop="date"-->
+                  <!--label="日期"-->
+                  <!--width="180">-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+                  <!--prop="name"-->
+                  <!--label="姓名"-->
+                  <!--width="180">-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+                  <!--prop="address"-->
+                  <!--label="地址">-->
+          <!--</el-table-column>-->
+        <!--</el-table>-->
+      <!--</div>-->
 
-    </div>
+    <!--</div>-->
   </div>
 </template>
 
@@ -104,8 +106,8 @@
 		},
 		created() {
 			this.newTime = this.dateFormat('y年m月d日', new Date())
-			this.GetLineData()
-			this.GetNowStatus()
+			// this.GetLineData()
+			// this.GetNowStatus()
 		},
 		methods: {
 			/**
@@ -186,6 +188,8 @@
 
 <style scoped lang="scss">
   .home-content {
+    text-align: center;
+    padding-top: 200px !important;
     .welcome-div {
       width: 100%;
       height: 80px;

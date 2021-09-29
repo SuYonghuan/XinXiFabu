@@ -86,11 +86,11 @@
           <el-input size="small" v-model="addForm.email" auto-complete="off"
                     placeholder="请输入正确的邮箱"></el-input>
         </el-form-item>
-        <el-form-item label="部门" prop="deptCode">
-          <el-select v-model="addForm.deptCode" placeholder="选择部门">
-            <el-option v-for="item in deptList" :label="item.name" :value="item.code"></el-option>
-          </el-select>
-        </el-form-item>
+        <!--<el-form-item label="部门" prop="deptCode">-->
+          <!--<el-select v-model="addForm.deptCode" placeholder="选择部门">-->
+            <!--<el-option v-for="item in deptList" :label="item.name" :value="item.code"></el-option>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
         <el-form-item label="角色" prop="roleCode">
           <el-select v-model="addForm.roleCode" placeholder="选择角色">
             <el-option v-for="item in roleList" :label="item.name" :value="item.code"/>
@@ -123,11 +123,11 @@
           <el-input size="small" v-model="editForm.email" auto-complete="off"
                     placeholder="请输入正确的邮箱"></el-input>
         </el-form-item>
-        <el-form-item label="部门" prop="deptCode">
-          <el-select v-model="editForm.deptCode" placeholder="选择部门">
-            <el-option v-for="item in deptList" :label="item.name" :value="item.code"></el-option>
-          </el-select>
-        </el-form-item>
+        <!--<el-form-item label="部门" prop="deptCode">-->
+          <!--<el-select v-model="editForm.deptCode" placeholder="选择部门">-->
+            <!--<el-option v-for="item in deptList" :label="item.name" :value="item.code"></el-option>-->
+          <!--</el-select>-->
+        <!--</el-form-item>-->
         <el-form-item label="角色" prop="roleCode">
           <el-select v-model="editForm.roleCode" placeholder="选择角色">
             <el-option v-for="item in roleList" :label="item.name" :value="item.code"/>

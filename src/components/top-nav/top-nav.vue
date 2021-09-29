@@ -47,6 +47,7 @@
   import {
     GetNoReadMessage,
     GetMessageInfo,
+    LoginOut,
   } from 'http/api/login'
   import {ERR_OK} from 'http/config'
 
@@ -69,7 +70,7 @@
       ...mapGetters(["user"])
     },
     created() {
-      this.GetNoReadMessage()
+      // this.GetNoReadMessage()
       this.autoAuth = getCookie('autoauth') ? true : false;
     },
     methods: {
@@ -119,6 +120,7 @@
           cancelButtonText: "取消",
           type: "warning"
         }).then(() => {
+          LoginOut()
           this.$router.push({path: "/login"});
           this.setuser("");
           delCookie('userInfo')
@@ -154,7 +156,7 @@
     },
     watch: {
       $route(val) {
-        this.GetNoReadMessage()
+        // this.GetNoReadMessage()
       }
     },
   };

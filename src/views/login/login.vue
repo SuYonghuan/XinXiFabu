@@ -163,27 +163,28 @@
 				login(params).then(res => {
 					this.userInfo = res.data
 					if (res.code == ERR_OK) {
-						//修改初始密码
-						if (res.data.default) {
-							this.dialogVisibleTitle = '请修改初始密码'
-							this.dialogVisible = true
-							this.logining = false
-							return;
-						}
-						//修改过期密码
-						if (res.data.cpd) {
-							this.dialogVisibleTitle = '密码已过期，请修改密码'
-							this.dialogVisible = true
-							this.logining = false
-							return;
-						}
-						this.setUser(res.data)
-						let cookieData = {
-							"userCode": res.data.userCode,
-							"mallCode": res.data.mallCode,
-						}
-						//保存帐号到cookie，有效期1天
-						setCookie(JSON.stringify(cookieData), 'userInfo', 1)
+            this.setUser(res.data)
+            let cookieData = {
+              "userCode": res.data.userCode,
+              "mallCode": res.data.mallCode,
+              "jwtToken": res.data.jwtToken
+            }
+            //保存帐号到cookie，有效期30天
+            setCookie(JSON.stringify(cookieData), 'userInfo', 30)
+            //修改初始密码
+            if (res.data.default) {
+              this.dialogVisibleTitle = '请修改初始密码'
+              this.dialogVisible = true
+              this.logining = false
+              return;
+            }
+            //修改过期密码
+            if (res.data.cpd) {
+              this.dialogVisibleTitle = '密码已过期，请修改密码'
+              this.dialogVisible = true
+              this.logining = false
+              return;
+            }
 						this.$message({
 							message: '登录成功',
 							type: 'success'

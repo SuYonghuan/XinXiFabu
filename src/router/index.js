@@ -163,6 +163,21 @@ const routes = [
         name: '节目播放',
         component: () => import('views/statistics/program-statistics'),
       },
+      {
+        path: '/statistics/format-log',
+        name: '业态导航统计',
+        component: () => import('views/statistics/format-log'),
+      },
+      {
+        path: '/statistics/shop-log',
+        name: '店铺导航统计',
+        component: () => import('views/statistics/shop-log'),
+      },
+      {
+        path: '/statistics/nav-log',
+        name: '导航统计',
+        component: () => import('views/statistics/nav-log'),
+      },
     ]
   },
 ]
