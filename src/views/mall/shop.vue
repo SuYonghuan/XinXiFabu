@@ -104,7 +104,7 @@
       <el-table-column label="启用状态">
         <template slot-scope="scope">
           <el-switch
-            v-model="scope.row.isShow"
+            :value="scope.row.isShow"
             v-if="pageMenu.changeShopStatus"
             @change="changeShow(scope.row)"
           ></el-switch>
@@ -900,7 +900,7 @@ export default {
     changeShow(item) {
       const param = {
         Code: item.code,
-        IsShow: item.isShow,
+        IsShow: !item.isShow,
         UserName: this.user.accountName,
         MallCode: this.user.mallCode,
       };
