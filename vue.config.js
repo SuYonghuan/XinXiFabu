@@ -5,8 +5,8 @@ const resolve = dir => {
 }
 
 module.exports = {
+  outputDir: resolve('./前滩太古里本地大后台'),
   devServer: {
-    outputDir: resolve('./前滩太古里本地大后台'),
     proxy: {
       '/api': {
         target: 'http://192.168.1.194:8999/Api', //对应自己的接口

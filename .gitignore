@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-
+/前滩太古里本地大后台
 # local env files
 .env.local
 .env.*.local
