@@ -34,7 +34,7 @@
       </el-form-item>
 
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>
+        <!-- <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button> -->
         <el-button type="success" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delprog">删除</el-button>
       </el-form-item>
@@ -130,15 +130,15 @@
           <!--{{ scope.row.launchTime }} ~ {{ scope.row.expiryDate }}-->
         <!--</template>-->
       <!--</el-table-column>-->
-      <el-table-column prop="status" label="节目状态" column-key="progStatus" :filters=programStatus :filter-multiple="false">
+      <!-- <el-table-column prop="status" label="节目状态" column-key="progStatus" :filters=programStatus :filter-multiple="false">
         <template slot-scope="scope">
           <span :style="scope.row.status == '排期中' ? 'color:#67C23A;' : 'color:#909399;'">{{ scope.row.status }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="switchMode" label="切换效果" column-key="switchMode" :filters=programEffect :filter-multiple="false"></el-table-column>
       <el-table-column prop="switchTime" label="切换间隔"></el-table-column>
       <el-table-column prop="screenMatch" label="屏幕适应" column-key="screenMatch" :filters=screenAdapt :filter-multiple="false"></el-table-column>
-      <el-table-column label="关联店铺">
+      <!-- <el-table-column label="关联店铺">
         <template slot-scope="scope">
           <el-link type="primary" @click="handleEditShop(scope.row)" :disabled="!pageMenu.setprogshop">
             {{scope.row.shopInfo ? scope.row.shopInfo : '未关联'}}
@@ -151,7 +151,8 @@
             {{scope.row.labels ? scope.row.labels : '未关联'}}
           </el-link>
         </template>
-      </el-table-column>
+      </el-table-column> -->
+      <el-table-column prop="founderName" label="上传人"></el-table-column>
       <el-table-column label="操作" width="240">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editprog && scope.row.allowEdit">编辑</el-button>
@@ -598,10 +599,14 @@
           this.$message.error(res.msg);
         })
       },
-      DelProgram_Pre(param) {
+      DelProgram_Pre(param,fun) {
         DelProgram_Pre(param).then(res => {
-          if (res.code === ERR_OK) {
+          if (res.code == ERR_OK) {
             this.delError = res.data
+            if ( res.data ) {
+              this.delError = '注意：'+ this.delError
+            }
+            fun()
             return
           }
           this.$message.error(res.msg);
@@ -858,7 +863,11 @@
       },
       //删除
       handleDelete(item) {
-        this.DelProgram_Pre({"Codes": [item.code]});
+        this.DelProgram_Pre({"Codes": [item.code]},()=>{
+          this.delFun(item)
+        });
+      },
+      delFun(item) {
         this.$confirm("此操作将永久删除, 是否继续?" + this.delError, "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",

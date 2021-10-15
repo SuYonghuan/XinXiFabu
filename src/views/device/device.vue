@@ -522,6 +522,11 @@
           if (res.code === ERR_OK) {
             console.log(res.data)
             this.eventsData = res.data
+            if ( this.eventsData.length ) {
+              for ( let i=0;i<this.eventsData.length;i++ ) {
+                this.eventsData[i].title = this.eventsData[i].title+'（'+ this.eventsData[i].founderName +'）'
+              }
+            } 
           }
         })
       },

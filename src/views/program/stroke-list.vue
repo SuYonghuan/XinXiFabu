@@ -50,14 +50,16 @@
       <el-table-column prop="resolution" label="广告分辨率" min-width="130"></el-table-column>
       <el-table-column prop="period" label="有效期" min-width="130"></el-table-column>
       <el-table-column prop="updateTime" label="修改时间"></el-table-column>
-      <el-table-column prop="isActivity" label="状态">
+      <el-table-column prop="isActivity" label="发布状态">
         <template slot-scope="scope">
           {{ scope.row.isActivity ? '已发布' : '待发布' }}
         </template>
       </el-table-column>
+      <el-table-column prop="dateState" label="日程状态"></el-table-column>
+      <el-table-column prop="creator" label="上传人"></el-table-column>
       <el-table-column label="操作" width="280">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" :disabled="scope.row.isActivity" @click="handleEdit(scope.row)" v-if="pageMenu.editschedule">编辑</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editschedule">编辑</el-button>
           <el-button type="primary" size="small" @click="handleEdit(scope.row,1)" v-if="pageMenu.scheduleinfo">查看</el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.deleteschedule">删除</el-button>
           <el-button type="primary" size="small" :disabled="scope.row.isActivity" @click="handlePublish(scope.row)" v-if="pageMenu.publishschedule">发布</el-button>
@@ -125,7 +127,7 @@
         </el-form-item>
         <el-form-item>
           <el-table :data="editForm.programs" style="width: 100%" height="620" ref="programsTab" v-if="isTable">
-            <el-table-column type="index" label="广告位" width="200"></el-table-column>
+            <el-table-column prop="programName" label="广告位" width="200"></el-table-column>
             <el-table-column prop="alreadyCount" label="广告数量">
               <template slot-scope="scope">
                 <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" v-show="scope.row.previewSrc" @click="handleEditProgram(scope.row)">
@@ -165,14 +167,20 @@
       </span>
     </el-dialog>
 
-    <!--  节目选择列表  -->
+    <!--  查看广告  -->
     <el-dialog title="查看广告" :visible.sync="dialogVisibleProgramDetail" width="50%" :before-close="handleCloseProDei"
                :close-on-click-modal="false" class="dialog" append-to-body>
       <el-form :label-width="formLabelWidth" :model="editForm" ref="editForm">
         <el-table :data="selectAbd.already" style="width: 100%" height="620">
           <el-table-column prop="programName" label="节目名称" min-width="180"></el-table-column>
-          <el-table-column prop="creator" label="上传人" min-width="180"></el-table-column>
-          <el-table-column prop="devNum" label="设备名称" min-width="180"></el-table-column>
+          <el-table-column prop="creator" label="上传人"></el-table-column>
+          <el-table-column prop="devNum" label="设备名称"></el-table-column>
+          <el-table-column prop="filePath" label="预览" min-width="80">
+            <template slot-scope="scope">
+              <!-- <img :src="scope.row.filePath" width="30" height="30" slot="reference"> -->
+              <el-image style="width: 30px; height: 30px" :src="scope.row.filePath" :preview-src-list="srcList"></el-image>
+            </template>
+          </el-table-column>
           <el-table-column prop="period" label="时间段" min-width="180"></el-table-column>
         </el-table>
       </el-form>

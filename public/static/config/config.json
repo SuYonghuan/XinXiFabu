@@ -1,8 +1,8 @@
 ﻿{
-  "url": "http://192.168.1.194:8017",
-  "yunUrl": "http://121.37.146.236:8012",
-  "mallYunUrl": "http://test.1000my.com:8013",
-  "fileUrl": "http://test.1000my.com:8011",
+  "url": "http://192.168.1.194:8012",
+  "yunUrl": "http://saas.1000my.com:8012",
+  "mallYunUrl": "http://saas.1000my.com:8013",
+  "fileUrl": "http://saas.1000my.com:8011",
   "uploadFile": "/api/FileManage/UpLoadFilesSec",
   "yunUpdateFile": "/api/MallFileManage/UpLoadFilesSec",
   "mapKey": "A",
