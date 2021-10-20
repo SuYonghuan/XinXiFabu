@@ -57,3 +57,7 @@ export const MallRegister = (param) =>
 //已读消息删除
 export const DelMessage = (param) =>
     post(`${store.state.config.url}/api/Detection/DelMessage?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Detection/DelMessage"))}&time=${timeStamp()}`,param)
+
+//首页数据看板
+export const StatisticsBoard = () =>
+    get(`${store.state.config.url}/Api/Statistics/StatisticsBoard?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Statistics/StatisticsBoard"))}&time=${timeStamp()}`)
