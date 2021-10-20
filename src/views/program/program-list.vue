@@ -996,7 +996,7 @@
           let type = ['image/jpg', 'image/png', 'image/jpeg', 'image/gif']
           this.updateForm.progType = type.indexOf(file.raw.type) === -1 ? '视频' : '图片'
           this.updateForm.fileGuid = res.data.fileGuid
-          this.updateForm.previewFileGUID = res.data.previewFileGuid
+          this.updateForm.previewFileGuid = res.data.previewFileGuid
           this.updateForm.programName = file.raw.name
         } else {
           this.$message.error('上传失败!');
