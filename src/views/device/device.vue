@@ -227,7 +227,7 @@
   } from 'http/api/device'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
-  import fullcalendar from 'vue-fullcalendar'
+  import fullcalendar from 'lib/vue-fullcalendar'
 
   export default {
     name: "deptManager",

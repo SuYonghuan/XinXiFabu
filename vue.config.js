@@ -20,6 +20,7 @@ module.exports = {
   chainWebpack: config => {
     config.resolve.alias
       .set('common', resolve('src/common'))
+      .set('lib', resolve('src/lib'))
       .set('components', resolve('src/components'))
       .set('http', resolve('src/http'))
       .set('base', resolve('src/base'))

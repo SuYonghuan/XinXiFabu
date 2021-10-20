@@ -514,6 +514,7 @@
       //点击搜索设备
       changeDevice() {
         this.GetDeviceByGroupCode('', this.deviceForm.screenInfo)
+        this.deviceForm.Devices = []
       },
       //分辨率筛选
       resolutionToName(code) {
