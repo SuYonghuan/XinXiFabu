@@ -155,8 +155,8 @@
       <el-table-column prop="founderName" label="上传人"></el-table-column>
       <el-table-column label="操作" width="240">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editprog && scope.row.allowEdit">编辑</el-button>
-          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delprog">删除</el-button>
+          <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editprog" :disabled="!scope.row.allowEdit">编辑</el-button>
+          <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delprog" :disabled="!scope.row.allowEdit">删除</el-button>
           <el-dropdown style="margin-left: 15px">
             <el-button type="primary" size="small">
               更多<i class="el-icon-arrow-down el-icon--right"></i>
