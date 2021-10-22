@@ -1109,6 +1109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          on: {
 	            "click": function($event) {
 	              _vm.eventClick(event, $event)
+								_vm.selectThisDay(day, $event)
 	            }
 	          }
 	        }, [_vm._v("\n              " + _vm._s(_vm.isBegin(event, day.date, day.weekDay)) + "\n            ")])

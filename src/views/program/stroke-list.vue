@@ -424,7 +424,8 @@
         this.dialogVisibleDevice = false
         this.$refs["editForm"] && this.$refs["editForm"].resetFields()
         this.$refs.videoRef && this.$refs.videoRef.pause()
-        this.deviceForm = {time:[]}
+        this.deviceForm = {time:[],Devices: []}
+        this.deviceData = []
       },
       //关闭节目
       handleClosePro() {
