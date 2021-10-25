@@ -1,7 +1,10 @@
 ﻿{
-  "url": "http://121.199.30.36:8012/mall",
+  "url": "http://121.40.193.52:8003",
   "yunUrl": "http://121.199.30.36:8012",
-  "fileUrl": "http://121.199.30.36:8012/file",
-  "uploadFile": "/api/MallFileManage/UpLoadFilesSec",
-  "version": "1.0"
+  "mallYunUrl": "http://121.199.30.36:8013",
+  "fileUrl": "http://121.199.30.36:8011",
+  "uploadFile": "/api/FileManage/UpLoadFilesSec",
+  "yunUpdateFile": "/api/MallFileManage/UpLoadFilesSec",
+  "mapKey": "A",
+  "version": "千目智能应用发布系统V3.2.0"
 }

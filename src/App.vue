@@ -176,8 +176,12 @@ body,
       color: #bbc1cc;
     }
   }
+  .el-table--scrollable-x .el-table__body-wrapper {
+    overflow-x: hidden;
+  }
   .el-table {
     position: relative;
+
     ::-webkit-scrollbar {
       width: 4px;
       height: 349px;
