@@ -94,6 +94,10 @@ export const PublishProgToDeviceGroup = (param) =>
 export const GetProgramListByGroupCode = (param) =>
 	post(`${store.state.config.url}/api/ProgGroup/GetProgramListByGroupCode?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/ProgGroup/GetProgramListByGroupCode"))}&time=${timeStamp()}`,param)
 
+//设置节目组状态
+export const AuditProgramGroup = (param) =>
+	post(`${store.state.config.url}/api/ProgGroup/AuditProgramGroup?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/ProgGroup/AuditProgramGroup"))}&time=${timeStamp()}`,param)
+
 //获取插播管理列表
 export const GetNewsGroupList = (param) =>
 	post(`${store.state.config.url}/api/News/GetNewsGroupList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/News/GetNewsGroupList"))}&time=${timeStamp()}`,param)

@@ -34,7 +34,7 @@
       </el-form-item>
 
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button>
+        <!-- <el-button type="success" @click="handleAdd(1)" v-if="pageMenu.addprog">快速发布</el-button> -->
         <el-button type="success" @click="handleAdd(2)" v-if="pageMenu.addprog">新增素材</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delprog">删除</el-button>
       </el-form-item>

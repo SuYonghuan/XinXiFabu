@@ -62,9 +62,11 @@
       </el-table-column>
       <el-table-column prop="groupName" label="组名称" min-width="150" column-key="NameOrder" :filters=sort :filter-multiple="false"></el-table-column>
       <el-table-column prop="screenInfo" label="屏幕属性"></el-table-column>
-      <el-table-column label="节目数量" column-key="Order" :filters=sort :filter-multiple="false">
+      <el-table-column label="状态" column-key="Status" :filters=groupStatus :filter-multiple="false">
         <template slot-scope="scope">
-          <el-link type="primary" @click="handleProgramDetail(scope.row)">{{ scope.row.programCount }}</el-link>
+          <p  :style="fontColor(scope.row.status)">
+            {{ groupStatus[scope.row.status].text }}
+          </p>
         </template>
       </el-table-column>
       <el-table-column prop="founderName" label="创建用户"></el-table-column>
@@ -75,11 +77,15 @@
       <el-table-column prop="updateTime" label="更新时间">
         <template slot-scope="scope">{{ timestampToTime(scope.row.updateTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="250px">
+      <el-table-column label="操作" width="370px">
         <template slot-scope="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)" v-if="pageMenu.editproggroup">编辑
           </el-button>
           <el-button type="danger" size="small" @click="handleDelete(scope.row)" v-if="pageMenu.delproggroup">删除
+          </el-button>
+          <el-button type="success" size="small" @click="handleProgramDetail(scope.row,1)" v-if="pageMenu.previewgroup">预览
+          </el-button>
+          <el-button type="warning" size="small" @click="handleProgramDetail(scope.row,2)" v-if="pageMenu.auditproggroup" :disabled="scope.row.status != 0">审核
           </el-button>
           <el-dropdown style="margin-left: 15px" v-if="pageMenu.publishproggroup">
             <el-button type="primary" size="small">
@@ -116,13 +122,17 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="intro">
+          <div class="transfer-div">
+            <el-tag type="" effect="dark">未关联</el-tag>
+            <el-tag type="success" effect="dark">已关联</el-tag>
+          </div>
           <transferViewProgram :List="staffList" ref="transferView" v-if="transferStatus"
                                @changeTransfer="changeTransfer"></transferViewProgram>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleClose('editForm')">取 消</el-button>
-        <el-button type="primary" @click="submitUpForm('editForm')">确 定</el-button>
+        <el-button type="primary" @click="submitUpForm('editForm')">提交审核</el-button>
       </span>
     </el-dialog>
 
@@ -180,7 +190,7 @@
         <el-table-column type="index" label="序列"></el-table-column>
         <el-table-column label="预览">
           <template slot-scope="scope">
-            <img :src="scope.row.previewSrc" width="30" height="30">
+            <img :src="scope.row.previewSrc" @click="clickImage(scope.row)" width="30" height="30">
           </template>
         </el-table-column>
         <el-table-column prop="programName" label="节目名称" min-width="150">
@@ -195,7 +205,14 @@
         <el-table-column prop="switchTime" label="切换间隔"></el-table-column>
         <el-table-column prop="screenMatch" label="屏幕适应"></el-table-column>
       </el-table>
+
+      <span slot="footer" class="dialog-footer" v-show="programType === 2">
+        <el-button @click="submitGroupForm(2)">不通过</el-button>
+        <el-button type="primary" @click="submitGroupForm(1)">通 过</el-button>
+      </span>
     </el-dialog>
+
+    <bigImage :src="bigFile.src" :type="bigFile.type" v-if="bigFile" @closeImg="closeImg"></bigImage>
   </div>
 </template>
 
@@ -218,9 +235,11 @@
     GetDeviceGroupByProgGroup,
     PublishProgToDeviceGroup,
     GetProgramListByGroupCode,
+    AuditProgramGroup,
   } from 'http/api/program'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
+  import bigImage from 'components/big-image/big-image'
 
   export default {
     name: "deptManager",
@@ -228,7 +247,7 @@
     data() {
       return {
         search: {
-          SearchKey: '', ScreenCode: '', Order: '', NameOrder: ''
+          SearchKey: '', ScreenCode: '', Status: null, NameOrder: ''
         },
         tableData: [],
         total: 0,
@@ -258,6 +277,14 @@
         groupInfo: [],
         transferStatus: false,
         groupProgram: [],
+        groupStatus: [
+          {text: '待审核', value: 0},
+          {text: '已通过', value: 1},
+          {text: '不通过', value: 2},
+          {text: '已发布', value: 3},
+        ],
+        bigFile: null,
+        programType: 1,
       }
     },
     created() {
@@ -294,7 +321,7 @@
         const param = {
           "SearchKey": this.search.SearchKey,
           "ScreenCode": this.search.ScreenCode,
-          "Order": this.search.Order,
+          "Status": this.search.Status,
           "NameOrder": this.search.NameOrder,
           "Paging": 1,
           "PageIndex": page,
@@ -413,6 +440,17 @@
           }
         })
       },
+      AuditProgramGroup(param) {
+        AuditProgramGroup(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.handleClose()
+            this.$message.success(res.msg);
+            this.getList(this.pageSize, this.currentPage)
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
       /**
        * End
        * @param val
@@ -440,7 +478,7 @@
       //重置搜索
       replaySearch() {
         this.search = {
-          SearchKey: '', ScreenCode: '', Order: '', NameOrder: ''
+          SearchKey: '', ScreenCode: '', Status: null, NameOrder: ''
         }
         this.currentPage = 1
         this.$refs.table.clearFilter()
@@ -453,8 +491,8 @@
           this.search.NameOrder = value.NameOrder[0]
         }
         //前端状态
-        if ( value.Order ) {
-          this.search.Order = value.Order[0]
+        if ( value.Status ) {
+          this.search.Status = value.Status[0]
         }
 
         this.getList(this.pageSize, this.currentPage)
@@ -506,8 +544,10 @@
         this.GetDeviceGroupByProgGroup(item.code);
       },
       //节目详情
-      handleProgramDetail(item) {
+      handleProgramDetail(item,type) {
         this.dialogVisibleProgram = true
+        this.programType = type
+        this.editForm = JSON.parse(JSON.stringify(item));
         this.GetProgramListByGroupCode(item.code)
       },
       //关闭弹窗
@@ -516,7 +556,7 @@
         this.dialogVisibleDevice = false
         this.dialogVisibleDeviceGroup = false
         this.dialogVisibleProgram = false
-        this.$refs["editForm"].resetFields()
+        this.$refs["editForm"] && this.$refs["editForm"].resetFields()
         this.transferStatus = false
       },
       //提交
@@ -636,12 +676,44 @@
           this.transferStatus = true;
         })
       },
+      //字体颜色
+      fontColor(status) {
+        if ( status == 1 ) {
+          return "color: #67C23A;"
+        } else if ( status == 2 ) {
+          return "color: #F56C6C;"
+        } else if ( status == 3 ) {
+          return "color: #E6A23C;"
+        }
+      },
+      //放大图片
+      clickImage(item) {
+        console.log(item)
+        this.bigFile = {}
+        this.bigFile.src = item.filePath
+        this.bigFile.type = item.progType
+        this.dialogVisibleProgram = false
+      },
+      //关闭放大
+      closeImg() {
+        this.bigFile = null
+        this.dialogVisibleProgram = true
+      },
+      //修改审核状态
+      submitGroupForm(type) {
+        const param = {
+          code: this.editForm.code,
+          Status: type
+        }
+        this.AuditProgramGroup(param)
+      },
     },
     components: {
       pagination,
       transferView,
       transferViewProgram,
       transferViewProgram1,
+      bigImage,
     },
     computed: {
       ...mapGetters(['presentMenu', 'config'])
@@ -675,5 +747,10 @@
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
+  }
+  .transfer-div{
+    display: flex;
+    width: 55%;
+    justify-content: space-between;
   }
 </style>
