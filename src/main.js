@@ -20,7 +20,7 @@ import echarts from "echarts";
 Vue.prototype.$echarts = echarts;
 
 
-get('/static/config/config.json')
+get('./static/config/config.json')
     .then((res) => {
       store.dispatch('setConfig', res)
       new Vue({
