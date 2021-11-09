@@ -16,7 +16,7 @@
           <el-table-column type="selection" :reserve-selection="true" width="30"></el-table-column>
           <el-table-column prop="previewSrc" label="预览" width="60">
             <template slot-scope="scope">
-              <img :src="scope.row.previewSrc" width="30" height="30" slot="reference">
+              <img :src="scope.row.previewSrc" @click="$emit('clickImage',scope.row,2)" width="30" height="30" slot="reference">
             </template>
           </el-table-column>
           <el-table-column prop="programName" label="节目名称" sortable min-width="180">
@@ -64,7 +64,7 @@
           <el-table-column type="selection" :reserve-selection="true" width="30"></el-table-column>
           <el-table-column prop="previewSrc" label="预览" width="60">
             <template slot-scope="scope">
-              <img :src="scope.row.previewSrc" width="30" height="30" slot="reference">
+              <img :src="scope.row.previewSrc" @click="$emit('clickImage',scope.row,2)" width="30" height="30" slot="reference">
             </template>
           </el-table-column>
           <el-table-column prop="programName" label="节目名称" sortable min-width="100">

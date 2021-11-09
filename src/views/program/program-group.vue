@@ -127,7 +127,7 @@
             <el-tag type="success" effect="dark">已关联</el-tag>
           </div>
           <transferViewProgram :List="staffList" ref="transferView" v-if="transferStatus"
-                               @changeTransfer="changeTransfer"></transferViewProgram>
+                               @changeTransfer="changeTransfer" @clickImage="clickImage"></transferViewProgram>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -153,6 +153,10 @@
           </el-tooltip>
         </el-form-item>
         <el-form-item label="设备" prop="intro">
+          <div class="transfer-div">
+            <el-tag type="" effect="dark">未关联</el-tag>
+            <el-tag type="success" effect="dark">已关联</el-tag>
+          </div>
           <transferView :List="staffList" ref="transferView" @changeTransfer="changeTransfer"
                         v-if="transferStatus"></transferView>
         </el-form-item>
@@ -174,6 +178,10 @@
           <el-input type="text" v-model="deviceForm.screenInfo" :disabled="true" placeholder="请输入分辨率"></el-input>
         </el-form-item>
         <el-form-item label="设备" prop="intro">
+          <div class="transfer-div">
+            <el-tag type="" effect="dark">未关联</el-tag>
+            <el-tag type="success" effect="dark">已关联</el-tag>
+          </div>
           <transferViewProgram1 :List="staffList" ref="transferView" v-if="transferStatus"
                                 @changeTransfer="changeTransfer"></transferViewProgram1>
         </el-form-item>
@@ -285,6 +293,7 @@
         ],
         bigFile: null,
         programType: 1,
+        previewType: 1,
       }
     },
     created() {
@@ -687,17 +696,25 @@
         }
       },
       //放大图片
-      clickImage(item) {
+      clickImage(item,type = 1) {
         console.log(item)
         this.bigFile = {}
-        this.bigFile.src = item.filePath
+        this.bigFile.src = item.filePath ? item.filePath : item.progSrc
         this.bigFile.type = item.progType
         this.dialogVisibleProgram = false
+        this.dialogVisible = false
+        this.previewType = type
       },
       //关闭放大
       closeImg() {
         this.bigFile = null
-        this.dialogVisibleProgram = true
+        //预览节目组
+        if ( this.previewType === 1 ) {
+          this.dialogVisibleProgram = true
+        //新增组
+        } else if ( this.previewType === 2 ) {
+          this.dialogVisible = true
+        }
       },
       //修改审核状态
       submitGroupForm(type) {
