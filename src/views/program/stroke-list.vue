@@ -130,6 +130,7 @@
             <el-table-column prop="programName" label="广告位" width="200"></el-table-column>
             <el-table-column prop="alreadyCount" label="广告数量">
               <template slot-scope="scope">
+                <i class="close-img el-icon-close" v-show="scope.row.previewSrc"  @click="handleDelProgram(scope.row)"></i>
                 <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" v-show="scope.row.previewSrc" @click="handleEditProgram(scope.row)">
                 <div v-show="!scope.row.previewSrc">
                   <el-button type="primary" size="small" v-if="scope.row.allowEdit" :disabled="editForm.isActivity" @click="handleEditProgram(scope.row)">设置广告</el-button>
@@ -530,6 +531,11 @@
         this.GetProgramList(this.editForm.resolution)
         this.dialogVisibleProgram = true
       },
+      //删除节目
+      handleDelProgram(item) {
+        item.programCode = ''
+        item.previewSrc = ''
+      },
       //点击素材
       handleTable(item) {
         this.selectAbd.programCode = item.code
@@ -650,5 +656,12 @@
     p{
       margin-right: 30px;
     }
+  }
+  .close-img{
+    position: absolute;
+    left: 33px;
+    top: 6px;
+    z-index: 2;
+    font-weight: 700;
   }
 </style>
