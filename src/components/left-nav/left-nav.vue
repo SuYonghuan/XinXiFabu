@@ -1,6 +1,5 @@
 <template>
   <el-menu
-          default-active="2"
           :collapse="collapsed"
           collapse-transition
           router
@@ -9,7 +8,6 @@
           class="el-menu-vertical-demo"
           background-color="#334157"
           text-color="#fff"
-          active-text-color="#ffd04b"
   >
     <div class="logobox">
       <img
@@ -18,6 +16,9 @@
               alt=""
       />
     </div>
+    <el-menu-item :index="'/index/home'" class="home-menu" style="">
+        <span slot="title">首页</span>
+    </el-menu-item>
     <el-submenu
             v-for="menu in menus"
             :key="menu.code"
@@ -345,5 +346,11 @@
   }
   .logoimg {
     height: 40px;
+  }
+  .home-menu{
+    background-color:#334157 !important;
+    &:hover{
+      background-color:#334157 !important;
+    }
   }
 </style>
