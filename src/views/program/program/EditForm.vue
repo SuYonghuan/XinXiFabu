@@ -16,15 +16,18 @@
       <el-col class="right">
         <div style="flex: 1"></div>
         <el-dropdown
-          @command="setStageScale"
+          @command="setScale"
           class="input1"
-          style="margin-right:8px;display: inline-flex;width: 65px;align-content: center;align-items: center;"
+          style="margin-right:8px;display: inline-flex;width: 65px;align-content: center;align-items: center;user-select:none"
         >
           <span class="el-dropdown-link">
-            {{ (scale * 100).toFixed(0) + "%"
+            {{ (stageScale * 100).toFixed(0) + "%"
             }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :command="initScale">
+              {{ (initScale * 100).toFixed(0) + "%" }}</el-dropdown-item
+            >
             <el-dropdown-item :command="1">100%</el-dropdown-item>
             <el-dropdown-item :command="1.5">150%</el-dropdown-item>
             <el-dropdown-item :command="2">200%</el-dropdown-item>
@@ -80,20 +83,26 @@
           </div>
         </template>
       </div>
-      <el-col :span="14" class="middle canvas-wrapper">
+      <div class="middle canvas-wrapper" @wheel="handleWheel">
+        <div
+          class="scroll-dummy"
+          :style="
+            `width: ${form.width * stageScale}px;height: ${form.height *
+              stageScale}px;`
+          "
+        ></div>
         <v-stage
           class="stage"
-          :style="`transform: scale(${stageScale})`"
+          :style="
+            `width: ${form.width}px;height: ${form.height}px;transform: scale(${stageScale})`
+          "
           :config="{
             width: form.width,
             height: form.height,
-            draggable: true,
-            dragBoundFunc: boundStageDrag,
           }"
           ref="stage"
           @mousedown="handleStageMouseDown"
           @touchstart="handleStageMouseDown"
-          @wheel="handleWheel"
         >
           <v-layer
             @dragmove="handleDragMove"
@@ -319,7 +328,7 @@
             />
           </v-layer>
         </v-stage>
-      </el-col>
+      </div>
 
       <el-form
         v-if="form"
@@ -963,12 +972,15 @@ export default {
     };
   },
   computed: {
-    stageScale() {
+    initScale() {
       if (!this.form) return 0;
       return Math.min(
         (this.$root.ww - 496 - 256 - 40) / this.form.width,
         (this.$root.wh - 80 - 40) / this.form.height
       );
+    },
+    stageScale() {
+      return this.initScale * this.scale;
     },
     materialDialogTitle() {
       return !this.form
@@ -984,59 +996,16 @@ export default {
     },
   },
   methods: {
-    boundStageDrag(newPos) {
-      const stage = this.$refs.stage.getNode();
-      const scale = stage.scaleX();
-      if (newPos.x > 0) newPos.x = 0;
-      if (newPos.y > 0) newPos.y = 0;
-      if (newPos.x + stage.width() * scale < stage.width())
-        newPos.x = stage.width() - stage.width() * scale;
-      if (newPos.y + stage.height() * scale < stage.height())
-        newPos.y = stage.height() - stage.height() * scale;
-      return newPos;
-    },
     handleWheel(e) {
-      const stage = this.$refs.stage.getNode();
-      e.evt.preventDefault();
-      var oldScale = stage.scaleX();
-
-      var pointer = stage.getPointerPosition();
-
-      var mousePointTo = {
-        x: (pointer.x - stage.x()) / oldScale,
-        y: (pointer.y - stage.y()) / oldScale,
-      };
-
-      let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      e.preventDefault();
+      const oldScale = this.scale;
+      let newScale = e.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
       newScale = Math.max(newScale, 1);
       newScale = Math.min(newScale, 4);
       this.scale = newScale;
-      stage.scale({ x: newScale, y: newScale });
-
-      var newPos = {
-        x: pointer.x - mousePointTo.x * newScale,
-        y: pointer.y - mousePointTo.y * newScale,
-      };
-      this.setFixedPos(newPos);
     },
-    setStageScale(scale) {
-      const stage = this.$refs.stage.getNode();
-      stage.scale({ x: scale, y: scale });
-      const newPos = stage.position();
-      this.setFixedPos(newPos);
-      this.scale = scale;
-    },
-    setFixedPos(newPos) {
-      const stage = this.$refs.stage.getNode();
-      const scale = stage.scaleX();
-      if (newPos.x > 0) newPos.x = 0;
-      if (newPos.y > 0) newPos.y = 0;
-      if (newPos.x + stage.width() * scale < stage.width())
-        newPos.x = stage.width() - stage.width() * scale;
-      if (newPos.y + stage.height() * scale < stage.height())
-        newPos.y = stage.height() - stage.height() * scale;
-      stage.position(newPos);
-      stage.batchDraw();
+    setScale(targetStageScale) {
+      this.scale = targetStageScale / this.initScale;
     },
     handleDragEnd() {
       this.guideLineHelper && this.guideLineHelper.handleDragEnd();
@@ -1047,12 +1016,8 @@ export default {
         const layer = this.$refs.layer.getNode();
         this.guideLineHelper = new GuideLineHelper({ stage, layer });
       } else {
-        console.log(e.target.getType());
         if (e.target.getType() === "Shape")
           this.guideLineHelper.handleDragMove(e);
-        else {
-          console.log(e.target.getType());
-        }
       }
     },
     attachImage(component) {
@@ -1561,6 +1526,25 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.canvas-wrapper {
+  padding: 20px;
+  flex: 1;
+  height: calc(100vh - 80px);
+  position: relative;
+  background: #ececec;
+  display: flex;
+  width: calc(100vw - 496px - 256px);
+  overflow: auto;
+}
+.scroll-dummy {
+  pointer-events: none;
+}
+.stage {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  transform-origin: top left;
+}
 .pef {
   display: flex;
   flex-direction: column;
@@ -1689,10 +1673,6 @@ export default {
       }
     }
     .middle {
-      flex: 1;
-      height: calc(100vh - 80px);
-      position: relative;
-      background: #ececec;
     }
     .right {
       flex: 0 0 496px;
@@ -1836,18 +1816,7 @@ export default {
   .updown {
     width: 30px;
   }
-  .stage {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: auto;
-    transform-origin: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+
   .cube {
     position: absolute;
     display: block;
