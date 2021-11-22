@@ -102,7 +102,9 @@
           }"
           ref="stage"
           @mousedown="handleStageMouseDown"
-          @touchstart="handleStageMouseDown"
+          @mousemove="handleStageMouseMove"
+          @mouseup="handleStageMouseUp"
+          @mouseleave="handleStageMouseUp"
         >
           <v-layer
             @dragmove="handleDragMove"
@@ -326,6 +328,17 @@
                     : undefined,
               }"
             />
+            <v-rect
+              v-if="downPos && rectSelectConfig"
+              name="rect-select"
+              :config="rectSelectConfig"
+            ></v-rect>
+            <v-rect
+              v-if="selectedComponentsGroupConfig"
+              name="selected-group"
+              :config="selectedComponentsGroupConfig"
+              @dragend="handleSelectedGroupDrag"
+            ></v-rect>
           </v-layer>
         </v-stage>
       </div>
@@ -362,7 +375,11 @@
             >
             </el-time-picker>
           </el-form-item>
-
+          <h5>对齐分布</h5>
+          <aligns
+            :active="selectedComponentsGroupConfig"
+            @set="handleAlignSet"
+          ></aligns>
           <h5>{{ activeComponent ? "元素属性" : "背景属性" }}</h5>
           <template v-if="!activeComponent">
             <el-form-item class="item" label="背景颜色" prop="backgroundColor">
@@ -855,6 +872,7 @@ import ComponentList from "./EditForm/ComponentList";
 import { svgs } from "./EditForm/svgs.js";
 import PreviewProgram from "./PreviewProgram";
 import { GuideLineHelper } from "./EditForm/GuideLineHelper";
+import Aligns from "./EditForm/Aligns";
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
@@ -893,8 +911,16 @@ const flatenComponent = ({ config, ...component }) => {
   return { ...component, ...config };
 };
 const scaleBy = 1.01;
+const haveIntersection = (r1, r2) => {
+  return !(
+    r2.x > r1.offsetX + r1.width ||
+    r2.x + r2.width < r1.offsetX ||
+    r2.y > r1.offsetY + r1.height ||
+    r2.y + r2.height < r1.offsetY
+  );
+};
 export default {
-  components: { MatList, ComponentList, PreviewProgram },
+  components: { MatList, ComponentList, PreviewProgram, Aligns },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -969,6 +995,9 @@ export default {
       previewKey: null,
       guideLineHelper: null,
       scale: 1,
+      downPos: null,
+      rectSelectConfig: null,
+      selectedComponents: null,
     };
   },
   computed: {
@@ -994,8 +1023,203 @@ export default {
     currentMaterialType() {
       return this.activeComponent ? this.activeComponent.typeCode : "image";
     },
+    selectedComponentsGroupConfig() {
+      if (!this.selectedComponents || !this.selectedComponents.length)
+        return null;
+      const { form } = this;
+      const { x1, x2, y1, y2 } = this.selectedComponents.reduce(
+        ({ x1, x2, y1, y2 }, nxt) => ({
+          x1: Math.min(x1, nxt.offsetX),
+          y1: Math.min(y1, nxt.offsetY),
+          x2: Math.max(x2, nxt.offsetX + nxt.width),
+          y2: Math.max(y2, nxt.offsetY + nxt.height),
+        }),
+        { x1: Infinity, y1: Infinity, x2: -Infinity, y2: -Infinity }
+      );
+      const { x, y, width, height } = {
+        x: x1,
+        y: y1,
+        width: x2 - x1,
+        height: y2 - y1,
+      };
+      return {
+        x,
+        y,
+        width,
+        height,
+        draggable: true,
+        stroke: "#2f6bff",
+        strokeEnabled: true,
+        zIndex: 10,
+        dragBoundFunc: (pos) => {
+          return {
+            x:
+              pos.x < 0
+                ? 0
+                : pos.x > form.width - width
+                ? form.width - width
+                : pos.x,
+            y:
+              pos.y < 0
+                ? 0
+                : pos.y > form.height - height
+                ? form.height - height
+                : pos.y,
+          };
+        },
+      };
+    },
   },
   methods: {
+    handleAlignSet(type) {
+      const group = this.selectedComponentsGroupConfig;
+      switch (type) {
+        case "top":
+          this.selectedComponents.forEach((c) => {
+            c.offsetY = group.y;
+          });
+          break;
+        case "bottom":
+          this.selectedComponents.forEach((c) => {
+            c.offsetY = group.y + group.height - c.height;
+          });
+          break;
+        case "left":
+          this.selectedComponents.forEach((c) => {
+            c.offsetX = group.x;
+          });
+          break;
+        case "right":
+          this.selectedComponents.forEach((c) => {
+            c.offsetX = group.x + group.width - c.width;
+          });
+          break;
+        case "center":
+          this.selectedComponents.forEach((c) => {
+            c.offsetX = Math.floor(group.x + group.width / 2 - c.width / 2);
+          });
+          break;
+        case "middle":
+          this.selectedComponents.forEach((c) => {
+            c.offsetY = Math.floor(group.y + group.height / 2 - c.height / 2);
+          });
+          break;
+        case "between-h":
+          {
+            const totalWidth = this.selectedComponents.reduce(
+              (acc, nxt) => (acc += nxt.width),
+              0
+            );
+            if (totalWidth > group.width) return;
+            const avg = Math.ceil(
+              (group.width - totalWidth) / (this.selectedComponents.length - 1)
+            );
+            this.selectedComponents.sort((a, b) => a.offsetX - b.offsetX);
+            this.selectedComponents.forEach((component, i) => {
+              if (i !== 0) {
+                const last = this.selectedComponents[i - 1];
+                component.offsetX = last.offsetX + last.width + avg;
+              }
+            });
+          }
+          break;
+        case "between-v":
+          {
+            const totalHeight = this.selectedComponents.reduce(
+              (acc, nxt) => (acc += nxt.height),
+              0
+            );
+            if (totalHeight > group.height) return;
+            const avg = Math.ceil(
+              (group.height - totalHeight) /
+                (this.selectedComponents.length - 1)
+            );
+            this.selectedComponents.sort((a, b) => a.offsetY - b.offsetY);
+            this.selectedComponents.forEach((component, i) => {
+              if (i !== 0) {
+                const last = this.selectedComponents[i - 1];
+                component.offsetY = last.offsetY + last.height + avg;
+              }
+            });
+          }
+          break;
+      }
+    },
+    handleSelectedGroupDrag(e) {
+      if (!this.selectedComponentsGroupConfig) return;
+      const now = { x: e.target.x(), y: e.target.y() };
+      const then = this.selectedComponentsGroupConfig;
+      const offsetX = Math.floor(now.x - then.x);
+      const offsetY = Math.floor(now.y - then.y);
+      this.selectedComponents.forEach((c) => {
+        c.offsetX += offsetX;
+        c.offsetY += offsetY;
+      });
+    },
+    handleStageMouseUp(e) {
+      if (!this.downPos) return;
+      if (!this.rectSelectConfig) {
+        this.downPos = null;
+        return;
+      }
+      this.downPos = null;
+      const selectedComponents = this.form.components.filter((r1) =>
+        haveIntersection(r1, this.rectSelectConfig)
+      );
+      if (selectedComponents.length === 1) {
+        const component = selectedComponents[0];
+        const index = this.form.components.findIndex((c) => c === component);
+        this.activeComponent = component;
+        this.selectedShapeName = "name_" + index;
+        this.updateTransformer();
+        return;
+      }
+      this.selectedComponents = selectedComponents;
+      this.rectSelectConfig = null;
+    },
+    handleStageMouseMove(e) {
+      if (!this.downPos) return;
+      const pos = e.currentTarget.pointerPos;
+
+      const x = Math.min(pos.x, this.downPos.x);
+      const y = Math.min(pos.y, this.downPos.y);
+      const width = Math.abs(pos.x - this.downPos.x);
+      const height = Math.abs(pos.y - this.downPos.y);
+      this.rectSelectConfig = {
+        x,
+        y,
+        width,
+        height,
+        draggable: false,
+        fill: "#2f6bff",
+        opacity: 0.5,
+        strokeEnabled: false,
+        zIndex: 10,
+      };
+    },
+    handleStageMouseDown(e) {
+      // clicked on transformer - do nothing
+      const clickedOnTransformer =
+        e.target.getParent().className === "Transformer";
+      if (clickedOnTransformer) return;
+      const name = e.target.name();
+      if (name === "selected-group") return;
+      // find clicked rect by its name
+      const component = this.form.components[name.replace("name_", "")];
+      // clicked on stage - clear selection
+      const clickBlank = e.target === e.target.getStage() || !component;
+      if (clickBlank) {
+        this.selectedShapeName = "";
+        this.updateTransformer();
+        this.downPos = e.currentTarget.pointerPos;
+        this.selectedComponents = null;
+        return;
+      }
+      this.selectedComponents = null;
+      this.activeComponent = component;
+      this.selectedShapeName = name;
+      this.updateTransformer();
+    },
     handleWheel(e) {
       e.preventDefault();
       const oldScale = this.scale;
@@ -1011,6 +1235,7 @@ export default {
       this.guideLineHelper && this.guideLineHelper.handleDragEnd();
     },
     handleDragMove(e) {
+      if (this.selectedComponentsGroupConfig) return;
       if (!this.guideLineHelper) {
         const stage = this.$refs.stage.getNode();
         const layer = this.$refs.layer.getNode();
@@ -1118,33 +1343,7 @@ export default {
         return oldBox;
       return newBox;
     },
-    handleStageMouseDown(e) {
-      // clicked on stage - clear selection
-      if (e.target === e.target.getStage()) {
-        this.selectedShapeName = "";
-        this.updateTransformer();
-        return;
-      }
 
-      // clicked on transformer - do nothing
-      const clickedOnTransformer =
-        e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-
-      // find clicked rect by its name
-      const name = e.target.name();
-
-      const component = this.form.components[name.replace("name_", "")];
-      if (component) {
-        this.activeComponent = component;
-        this.selectedShapeName = name;
-      } else {
-        this.selectedShapeName = "";
-      }
-      this.updateTransformer();
-    },
     handleTransformEnd({ target }) {
       const {
         attrs: { x, y, scaleX, scaleY, name },

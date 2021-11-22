@@ -90,3 +90,64 @@ export const svgs = ({ type, style, backgroundColor, color }) => {
     }
     return head + encodeURIComponent(body)
 }
+export const aligns = ({ type, color }) => {
+    const head = 'data:image/svg+xml;charset=UTF-8,';
+    let body
+    switch (type) {
+        case 'left':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M85.312 0v1024H0V0h85.312zM1024 256H170.688V0H1024v256z m-85.312-85.312V85.312H256v85.376h682.688zM1024 1024H170.688v-256H1024v256z m-85.312-85.312v-85.376H256v85.376h682.688zM853.312 640H170.688V384h682.624v256zM768 554.688V469.312H256v85.376h512z" />
+            </svg>
+            `
+            break;
+        case 'center':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M460.16 1024V0h103.68v1024H460.16zM64 577.152h896v296.32H64v-296.32z m89.6 98.816v98.752h716.8v-98.752H153.6z m0-525.44h716.8v296.32H153.6v-296.32z m89.6 98.752v98.752h537.6V249.28H243.2z" />
+             </svg>
+            `
+            break;
+        case 'right':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+                <path fill="${color ? color : 'none'}" d="M938.688 1024V0H1024v1024h-85.312zM0 768h853.312v256H0v-256z m85.312 85.312v85.376H768v-85.376H85.312zM0 0h853.312v256H0V0z m85.312 85.312v85.376H768V85.312H85.312zM170.688 384h682.624v256H170.688V384zM256 469.312v85.376h512V469.312H256z" />
+            </svg>
+            `
+            break;
+        case 'bottom':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M0 938.688h1024V1024H0v-85.312zM256 0v853.312H0V0h256zM170.688 85.312H85.312V768h85.376V85.312zM1024 0v853.312h-256V0h256z m-85.312 85.312h-85.376V768h85.376V85.312zM640 170.688v682.624H384V170.688h256zM554.688 256H469.312v512h85.376V256z" />
+        </svg>
+                `
+            break;
+        case 'top':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M1024 85.312H0V0h1024v85.312zM768 1024V170.688h256V1024h-256z m85.312-85.312h85.376V256h-85.376v682.688zM0 1024V170.688h256V1024H0z m85.312-85.312h85.376V256H85.312v682.688zM384 853.312V170.688h256v682.624H384zM469.312 768h85.376V256H469.312v512z" />
+        </svg>`
+            break;
+        case 'middle':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M0 460.16h1024v103.68H0V460.16zM446.848 64v896h-296.32V64h296.32zM348.032 153.6H249.28v716.8h98.752V153.6z m525.44 0v716.8h-296.32V153.6h296.32z m-98.752 89.6h-98.752v537.6h98.752V243.2z" />
+        </svg>`
+            break;
+        case 'between-v':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M0 0h1024v93.12H0V0z m0 930.88h1024V1024H0v-93.12zM128 186.24h768v279.296H128V186.176z m85.312 93.12v93.056h597.376V279.296H213.312zM128 558.528h768v279.296H128V558.528z m85.312 93.12v93.056h597.376v-93.056H213.312z" />
+        </svg>`
+            break;
+        case 'between-h':
+            body = `<svg class="icon" width="200px" height="200.00px" viewBox="0 0 1024 1024" version="1.1"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill="${color ? color : 'none'}" d="M1024 0v1024h-93.12V0H1024zM93.12 0v1024H0V0h93.12zM837.76 128v768H558.528V128h279.296z m-93.12 85.312h-93.056v597.376h93.056V213.312zM465.472 128v768H186.176V128h279.296zM372.352 213.312H279.296v597.376h93.056V213.312z" />
+        </svg>`
+            break;
+        default:
+            break;
+    }
+    return head + encodeURIComponent(body)
+}
