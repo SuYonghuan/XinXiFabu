@@ -131,9 +131,9 @@
             <el-table-column prop="alreadyCount" label="广告数量">
               <template slot-scope="scope">
                 <i class="close-img el-icon-close" v-show="scope.row.previewSrc"  @click="handleDelProgram(scope.row)"></i>
-                <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" v-show="scope.row.previewSrc" @click="handleEditProgram(scope.row)">
+                <img :src="scope.row.previewSrc" width="30" height="30" slot="reference" v-show="previewStatus && scope.row.previewSrc" @click="handleEditProgram(scope.row)">
                 <div v-show="!scope.row.previewSrc">
-                  <el-button type="primary" size="small" v-if="scope.row.allowEdit" :disabled="editForm.isActivity" @click="handleEditProgram(scope.row)">设置广告</el-button>
+                  <el-button type="primary" size="small" v-if="scope.row.allowEdit || scope.row.alreadyCount < 1" :disabled="editForm.isActivity" @click="handleEditProgram(scope.row)">设置广告</el-button>
                   <span v-else>
                     <el-link type="primary" @click="handleProgram(scope.row)">{{scope.row.alreadyCount}}</el-link>
                   </span>
@@ -252,7 +252,7 @@
         programList: [],
         selectAbd: {},
         isTable: true,
-
+        previewStatus: true,
       }
     },
     created() {
@@ -535,6 +535,10 @@
       handleDelProgram(item) {
         item.programCode = ''
         item.previewSrc = ''
+        this.previewStatus = false
+        this.$nextTick(()=>{
+          this.previewStatus = true
+        })
       },
       //点击素材
       handleTable(item) {

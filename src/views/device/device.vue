@@ -139,7 +139,7 @@
               <el-dropdown-item v-if="pageMenu.devdel"><p @click="handleDelete(scope.row)">删除</p></el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.startexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,2)">开启Explorer</p></el-dropdown-item>
               <el-dropdown-item v-if="pageMenu.killexplorer" v-show="scope.row.systemType == 'Windows'"><p @click="handleExplorer(scope.row,1)">关闭Explorer</p></el-dropdown-item>
-              <el-dropdown-item v-if="pageMenu.killexplorer"><p @click="handleSchedule(scope.row)">查看排期</p></el-dropdown-item>
+              <el-dropdown-item v-if="pageMenu.scheduledetail"><p @click="handleSchedule(scope.row)">查看排期</p></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
