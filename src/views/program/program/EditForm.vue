@@ -63,9 +63,9 @@
           <el-popover
             v-if="componentTypeTip[code]"
             :key="code"
-            placement="right"
+            placement="top"
             title="提示"
-            trigger="hover"
+            trigger="focus"
             :content="componentTypeTip[code]"
           >
             <div class="btn" slot="reference" @click="appendComponent(code)">
@@ -252,33 +252,14 @@
                   @dragend="handleDragend"
                   @transformend="handleTransformEnd"
                 ></v-rect>
-                <v-text
+                <inner-text
+                  :form="form"
+                  :component="component"
+                  :i="i"
                   :key="i + '_text'"
-                  :config="{
-                    x: component.offsetX,
-                    y: component.offsetY,
-                    width: component.width,
-                    height: component.height,
-                    strokeEnabled: false,
-                    fill: component.fontColor,
-                    listening: false,
-                    fontStyle:
-                      component.fontStyle === '正常'
-                        ? 'normal'
-                        : component.fontStyle === '加粗'
-                        ? 'bold'
-                        : component.fontStyle === '斜体'
-                        ? 'italic'
-                        : component.fontStyle === '加粗、斜体'
-                        ? 'bold italic'
-                        : 'normal',
-                    wrap: 'none',
-                    fontSize: component.fontSize,
-                    text: component.materials.length
-                      ? component.materials[0].text
-                      : '请选择素材',
-                  }"
-                ></v-text>
+                  :componentTypes="componentTypes"
+                >
+                </inner-text>
               </template>
               <v-rect
                 v-else
@@ -541,6 +522,16 @@
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
+            <template v-else-if="activeComponent.typeCode === 'svga'">
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="previewMat"
+                @remove="removeMaterial"
+                :limit="1"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
             <template v-else-if="activeComponent.typeCode === 'url'">
               <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
                 <el-time-picker
@@ -586,6 +577,23 @@
                   v-model="activeComponent.backgroundOpacity"
                 ></el-slider>
               </el-form-item>
+              <el-form-item class="item" label="字体">
+                <el-select v-model="activeComponent.fontFamily">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in [
+                      '思源黑体Bold',
+                      '思源黑体Heavy',
+                      '思源黑体Light',
+                      '思源黑体Medium',
+                      '思源黑体Normal',
+                      '思源黑体Regular',
+                    ]"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item
                 class="item"
                 label="字体颜色"
@@ -630,7 +638,7 @@
                     :key="key"
                     :value="key"
                     :label="key"
-                    v-for="key in ['从左往右', '从右往左']"
+                    v-for="key in ['自动', '固定', '从右往左']"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -827,6 +835,11 @@
           controls
           :src="previewMaterial.fileUrl"
         ></video>
+        <svga
+          v-else-if="previewMaterial.typeCode === 'svga'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          :src="previewMaterial.fileUrl"
+        ></svga>
         <img
           v-else-if="previewMaterial.typeCode === '图片'"
           style="width:100%;min-height:500px;object-fit:contain;"
@@ -873,10 +886,13 @@ import { svgs } from "./EditForm/svgs.js";
 import PreviewProgram from "./PreviewProgram";
 import { GuideLineHelper } from "./EditForm/GuideLineHelper";
 import Aligns from "./EditForm/Aligns";
+import svga from "../svga.vue";
+import InnerText from "./EditForm/KonvaComponents/InnerText";
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
   html: "#iconHTML",
+  svga: "#iconshipin",
   image: "#icontupian",
   stream: "#iconliumeiti",
   text: "#iconwendang",
@@ -920,7 +936,14 @@ const haveIntersection = (r1, r2) => {
   );
 };
 export default {
-  components: { MatList, ComponentList, PreviewProgram, Aligns },
+  components: {
+    MatList,
+    ComponentList,
+    PreviewProgram,
+    Aligns,
+    svga,
+    InnerText,
+  },
   props: ["showEditForm", "code"],
   data() {
     return {
@@ -964,6 +987,7 @@ export default {
         "image",
         "text",
         "html",
+        "svga",
         "weather",
         "clock",
         "url",
@@ -1506,10 +1530,11 @@ export default {
           component.backgroundColor = "#FFFFFF";
           component.backgroundOpacity = 100;
           component.fontColor = "#000000";
+          component.fontFamily = undefined;
           component.fontSize = 24;
           component.fontStyle = "正常";
           component.animationSpeed = "中等";
-          component.animation = "从左往右";
+          component.animation = "自动";
           component.materials = [];
           break;
         case "weather":

@@ -98,7 +98,23 @@
             }"
           />
         </template>
-
+        <svga
+          class="component"
+          :style="{
+            top: component.offsetY + 'px',
+            left: component.offsetX + 'px',
+            width: component.width + 'px',
+            height: component.height + 'px',
+            zIndex: 1000 + i,
+          }"
+          v-else-if="
+            component.typeCode === 'svga' &&
+              component.materials &&
+              component.materials.length
+          "
+          :key="i"
+          :src="component.materials[0].fileUrl"
+        ></svga>
         <div
           :key="i"
           class="component"
@@ -107,29 +123,7 @@
               component.materials &&
               component.materials.length
           "
-          :style="{
-            fontSize:
-              (component.config ? component.config : component).fontSize + 'px',
-            color: (component.config ? component.config : component).fontColor,
-            lineHeight: 1,
-            fontWeight: (component.config
-              ? component.config
-              : component
-            ).fontStyle.includes('加粗')
-              ? 'bold'
-              : 'normal',
-            fontStyle: (component.config
-              ? component.config
-              : component
-            ).fontStyle.includes('斜体')
-              ? 'italic'
-              : 'normal',
-            top: component.offsetY + 'px',
-            left: component.offsetX + 'px',
-            width: component.width + 'px',
-            height: component.height + 'px',
-            zIndex: 1000 + i,
-          }"
+          :style="textComponentStyle(component, i)"
         >
           <div
             :style="{
@@ -138,6 +132,7 @@
               left: 0,
               right: 0,
               bottom: 0,
+              zIndex: -1,
               background: (component.config ? component.config : component)
                 .backgroundColor,
               opacity:
@@ -145,7 +140,36 @@
                   .backgroundOpacity + '%',
             }"
           ></div>
+          <template
+            v-if="
+              (component.config ? component.config : component).animation ===
+                '自动'
+            "
+          >
+            <span
+              style="white-space: nowrap;"
+              v-if="
+                component.materials[0].text.length *
+                  (component.config ? component.config : component).fontSize <
+                  component.width
+              "
+              >{{ component.materials[0].text }}</span
+            >
+            <v-text-marquee
+              v-else
+              :content="component.materials[0].text"
+            ></v-text-marquee>
+          </template>
+          <span
+            style="white-space: nowrap;"
+            v-else-if="
+              (component.config ? component.config : component).animation ===
+                '固定'
+            "
+            >{{ component.materials[0].text }}</span
+          >
           <v-text-marquee
+            v-else
             :content="component.materials[0].text"
           ></v-text-marquee>
         </div>
@@ -228,7 +252,7 @@
 import videoPlaceHolder from "./video-unsupported.png";
 import { VTextMarquee } from "vue-text-marquee";
 import { svgs } from "./EditForm/svgs.js";
-
+import svga from "../svga.vue";
 const playVideo = (video, src, poster, duration) =>
   new Promise((resolve, reject) => {
     if (video.id === "destroyed") reject();
@@ -268,7 +292,7 @@ const playImage = (img, src, duration) =>
     }, duration);
   });
 export default {
-  components: { VTextMarquee },
+  components: { VTextMarquee, svga },
   data() {
     return {
       seconds: 0,
@@ -357,6 +381,35 @@ export default {
   },
 
   methods: {
+    textComponentStyle(component, i) {
+      return {
+        fontSize:
+          (component.config ? component.config : component).fontSize + "px",
+        fontFamily: (component.config ? component.config : component)
+          .fontFamily,
+        color: (component.config ? component.config : component).fontColor,
+        lineHeight: component.height + "px",
+        fontWeight: (component.config
+          ? component.config
+          : component
+        ).fontStyle.includes("加粗")
+          ? "bold"
+          : "normal",
+        fontStyle: (component.config
+          ? component.config
+          : component
+        ).fontStyle.includes("斜体")
+          ? "italic"
+          : "normal",
+        top: component.offsetY + "px",
+        left: component.offsetX + "px",
+        width: component.width + "px",
+        height: component.height + "px",
+        zIndex: 1000 + i,
+        overflow: "hidden",
+        textAlign: "center",
+      };
+    },
     svgs,
     hms(seconds) {
       const hours = Math.floor(seconds / 3600);
