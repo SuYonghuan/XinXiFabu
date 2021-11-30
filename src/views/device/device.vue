@@ -180,6 +180,20 @@
           ></el-switch>
         </template>
       </el-table-column>
+      <el-table-column
+        prop="dataUpdateTime"
+        label="数据更新时间"
+      ></el-table-column>
+      <el-table-column
+        prop="dataUpdate"
+        label="数据更新状态"
+        column-key="dataUpdate"
+      >
+        <template slot-scope="scope">
+          <span :class="['dot', scope.row.dataUpdate ? 'green' : 'red']"></span
+          >{{ scope.row.dataUpdate ? "完成" : "未完成" }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="132px">
         <template slot-scope="scope">
           <el-button
