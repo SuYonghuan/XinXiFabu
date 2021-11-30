@@ -87,7 +87,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="ip" label="IP"></el-table-column>
-      <el-table-column prop="name" label="标签">
+      <el-table-column prop="name" label="标签" width="60">
         <template slot-scope="scope">
           <svg
             class="icon"
@@ -126,13 +126,12 @@
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column prop="sName" label="屏幕属性"></el-table-column>
-      <el-table-column prop="floor" label="楼栋/楼层"></el-table-column>
-      <el-table-column label="设备所在组">
-        <template slot-scope="scope">
-          {{ scope.row.groupList.length }}
-        </template>
-      </el-table-column>
+      <el-table-column
+        prop="sName"
+        label="屏幕属性"
+        width="120"
+      ></el-table-column>
+      <el-table-column prop="floor" label="楼层" width="60"></el-table-column>
       <el-table-column prop="bootTime" label="开机时间"></el-table-column>
       <el-table-column prop="shutdownTime" label="关机时间"></el-table-column>
       <el-table-column
@@ -178,6 +177,21 @@
             v-model="scope.row.isSyn"
             @change="changeSyn(scope.row)"
           ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="dataUpdateTime"
+        label="数据更新时间"
+        width="150"
+      ></el-table-column>
+      <el-table-column
+        prop="dataUpdate"
+        label="数据更新状态"
+        column-key="dataUpdate"
+      >
+        <template slot-scope="scope">
+          <span :class="['dot', scope.row.dataUpdate ? 'green' : 'red']"></span
+          >{{ scope.row.dataUpdate ? "完成" : "未完成" }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="132px">
