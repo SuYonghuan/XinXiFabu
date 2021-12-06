@@ -22,7 +22,15 @@ Vue.prototype.$echarts = echarts;
 
 get('./static/config/config.json')
     .then((res) => {
-      store.dispatch('setConfig', res)
+      // "yunUrl": "http://192.168.1.194:8006",
+      // "mallYunUrl": "http://192.168.1.194:8006",
+      // "fileUrl": "http://192.168.1.194:8006/file",
+      let newRes = res
+      newRes.yunUrl = res.url
+      newRes.mallYunUrl = res.url+'/file'
+      newRes.fileUrl = res.url
+      
+      store.dispatch('setConfig', newRes)
       new Vue({
         router,
         store,
