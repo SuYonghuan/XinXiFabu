@@ -10,7 +10,7 @@
 
     <el-form :inline="true" :model="search" class="demo-form-inline">
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addformat">新增业态</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addformat">新增分类</el-button>
         <el-button type="danger" @click="batchDelete(tableChecked)" v-if="pageMenu.delformat">删除</el-button>
       </el-form-item>
     </el-form>
@@ -19,25 +19,25 @@
     <el-table :data="tableData" @selection-change="handleDeletion" style="width: 100%;margin-top: 20px;"
               height="620px">
       <el-table-column align="center" type="selection" width="60"></el-table-column>
-      <el-table-column prop="name" label="业态名称"></el-table-column>
-      <el-table-column prop="nameEn" label="业态英文"></el-table-column>
-      <el-table-column prop="name" label="业态图标">
+      <el-table-column prop="name" label="分类名称"></el-table-column>
+      <el-table-column prop="nameEn" label="分类英文"></el-table-column>
+      <el-table-column prop="name" label="分类图标">
         <template slot-scope="scope">
           <img :src="scope.row.iconFilePath" v-if="scope.row.iconFilePath" style="height: 30px"
                @click="clickImg(scope.row.iconFilePath)" alt="">
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="关联店铺数量">
+      <el-table-column prop="name" label="关联POI数量">
         <template slot-scope="scope">
           {{ scope.row.shopCount }}
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="子业态">
+      <el-table-column prop="name" label="子分类">
         <template slot-scope="scope">
           {{ scope.row.childCount }}
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="业态颜色">
+      <el-table-column prop="name" label="分类颜色">
         <template slot-scope="scope">
           <div class="color-div" :style="`background-color: ${scope.row.color}`"></div>
         </template>
@@ -73,15 +73,15 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
                append-to-body>
       <el-tabs type="border-card" v-model="tabDefa">
-        <el-tab-pane label="父级业态" name="父级业态">
+        <el-tab-pane label="父级分类" name="父级分类">
           <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
-            <el-form-item label="业态名称" prop="name">
-              <el-input type="text" v-model="editForm.name" maxlength="8" placeholder="请输入业态名称"></el-input>
+            <el-form-item label="分类名称" prop="name">
+              <el-input type="text" v-model="editForm.name" maxlength="8" placeholder="请输入分类名称"></el-input>
             </el-form-item>
             <el-form-item label="英文名称" prop="nameEn">
-              <el-input type="text" v-model="editForm.nameEn" maxlength="24" placeholder="请输入业态英文名称"></el-input>
+              <el-input type="text" v-model="editForm.nameEn" maxlength="24" placeholder="请输入分类英文名称"></el-input>
             </el-form-item>
-            <el-form-item label="业态图标" prop="iconFile">
+            <el-form-item label="分类图标" prop="iconFile">
               <el-upload
                       class="avatar-uploader"
                       :action="config.fileUrl+config.yunUpdateFile"
@@ -92,9 +92,9 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
-            <el-form-item label="业态颜色" prop="color">
+            <el-form-item label="分类颜色" prop="color">
               <el-input type="text" v-model="editForm.color" style="width: 200px;top: -15px"
-                        placeholder="请输入业态颜色"></el-input>
+                        placeholder="请输入分类颜色"></el-input>
               <el-color-picker v-model="editForm.color"></el-color-picker>
             </el-form-item>
             <el-form-item label="边框颜色" prop="borderColor">
@@ -104,14 +104,14 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="子级业态" name="子级业态">
+        <el-tab-pane label="子级分类" name="子级分类">
           <el-form :label-width="'120px'" ref="childForm">
             <el-row :gutter="20" v-for="(item,index) of childForm">
               <el-col :span="10">
                 <div class="grid-content bg-purple">
-                  <el-form-item label="业态名称">
+                  <el-form-item label="分类名称">
                     <el-input type="text" v-model="item.Name" ref="childName"  maxlength="8"
-                              placeholder="请输入业态名称"></el-input>
+                              placeholder="请输入分类名称"></el-input>
                   </el-form-item>
                 </div>
               </el-col>
@@ -119,7 +119,7 @@
                 <div class="grid-content bg-purple">
                   <el-form-item label="英文名称">
                     <el-input type="text" v-model="item.NameEn" ref="childNameEn" maxlength="24"
-                              placeholder="请输入业态英文名称"></el-input>
+                              placeholder="请输入分类英文名称"></el-input>
                   </el-form-item>
                 </div>
               </el-col>
@@ -128,7 +128,7 @@
               </el-col>
             </el-row>
           </el-form>
-          <el-button type="success" style="width: 100%" @click="addChild">添加子业态</el-button>
+          <el-button type="success" style="width: 100%" @click="addChild">添加子分类</el-button>
         </el-tab-pane>
       </el-tabs>
 
@@ -173,13 +173,13 @@
 				tableChecked: [],
 				deviceForm: {},
 				rules: {
-					name: [{required: true, message: '请输入业态名称', trigger: 'blur'}]
+					name: [{required: true, message: '请输入分类名称', trigger: 'blur'}]
 				},
 				imageUrl: '',
 				maxImg: '',
 				childNum: 1,
 				pageMenu: {},
-				tabDefa: '父级业态',
+				tabDefa: '父级分类',
         loading: false,
 			}
 		},
@@ -296,7 +296,7 @@
       },
 			//打开弹窗
 			handleEdit(item) {
-				this.tabDefa = '父级业态'
+				this.tabDefa = '父级分类'
 				this.dialogVisible = true
 				if (JSON.stringify(item) != '{}') {
 					this.GetShopFormatInfo(item.code)

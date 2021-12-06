@@ -10,8 +10,8 @@
 
     <!--  搜索  -->
     <el-form :inline="true" :model="search" class="demo-form-inline">
-      <el-form-item label="店铺名称">
-        <el-input v-model="search.Name" placeholder="店铺名称、店铺编号"></el-input>
+      <el-form-item label="POI名称">
+        <el-input v-model="search.Name" placeholder="POI名称、POI编号"></el-input>
       </el-form-item>
       <el-form-item label="楼栋">
         <el-select v-model="search.BuildingCode" placeholder="请选择" @change="changeBuilding1()">
@@ -23,7 +23,7 @@
           <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="业态">
+      <el-form-item label="分类">
         <el-select v-model="search.ShopFormatCode" placeholder="请选择">
           <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
         </el-select>
@@ -33,7 +33,7 @@
         <el-button @click="replaySearch">清空</el-button>
       </el-form-item>
       <el-form-item class="right-button">
-        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addShop">新增店铺</el-button>
+        <el-button type="success" @click="handleEdit({})" v-if="pageMenu.addShop">新增POI</el-button>
         <el-button type="primary" @click="handleSysData()" v-if="pageMenu.syndata" :loading="loadingStatus">同步数据</el-button>
         <el-button type="success" @click="handleExcel()" v-if="pageMenu.exportShop">导出数据</el-button>
       </el-form-item>
@@ -41,9 +41,9 @@
 
     <!--  表格  -->
     <el-table :data="tableData" style="width: 100%;" height="620">
-      <el-table-column prop="name" label="店铺名称"></el-table-column>
+      <el-table-column prop="name" label="POI名称"></el-table-column>
       <el-table-column prop="nameEn" label="英文名称"></el-table-column>
-      <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
+      <el-table-column prop="shopFormat" label="所属分类"></el-table-column>
       <el-table-column prop="floorName" label="所属楼层"></el-table-column>
       <el-table-column prop="houseNum" label="门牌号"></el-table-column>
       <el-table-column prop="phone" label="联系方式"></el-table-column>
@@ -75,7 +75,7 @@
                 :auto-upload="true"
                 :accept="'.xls, .xlsx'"
                 :on-success="handleShopSuccess">
-          <el-button slot="trigger" type="success" v-if="pageMenu.importshopdata">导入店铺</el-button>
+          <el-button slot="trigger" type="success" v-if="pageMenu.importshopdata">导入POI</el-button>
         </el-upload>
         <el-upload
                 ref="upload"
@@ -85,7 +85,7 @@
                 :accept="'.zip'"
                 :data="logoData"
                 :on-success="handleLogoSuccess">
-          <el-button slot="trigger" type="success" v-if="pageMenu.UpLoadLogoFiles">导入店铺LOGO</el-button>
+          <el-button slot="trigger" type="success" v-if="pageMenu.UpLoadLogoFiles">导入POILOGO</el-button>
         </el-upload>
       </div>
     </div>
@@ -105,11 +105,11 @@
           <el-input type="text" v-model="editForm.nameEn" style="width: 40%;margin-left: 10px;"
                     placeholder="请输入英文商铺名称"></el-input>
         </el-form-item>
-        <el-form-item label="所属业态" prop="shopFormat">
-          <el-select v-model="editForm.shopFormat" placeholder="请选择业态" @change="changeFormat()">
+        <el-form-item label="所属分类" prop="shopFormat">
+          <el-select v-model="editForm.shopFormat" placeholder="请选择分类" @change="changeFormat()">
             <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
           </el-select>
-          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态" @change="changeFloor()">
+          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子分类" @change="changeFloor()">
             <el-option v-for="item in formatInfo.child" :label="item.name" :value="item.code"></el-option>
           </el-select>
         </el-form-item>
@@ -236,7 +236,7 @@
 				deviceForm: {},
 				rules: {
 					name: [{required: true, message: '请输入商铺名称', trigger: 'blur'}],
-					shopFormat: [{required: true, message: '请选择所属业态', trigger: 'blur'}],
+					shopFormat: [{required: true, message: '请选择所属分类', trigger: 'blur'}],
 					floorCode: [{required: true, message: '请选择所属楼层', trigger: 'blur'}],
 					houseNum: [{required: true, message: '请输入商铺编号', trigger: 'blur'}],
 					logo: [{required: true, message: '请上传logo信息', trigger: 'blur'}],
@@ -718,14 +718,14 @@
 				require.ensure([], () => {
 					const {export_json_to_excel} = require('../../vendor/Export2Excel');
 					//头
-					const tHeader = ['店铺名称', '所属业态', '所属楼层', '门牌号', '联系方式'];
+					const tHeader = ['POI名称', '所属分类', '所属楼层', '门牌号', '联系方式'];
 					//对应的标签
 					const filterVal = ['name', 'shopFormat', 'floorName', 'houseNum', 'phone'];
 					//标签对应的内容  是一个数组结构
 					const list = this.excelData;
 					//一个方法 我也不知道干嘛的
 					const data = this.formatJson(filterVal, list);
-					export_json_to_excel(tHeader, data, '店铺数据');
+					export_json_to_excel(tHeader, data, 'POI数据');
 				})
 			},
 			formatJson(filterVal, jsonData) {
@@ -735,7 +735,7 @@
       exportExcelImg() {
         const column = [
           {
-            title: '店铺名称',
+            title: 'POI名称',
             key: 'name',
             type: 'text'
           },
@@ -747,7 +747,7 @@
             height: 50
           },
           {
-            title: '所属业态',
+            title: '所属分类',
             key: 'shopFormat',
             type: 'text'
           },
@@ -768,7 +768,7 @@
           },
         ]
         const data = this.excelData
-        const excelName = '店铺数据'
+        const excelName = 'POI数据'
 
         table2excel(column, data, excelName)
       },

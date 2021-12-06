@@ -29,7 +29,7 @@
     <!--  表格  -->
     <el-table :data="tableData" style="width: 100%" height="620px">
       <el-table-column type="index" label="序号"></el-table-column>
-      <el-table-column prop="shopFormatName" label="业态名称"></el-table-column>
+      <el-table-column prop="shopFormatName" label="分类名称"></el-table-column>
       <el-table-column prop="aiUser" label="AR导航人数（人）"></el-table-column>
       <el-table-column prop="ai" label="AR导航次数（次）"></el-table-column>
       <el-table-column prop="simulationUser" label="模拟导航人数（人数）"></el-table-column>

@@ -1,8 +1,8 @@
 ﻿{
-  "url": "http://106.12.83.126:8001",
-  "yunUrl": "http://106.12.83.126:8001",
-  "mallYunUrl": "http://106.12.83.126:8001",
-  "fileUrl": "http://106.12.83.126:8001/file",
+  "url": "http://192.168.1.194:8006",
+  "yunUrl": "http://192.168.1.194:8006",
+  "mallYunUrl": "http://192.168.1.194:8006",
+  "fileUrl": "http://192.168.1.194:8006/file",
   "uploadFile": "/api/FileManage/UpLoadFilesSec",
   "yunUpdateFile": "/api/MallFileManage/UpLoadFilesSec",
   "mapKey": "A",

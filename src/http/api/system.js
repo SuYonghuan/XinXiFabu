@@ -145,3 +145,11 @@ export const ResolutionList = (param) =>
 //设置分辨率默认图片
 export const SetResolution = (param) =>
     post(`${store.state.config.url}/api/Screensaver/SetResolution?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Screensaver/SetResolution"))}&time=${timeStamp()}`,param)
+
+//获取数据来源
+export const GetSourceInfo = (param) =>
+    post(`${store.state.config.url}/Api/Data/GetSourceInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Data/GetSourceInfo"))}&time=${timeStamp()}`,param)
+
+//设置数据来源
+export const SetSourceInfo = (param) =>
+    post(`${store.state.config.url}/Api/Data/SetSourceInfo?token=${encodeURIComponent(mergeWordAndTimeStamp("/Api/Data/SetSourceInfo"))}&time=${timeStamp()}`,param)

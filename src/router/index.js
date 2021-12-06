@@ -84,6 +84,11 @@ const routes = [
         component: () => import('views/system/personal'),
       },
       {
+        path: '/system/datasource',
+        name: '数据来源',
+        component: () => import('views/system/datasource'),
+      },
+      {
         path: '/device/device',
         name: '终端设备列表',
         component: () => import('views/device/device'),
@@ -140,12 +145,12 @@ const routes = [
       },
       {
         path: '/mall/format',
-        name: '业态管理',
+        name: 'POI分类管理',
         component: () => import('views/mall/format'),
       },
       {
         path: '/mall/shop',
-        name: '品牌数据',
+        name: 'POI数据',
         component: () => import('views/mall/shop'),
       },
       {
@@ -165,12 +170,12 @@ const routes = [
       },
       {
         path: '/statistics/format-log',
-        name: '业态导航统计',
+        name: 'POI分类导航统计',
         component: () => import('views/statistics/format-log'),
       },
       {
         path: '/statistics/shop-log',
-        name: '店铺导航统计',
+        name: 'POI导航统计',
         component: () => import('views/statistics/shop-log'),
       },
       {
