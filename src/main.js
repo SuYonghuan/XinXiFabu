@@ -27,8 +27,8 @@ get('./static/config/config.json')
       // "fileUrl": "http://192.168.1.194:8006/file",
       let newRes = res
       newRes.yunUrl = res.url
-      newRes.mallYunUrl = res.url+'/file'
-      newRes.fileUrl = res.url
+      newRes.mallYunUrl = res.url
+      newRes.fileUrl = res.url+'/file'
       
       store.dispatch('setConfig', newRes)
       new Vue({
