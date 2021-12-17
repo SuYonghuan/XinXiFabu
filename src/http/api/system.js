@@ -145,3 +145,11 @@ export const ResolutionList = (param) =>
 //设置分辨率默认图片
 export const SetResolution = (param) =>
     post(`${store.state.config.url}/api/Screensaver/SetResolution?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Screensaver/SetResolution"))}&time=${timeStamp()}`,param)
+
+//获取审核权限
+export const ProgramAuditSetting = (param) =>
+    post(`${store.state.config.url}/api/Setting/ProgramAuditSetting?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Setting/ProgramAuditSetting"))}&time=${timeStamp()}`,param)
+
+//设置审核开关
+export const SetProgramAudit = (param) =>
+    post(`${store.state.config.url}/api/Setting/SetProgramAudit?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Setting/SetProgramAudit"))}&time=${timeStamp()}`,param)

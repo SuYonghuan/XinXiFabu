@@ -63,6 +63,18 @@
       </div>
     </el-card>
 
+    <!--  审核权限设置  -->
+    <el-card class="box-card" v-show="pageMenu.progauditset">
+      <div class="top-div">
+        <p>
+          <span class="title-span">审核权限设置</span>
+          <el-radio v-model="programAudit" :label="0" @change="changeAudit" :disabled="!pageMenu.setprogsaudit">不审核</el-radio>
+          <el-radio v-model="programAudit" :label="1" @change="changeAudit" :disabled="!pageMenu.setprogsaudit">审核</el-radio>
+        </p>
+        <!-- <el-button type="primary" @click="submitPgForm()" v-if="pageMenu.progSet">保存</el-button> -->
+      </div>
+    </el-card>
+
     <!--  应用功能  -->
     <el-card class="box-card">
       <p class="switch-p" v-for="item of moduleList">
@@ -96,6 +108,8 @@
     GetModuleList,
     GetProgramMonitor,
     SettingProgramMonitor,
+    ProgramAuditSetting,
+    SetProgramAudit,
   } from 'http/api/system'
   import {ERR_OK} from 'http/config'
   import {mapGetters} from 'vuex'
@@ -146,6 +160,7 @@
         ],
         programMonitorList: {days: '', clockTime: '', repeatExecution: 'false'},
         pageMenu: {},
+        programAudit: 0,
       }
     },
     created() {
@@ -153,6 +168,7 @@
       this.GetProgramMonitor()
       this.getTimeAxis()
       this.GetModuleList()
+      this.ProgramAuditSetting()
     },
     methods: {
       /**
@@ -200,6 +216,13 @@
           if (res.code === ERR_OK) {
             this.localModuleList = res.data
             // console.log(this.localModuleList)
+          }
+        })
+      },
+      ProgramAuditSetting() {
+        ProgramAuditSetting({}).then(res => {
+          if (res.code === ERR_OK) {
+            this.programAudit = res.data
           }
         })
       },
@@ -277,6 +300,15 @@
           this.$message.error(res.msg);
         })
       },
+      SetProgramAudit(param) {
+        SetProgramAudit(param).then(res => {
+          if (res.code === ERR_OK) {
+            this.$message.success(res.msg);
+            return
+          }
+          this.$message.error(res.msg);
+        })
+      },
       /**
        * End
        */
@@ -332,6 +364,33 @@
         this.programMonitorList.mallCode = this.user.mallCode
         this.SettingProgramMonitor(this.programMonitorList);
       },
+      //修改审核设置
+      changeAudit() {
+        if ( this.programAudit == 0 ) {
+          this.$confirm("将审核类型切换为“不审核”，会将审核状态下的节目组都进行审核通过的操作，是否继续修改？", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning"
+          }).then(() => {
+            const param = {
+              IsAudit: 0
+            }
+            this.SetProgramAudit(param)
+          }).catch(() => {
+            this.programAudit = 1
+            this.$message({
+              type: 'info',
+              message: '已取消操作'
+            });
+          });
+        }else {
+          const param = {
+            IsAudit: 1
+          }
+          this.SetProgramAudit(param)
+        }
+        
+      },
     },
     computed: {
       ...mapGetters(['presentMenu', 'user'])
@@ -356,6 +415,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      .title-span{
+        margin-right: 50px;
+      }
     }
 
     .collapse-div {
