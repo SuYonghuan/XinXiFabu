@@ -1,45 +1,45 @@
-const path = require('path')
+const path = require("path");
 
-const resolve = dir => {
-  return path.join(__dirname, dir)
-}
+const resolve = (dir) => {
+  return path.join(__dirname, dir);
+};
 
 module.exports = {
-  outputDir: resolve('./本地大后台'),
+  outputDir: resolve("./前滩太古里本地大后台"),
   devServer: {
     proxy: {
-      '/api': {
-        target: 'http://192.168.1.194:8999/Api', //对应自己的接口
+      "/api": {
+        target: "http://192.168.1.194:8999/Api", //对应自己的接口
         changeOrigin: true,
         ws: true,
         pathRewrite: {
           //'^/api': ''
-        }
-      }
-    }
+        },
+      },
+    },
   },
-  chainWebpack: config => {
+  chainWebpack: (config) => {
     config.resolve.alias
-      .set('common', resolve('src/common'))
-      .set('components', resolve('src/components'))
-      .set('http', resolve('src/http'))
-      .set('base', resolve('src/base'))
-      .set('views', resolve('src/views'))
-      .set('store', resolve('src/store'))
-      .set('filters', resolve('src/filters'))
-      .set('directives', resolve('src/directives'))
-      .set('router', resolve('src/router'))
+      .set("common", resolve("src/common"))
+      .set("components", resolve("src/components"))
+      .set("http", resolve("src/http"))
+      .set("base", resolve("src/base"))
+      .set("views", resolve("src/views"))
+      .set("store", resolve("src/store"))
+      .set("filters", resolve("src/filters"))
+      .set("directives", resolve("src/directives"))
+      .set("router", resolve("src/router"));
 
-    config.plugin('preload').tap(() => [
+    config.plugin("preload").tap(() => [
       {
-        rel: 'preload',
+        rel: "preload",
         fileBlacklist: [/\.map$/, /hot-update\.js$/, /runtime\..*\.js$/],
-        include: 'initial'
-      }
-    ])
+        include: "initial",
+      },
+    ]);
 
-    config.plugins.delete('prefetch')
+    config.plugins.delete("prefetch");
   },
   lintOnSave: false,
-  productionSourceMap: false
-}
+  productionSourceMap: false,
+};
