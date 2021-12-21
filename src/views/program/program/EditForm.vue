@@ -25,6 +25,23 @@
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
+        <el-dropdown
+          @command="setStageScale"
+          class="input1"
+          style="margin-right:8px;display: inline-flex;width: 65px;align-content: center;align-items: center;"
+        >
+          <span class="el-dropdown-link">
+            {{ (scale * 100).toFixed(0) + "%"
+            }}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :command="1">100%</el-dropdown-item>
+            <el-dropdown-item :command="1.5">150%</el-dropdown-item>
+            <el-dropdown-item :command="2">200%</el-dropdown-item>
+            <el-dropdown-item :command="3">300%</el-dropdown-item>
+            <el-dropdown-item :command="4">400%</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
         <div class="btn" @click="preview">
           <svg class="icon" aria-hidden="true">
             <use xlink:href="#iconyanjing"></use>
@@ -83,11 +100,19 @@
           :config="{
             width: form.width,
             height: form.height,
+            draggable: true,
+            dragBoundFunc: boundStageDrag,
           }"
+          ref="stage"
           @mousedown="handleStageMouseDown"
           @touchstart="handleStageMouseDown"
+          @wheel="handleWheel"
         >
-          <v-layer>
+          <v-layer
+            @dragmove="handleDragMove"
+            @dragend="handleDragEnd"
+            ref="layer"
+          >
             <background-color :form="form"></background-color>
             <background-image
               v-if="backgroundImage"
@@ -1022,6 +1047,7 @@ import defaultBrand from "./defaultBrand.svg";
 import defaultFac from "./defaultFac.svg";
 import defaultArrow from "./defaultArrow.svg";
 import { mapGetters } from "vuex";
+import { GuideLineHelper } from "./EditForm/GuideLineHelper";
 
 const logos = {
   audio: "#iconyinpin",
@@ -1083,7 +1109,7 @@ const seperateConfig = (component) =>
         : { ...acc, config: { ...acc.config, [k]: v } },
     { config: {} }
   );
-
+const scaleBy = 1.01;
 export default {
   components: {
     MatList,
@@ -1198,6 +1224,8 @@ export default {
       deviceName: null,
       deviceCode: null,
       device: null,
+      guideLineHelper: null,
+      scale: 1,
     };
   },
   computed: {
@@ -1211,8 +1239,8 @@ export default {
     stageScale() {
       if (!this.form) return 0;
       return Math.min(
-        (this.$root.ww - 752 - 240) / this.form.width,
-        (this.$root.wh - 80 - 120) / this.form.height
+        (this.$root.ww - 496 - 256 - 40) / this.form.width,
+        (this.$root.wh - 80 - 40) / this.form.height
       );
     },
     materialDialogTitle() {
@@ -1230,6 +1258,77 @@ export default {
     ...mapGetters(["config", "user"]),
   },
   methods: {
+    boundStageDrag(newPos) {
+      const stage = this.$refs.stage.getNode();
+      const scale = stage.scaleX();
+      if (newPos.x > 0) newPos.x = 0;
+      if (newPos.y > 0) newPos.y = 0;
+      if (newPos.x + stage.width() * scale < stage.width())
+        newPos.x = stage.width() - stage.width() * scale;
+      if (newPos.y + stage.height() * scale < stage.height())
+        newPos.y = stage.height() - stage.height() * scale;
+      return newPos;
+    },
+    handleWheel(e) {
+      const stage = this.$refs.stage.getNode();
+      e.evt.preventDefault();
+      var oldScale = stage.scaleX();
+
+      var pointer = stage.getPointerPosition();
+
+      var mousePointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale,
+      };
+
+      let newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      newScale = Math.max(newScale, 1);
+      newScale = Math.min(newScale, 4);
+      this.scale = newScale;
+      stage.scale({ x: newScale, y: newScale });
+
+      var newPos = {
+        x: pointer.x - mousePointTo.x * newScale,
+        y: pointer.y - mousePointTo.y * newScale,
+      };
+      this.setFixedPos(newPos);
+    },
+    setStageScale(scale) {
+      const stage = this.$refs.stage.getNode();
+      stage.scale({ x: scale, y: scale });
+      const newPos = stage.position();
+      this.setFixedPos(newPos);
+      this.scale = scale;
+    },
+    setFixedPos(newPos) {
+      const stage = this.$refs.stage.getNode();
+      const scale = stage.scaleX();
+      if (newPos.x > 0) newPos.x = 0;
+      if (newPos.y > 0) newPos.y = 0;
+      if (newPos.x + stage.width() * scale < stage.width())
+        newPos.x = stage.width() - stage.width() * scale;
+      if (newPos.y + stage.height() * scale < stage.height())
+        newPos.y = stage.height() - stage.height() * scale;
+      stage.position(newPos);
+      stage.batchDraw();
+    },
+    handleDragEnd() {
+      this.guideLineHelper && this.guideLineHelper.handleDragEnd();
+    },
+    handleDragMove(e) {
+      if (!this.guideLineHelper) {
+        const stage = this.$refs.stage.getNode();
+        const layer = this.$refs.layer.getNode();
+        this.guideLineHelper = new GuideLineHelper({ stage, layer });
+      } else {
+        console.log(e.target.getType());
+        if (e.target.getType() === "Shape")
+          this.guideLineHelper.handleDragMove(e);
+        else {
+          console.log(e.target.getType());
+        }
+      }
+    },
     async submitDevice(deviceCode) {
       this.isSelectPreviewDevice = false;
       await this.$nextTick();
@@ -1711,6 +1810,7 @@ export default {
       this.activeComponent = null;
       this.selectedShapeName = "";
       this.colorIndex = 0;
+      this.scale = 1;
     },
     async init() {
       this.reset();
