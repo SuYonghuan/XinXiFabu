@@ -11,7 +11,7 @@ export class GuideLineHelper {
       return (
         node.getType() === "Shape" &&
         node.name() &&
-        node.name().startsWith("name_")
+        node.name().startsWith("name*")
       );
     });
     return [
