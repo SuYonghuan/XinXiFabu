@@ -28,3 +28,27 @@
   src: url("SourceHanSansCN-Light_0.otf");
   font-weight: lighter;
 }
+@font-face {
+  font-family: "思源黑体Bold";
+  src: url("SourceHanSansSC-Bold_1.otf");
+}
+@font-face {
+  font-family: "思源黑体Heavy";
+  src: url("SourceHanSansSC-Heavy_1.otf");
+}
+@font-face {
+  font-family: "思源黑体Light";
+  src: url("SourceHanSansSC-Light_1.otf");
+}
+@font-face {
+  font-family: "思源黑体Medium";
+  src: url("SourceHanSansSC-Medium_1.otf");
+}
+@font-face {
+  font-family: "思源黑体Normal";
+  src: url("SourceHanSansSC-Normal_1.otf");
+}
+@font-face {
+  font-family: "思源黑体Regular";
+  src: url("SourceHanSansSC-Regular_1.otf");
+}

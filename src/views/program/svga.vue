@@ -1,18 +1,13 @@
 <template>
-  <canvas
-    :class="'svga ' + (played ? 'played' : '')"
-    ref="canvas"
-    @click="played && replay()"
-  ></canvas>
+  <canvas class="svga" ref="canvas"></canvas>
 </template>
 
 <script>
 import { Parser, Player } from "svga";
-const parser = new Parser();
 export default {
   props: ["src"],
   data() {
-    return { player: null, played: false };
+    return { parser: null, player: null };
   },
   watch: {
     src(value) {
@@ -20,33 +15,25 @@ export default {
     },
   },
   mounted() {
+    this.parser = new Parser();
     this.player = new Player({
       container: this.$refs.canvas,
-      loop: 1,
+      loop: 0,
     });
+
     if (this.src) this.play(this.src);
   },
   beforeDestroy() {
     this.player.destroy();
     this.player = null;
-    this.played = false;
+    this.parser.destroy();
+    this.parser = null;
   },
   methods: {
     async play(src) {
-      const svga = await parser.load(src);
+      const svga = await this.parser.load(src);
       await this.player.mount(svga);
-      this.played = false;
       this.player.start();
-      this.player.onEnd = () => {
-        console.log("onEnd ");
-        this.played = true;
-      };
-    },
-    replay() {
-      if (this.player) {
-        this.played = false;
-        this.player.start();
-      }
     },
   },
 };
@@ -57,8 +44,5 @@ export default {
   width: 100%;
   height: 100%;
   cursor: default;
-  &.played {
-    cursor: pointer;
-  }
 }
 </style>

@@ -115,7 +115,23 @@
             }"
           />
         </template>
-
+        <svga
+          class="component"
+          :style="{
+            top: component.offsetY + 'px',
+            left: component.offsetX + 'px',
+            width: component.width + 'px',
+            height: component.height + 'px',
+            zIndex: 1000 + i,
+          }"
+          v-else-if="
+            component.typeCode === 'svga' &&
+              component.materials &&
+              component.materials.length
+          "
+          :key="i"
+          :src="component.materials[0].fileUrl"
+        ></svga>
         <div
           :key="i"
           class="component"
@@ -254,7 +270,7 @@
 import videoPlaceHolder from "./video-unsupported.png";
 import { VTextMarquee } from "vue-text-marquee";
 import { svgs } from "./EditForm/svgs.js";
-
+import svga from "../svga.vue";
 const playVideo = (video, src, poster, duration) =>
   new Promise((resolve, reject) => {
     if (video.id === "destroyed") reject();
@@ -294,7 +310,7 @@ const playImage = (img, src, duration) =>
     }, duration);
   });
 export default {
-  components: { VTextMarquee },
+  components: { VTextMarquee, svga },
   data() {
     return {
       seconds: 0,

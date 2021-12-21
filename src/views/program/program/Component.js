@@ -26,7 +26,7 @@ export const componentSubMap = {
     "signTxt_time",
   ],
   position: ["signImage_direction", "signTxt_distance", "signTxt_time"],
-}
+};
 class BaseComponent {
   constructor({ typeCode, zIndex, color, j }) {
     const component = {
@@ -39,39 +39,50 @@ class BaseComponent {
       materials: [],
       color,
     };
-    if (j) component.offsetX += j * 200
-    Object.assign(this, component)
+    if (j) component.offsetX += j * 200;
+    Object.assign(this, component);
   }
 }
 class ImageComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
+    super({ typeCode, zIndex, color });
     this.transition = "随机";
     this.transitionPeriod = 15;
   }
 }
 class UrlComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
+    super({ typeCode, zIndex, color });
     this.refreshPeriod = "00:00:00";
   }
 }
 class TextComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color, j }) {
-    super({ typeCode, zIndex, color, j })
-    this.backgroundColor = (typeCode === 'signTxt_distance' || typeCode === 'signTxt_time' || typeCode === 'signTxt_name') ? null : "#FFFFFF";
+    super({ typeCode, zIndex, color, j });
+    this.backgroundColor =
+      typeCode === "signTxt_distance" ||
+      typeCode === "signTxt_time" ||
+      typeCode === "signTxt_name"
+        ? null
+        : "#FFFFFF";
     this.backgroundOpacity = 100;
     this.fontColor = "#000000";
+    this.fontFamily = undefined;
     this.fontSize = 24;
     this.fontStyle = "正常";
     this.animationSpeed = "中等";
-    this.animation = (typeCode === 'signTxt_distance' || typeCode === 'signTxt_time' || typeCode === 'signTxt_name') ? '自动' : "从左往右";
+    this.animation =
+      typeCode === "signTxt_distance" ||
+      typeCode === "signTxt_time" ||
+      typeCode === "signTxt_name"
+        ? "自动"
+        : "从左往右";
     this.materials = [];
   }
 }
 class WeatherComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
+    super({ typeCode, zIndex, color });
     this.cityName = "";
     this.style = 0;
     this.width = weatherStyles[0].width;
@@ -82,7 +93,7 @@ class WeatherComponent extends BaseComponent {
 }
 class ClockComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
+    super({ typeCode, zIndex, color });
     this.fontColor = "#FFFFFF";
     this.style = 0;
     this.width = clockStyles[0].width;
@@ -92,7 +103,7 @@ class ClockComponent extends BaseComponent {
 }
 class SignComponent extends BaseComponent {
   constructor({ typeCode, zIndex, color }) {
-    super({ typeCode, zIndex, color })
+    super({ typeCode, zIndex, color });
     delete this.offsetX;
     delete this.offsetY;
     delete this.width;
@@ -100,25 +111,29 @@ class SignComponent extends BaseComponent {
     this.bindingCode = null;
     this.bindingName = null;
 
-    this.dirTheme = '8';
-    this.arrowTheme = null
-    ProgramApi.getArrowThemes().then(themes => {
-      themes.forEach(theme => {
+    this.dirTheme = "8";
+    this.arrowTheme = null;
+    ProgramApi.getArrowThemes().then((themes) => {
+      themes.forEach((theme) => {
         if (theme.readOnly) {
           this.arrowTheme = theme.code;
         }
       });
-    })
-    this.subComponents = componentSubMap[typeCode].map((code, j) => new (typeCodeClassMap[code])({ typeCode: code, j, color })).reduce((acc, nxt) => ({ ...acc, [nxt.typeCode]: nxt }), {});
-    if (typeCode !== 'position') {
-      this.logoTheme = null
-      ProgramApi.getLogoThemes().then(themes => {
-        themes.forEach(theme => {
+    });
+    this.subComponents = componentSubMap[typeCode]
+      .map(
+        (code, j) => new typeCodeClassMap[code]({ typeCode: code, j, color })
+      )
+      .reduce((acc, nxt) => ({ ...acc, [nxt.typeCode]: nxt }), {});
+    if (typeCode !== "position") {
+      this.logoTheme = null;
+      ProgramApi.getLogoThemes().then((themes) => {
+        themes.forEach((theme) => {
           if (theme.readOnly) {
             this.logoTheme = theme.code;
           }
         });
-      })
+      });
     }
   }
 }
@@ -135,11 +150,12 @@ export const typeCodeClassMap = {
   facility: SignComponent,
   brand: SignComponent,
   position: SignComponent,
-  "signImage_logo": BaseComponent,
-  "signImage_direction": BaseComponent,
-  "signTxt_distance": TextComponent,
-  "signTxt_time": TextComponent,
-  "signTxt_name": TextComponent,
-}
+  signImage_logo: BaseComponent,
+  signImage_direction: BaseComponent,
+  signTxt_distance: TextComponent,
+  signTxt_time: TextComponent,
+  signTxt_name: TextComponent,
+};
 
-export default ({ typeCode, zIndex, color }) => new typeCodeClassMap[typeCode]({ typeCode, zIndex, color })
+export default ({ typeCode, zIndex, color }) =>
+  new typeCodeClassMap[typeCode]({ typeCode, zIndex, color });

@@ -76,9 +76,9 @@
           <el-popover
             v-if="componentTypeTip[code]"
             :key="code"
-            placement="right"
+            placement="top"
             title="提示"
-            trigger="hover"
+            trigger="focus"
             :content="componentTypeTip[code]"
           >
             <div class="btn" slot="reference" @click="appendComponent(code)">
@@ -462,6 +462,16 @@
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
+            <template v-else-if="activeComponent.typeCode === 'svga'">
+              <mat-list
+                :data="activeComponent.materials"
+                @swap="([i, j]) => swap(i, j)"
+                @preview="previewMat"
+                @remove="removeMaterial"
+                :limit="1"
+                @selectMat="openMaterialModal"
+              ></mat-list>
+            </template>
             <template v-else-if="activeComponent.typeCode === 'url'">
               <el-form-item class="item" label="刷新时间" prop="refreshPeriod">
                 <el-time-picker
@@ -512,6 +522,23 @@
                 <el-slider
                   v-model="activeComponent.backgroundOpacity"
                 ></el-slider>
+              </el-form-item>
+              <el-form-item class="item" label="字体">
+                <el-select v-model="activeComponent.fontFamily">
+                  <el-option
+                    :key="key"
+                    :value="key"
+                    :label="key"
+                    v-for="key in [
+                      '思源黑体Bold',
+                      '思源黑体Heavy',
+                      '思源黑体Light',
+                      '思源黑体Medium',
+                      '思源黑体Normal',
+                      '思源黑体Regular',
+                    ]"
+                  ></el-option>
+                </el-select>
               </el-form-item>
               <el-form-item
                 class="item"
@@ -875,6 +902,11 @@
           controls
           :src="previewMaterial.fileUrl"
         ></video>
+        <svga
+          v-else-if="previewMaterial.typeCode === 'svga'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          :src="previewMaterial.fileUrl"
+        ></svga>
         <img
           v-else-if="previewMaterial.typeCode === '图片'"
           style="width:100%;min-height:500px;object-fit:contain;"
@@ -1076,11 +1108,13 @@ import defaultArrow from "./defaultArrow.svg";
 import { mapGetters } from "vuex";
 import { GuideLineHelper } from "./EditForm/GuideLineHelper";
 import Aligns from "./EditForm/Aligns";
+import svga from "../svga.vue";
 
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
   html: "#iconHTML",
+  svga: "#iconshipin",
   image: "#icontupian",
   stream: "#iconliumeiti",
   text: "#iconwendang",
@@ -1158,6 +1192,7 @@ export default {
     ImageComponent,
     InnerText,
     Aligns,
+    svga,
   },
   props: ["showEditForm", "code"],
   data() {
@@ -1203,6 +1238,7 @@ export default {
         "text",
         "html",
         "weather",
+        "svga",
         "clock",
         "url",
         "audio",
