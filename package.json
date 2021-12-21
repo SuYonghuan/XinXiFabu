@@ -15,6 +15,7 @@
     "element-ui": "^2.13.2",
     "file-saver": "^2.0.2",
     "konva": "^7.2.5",
+    "svga": "^2.0.4",
     "vue": "^2.6.11",
     "vue-konva": "^2.1.7",
     "vue-router": "^3.2.0",

@@ -1989,6 +1989,7 @@ export default {
       this.selectedShapeName = "";
       this.colorIndex = 0;
       this.scale = 1;
+      this.selectedComponents = null;
     },
     async init() {
       this.reset();

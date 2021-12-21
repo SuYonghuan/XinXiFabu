@@ -380,8 +380,40 @@
       :visible.sync="showModal"
     >
       <template v-if="modalMat">
+        <el-alert
+          v-if="modalMat.typeCode === '视频'"
+          :closable="false"
+          type="info"
+        >
+          <div slot="title">
+            如视频无法播放可点击下载
+            <a :href="modalMat.fileUrl" target="_blank" download>下载</a>
+          </div>
+        </el-alert>
+        <video
+          v-if="modalMat.typeCode === '视频'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          controls
+          :src="modalMat.fileUrl"
+        ></video>
+        <svga
+          v-else-if="modalMat.typeCode === 'svga'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          :src="modalMat.fileUrl"
+        ></svga>
+        <img
+          v-else-if="modalMat.typeCode === '图片'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          :src="modalMat.fileUrl"
+        />
+        <audio
+          v-else-if="modalMat.typeCode === '音频'"
+          controls
+          :src="modalMat.fileUrl"
+        ></audio>
         <object
-          style="width:100%;min-height:500px;"
+          v-else
+          style="width:100%;min-height:500px;object-fit:contain;"
           :data="modalMat.fileUrl"
         ></object>
       </template>
@@ -394,8 +426,9 @@ import { GetRolePermissions } from "http/api/program";
 import { MaterialApi } from "../program/program.js";
 import { mapGetters } from "vuex";
 import { ERR_OK } from "http/config";
-
+import svga from "../program/svga.vue";
 export default {
+  components: { svga },
   data() {
     return {
       name: "",
@@ -508,12 +541,11 @@ export default {
       return `${date} ${time}`;
     },
     preview(row) {
-      this.modalMat = row;
+      this.modalMat = null;
       this.$nextTick(() => {
+        this.modalMat = row;
         this.showModal = true;
       });
-
-      // window.open(row.fileUrl);
     },
 
     handleSelectionChange(data) {
@@ -560,8 +592,6 @@ export default {
       }
     },
   },
-
-  components: {},
 };
 </script>
 

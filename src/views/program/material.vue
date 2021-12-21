@@ -526,6 +526,11 @@
           controls
           :src="modalMat.fileUrl"
         ></video>
+        <svga
+          v-else-if="modalMat.typeCode === 'svga'"
+          style="width:100%;min-height:500px;object-fit:contain;"
+          :src="modalMat.fileUrl"
+        ></svga>
         <img
           v-else-if="modalMat.typeCode === '图片'"
           style="width:100%;min-height:500px;object-fit:contain;"
@@ -610,8 +615,9 @@ import { mapGetters } from "vuex";
 import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import EditForm from "./program/EditForm.vue";
+import svga from "./svga.vue";
 export default {
-  components: { EditForm },
+  components: { EditForm, svga },
   data() {
     return {
       name: "",
@@ -855,6 +861,8 @@ export default {
           ? "html"
           : file.type === "text/plain"
           ? "文本"
+          : file.name && file.name.toLowerCase().endsWith(".svga")
+          ? "svga"
           : null;
       if (!type) {
         this.$message.error("文件类型不支持");
@@ -1163,8 +1171,9 @@ export default {
       }
     },
     preview(row) {
-      this.modalMat = row;
+      this.modalMat = null;
       this.$nextTick(() => {
+        this.modalMat = row;
         this.showModal = true;
       });
     },
