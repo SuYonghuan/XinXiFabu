@@ -446,6 +446,7 @@
 					this.dialogTitle = '编辑'
 					this.dialogType = true
 				} else {
+					this.deviceForm = {}
 					this.deviceForm.gName = this.dateFormat("yyyy-mm-dd hh:ii:ss") + ' 新建节目组'
 					this.deviceForm.screenInfoCode = this.searchDeviceList[0].code
 					this.deviceForm.isSync = false
@@ -473,6 +474,7 @@
 				this.dialogVisibleGroup = false
 				this.$refs["editForm"] && this.$refs["editForm"].resetFields()
 				this.transferStatus = false
+				this.selectedStaffList = []
 			},
 			//删除
 			handleDelete(item) {
