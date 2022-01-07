@@ -26,7 +26,7 @@
           </div>
           <i class="el-icon-circle-check"></i>
         </div>
-        <div class="style-item" @click="clickStyle(6)" :class="{'style-active' : active == 6}">
+        <div class="style-item" @click="clickStyle(5)" :class="{'style-active' : active == 5}">
           <p class="style-title">提示图标样式自定义</p>
           <div class="item-div">
             <div @click.stop="">
