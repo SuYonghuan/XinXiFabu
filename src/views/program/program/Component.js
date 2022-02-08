@@ -155,6 +155,7 @@ export const typeCodeClassMap = {
   signTxt_distance: TextComponent,
   signTxt_time: TextComponent,
   signTxt_name: TextComponent,
+  svga: BaseComponent,
 };
 
 export default ({ typeCode, zIndex, color }) =>
