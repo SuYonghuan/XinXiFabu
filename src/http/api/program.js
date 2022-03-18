@@ -138,6 +138,10 @@ export const GetNewsListByGroupCode = (param) =>
 export const GetDevicesByNewsGroupCode = (param) =>
 	post(`${store.state.config.url}/api/News/GetDevicesByNewsGroupCode?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/News/GetDevicesByNewsGroupCode"))}&time=${timeStamp()}`,param)
 
+//获取日程设备数量 2022/03/18
+export const GetDevicesByCode = (param) =>
+	post(`${store.state.config.url}/api/Schedule/GetDevicesByCode?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Schedule/GetDevicesByCode"))}&time=${timeStamp()}`,param)
+
 //获取插播设备
 export const GetSubtitleList = (param) =>
 	post(`${store.state.config.url}/api/Subtitle/GetList?token=${encodeURIComponent(mergeWordAndTimeStamp("/api/Subtitle/GetList"))}&time=${timeStamp()}`,param)

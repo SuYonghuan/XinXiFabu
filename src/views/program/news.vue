@@ -689,6 +689,7 @@
     NewsStop,
     GetNewsListByGroupCode,
     GetDevicesByNewsGroupCode,
+    GetDevicesByCode,
     GetSubtitleList,
     SetSubtitle,
     UpdateSubtitle,
@@ -993,8 +994,8 @@
           this.$message.error(res.msg);
         })
       },
-      GetDevicesByNewsGroupCode(param) {
-        GetDevicesByNewsGroupCode(param).then(res => {
+      GetDevicesByCode(param) {
+        GetDevicesByCode(param).then(res => {
           if (res.code === ERR_OK) {
             this.newsProgram = res.data
             return
@@ -1345,7 +1346,7 @@
       //设备详情
       handleDeviceDetail(item) {
         const param = {"Code": item.code}
-        this.GetDevicesByNewsGroupCode(param)
+        this.GetDevicesByCode(param)
         this.dialogVisibleDeviceDetails = true
       },
       //设备详情
