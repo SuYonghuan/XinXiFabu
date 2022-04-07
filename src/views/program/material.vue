@@ -309,144 +309,6 @@
             </el-input>
           </el-form-item>
         </template>
-        <template v-else-if="isIpc">
-          <el-form-item label="素材类型" prop="typeCode">
-            <el-select
-              class="prefix"
-              v-model="form.typeCode"
-              placeholder="请选择"
-              size="small"
-              style="width: 250px"
-              :disabled="isEdit"
-              @change="handleTypeCodeChange"
-            >
-              <el-option
-                v-for="item in [
-                  { code: '在线网页', name: '在线网页' },
-                  { code: 'ipc', name: '网络摄像机' },
-                  { code: '流媒体', name: '流媒体服务器' },
-                ]"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="素材名称" prop="name">
-            <el-input
-              v-model="form.name"
-              :maxlength="50"
-              placeholder="请输入素材名称"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="IP类型" prop="ipType">
-            <el-select
-              class="prefix"
-              v-model="form.ipType"
-              placeholder="请选择"
-              size="small"
-              style="width: 250px"
-            >
-              <el-option
-                v-for="item in [
-                  { code: 'IPV4', name: 'IPV4' },
-                  { code: 'IPV6', name: 'IPV6' },
-                ]"
-                :key="item.code"
-                :label="item.name"
-                :value="item.code"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="IP地址" prop="ipAddress">
-            <el-input
-              v-model="form.ipAddress"
-              maxlength="250"
-              placeholder="请输入IP地址"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="端口号" prop="port">
-            <el-input
-              type="number"
-              v-model="form.port"
-              :maxlength="5"
-              placeholder="请输入端口号"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="通道号" prop="channel">
-            <el-input
-              v-model="form.channel"
-              :maxlength="3"
-              placeholder="请输入通道号"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="用户名" prop="userName">
-            <el-input
-              v-model="form.userName"
-              :maxlength="50"
-              placeholder="请输入用户名"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input
-              v-model="form.password"
-              :maxlength="50"
-              placeholder="请输入密码"
-              autocomplete="off"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="传输协议" prop="protocol">
-            <el-select
-              class="prefix"
-              v-model="form.protocol"
-              placeholder="请选择"
-              size="small"
-              style="width: 250px"
-            >
-              <el-option
-                v-for="(name, code) in protocols"
-                :key="code"
-                :label="name + '(' + code + ')'"
-                :value="code"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="码率类型" prop="bitRateType">
-            <el-select
-              class="prefix"
-              v-model="form.bitRateType"
-              placeholder="请选择"
-              size="small"
-              style="width: 250px"
-            >
-              <el-option
-                v-for="(name, code) in bitRateTypes"
-                :key="code"
-                :label="name"
-                :value="code"
-              >
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="素材描述" prop="desc">
-            <el-input
-              type="textarea"
-              :rows="4"
-              placeholder="请输入素材描述"
-              :maxlength="200"
-              v-model="form.desc"
-            >
-            </el-input>
-          </el-form-item>
-        </template>
         <template v-else>
           <el-form-item label="素材类型" prop="typeCode">
             <el-select
@@ -461,7 +323,6 @@
               <el-option
                 v-for="item in [
                   { code: '在线网页', name: '在线网页' },
-                  { code: 'ipc', name: '网络摄像机' },
                   { code: '流媒体', name: '流媒体服务器' },
                 ]"
                 :key="item.code"
@@ -672,13 +533,8 @@ export default {
     },
     isStatic() {
       return (
-        this.form.typeCode !== "在线网页" &&
-        this.form.typeCode !== "流媒体" &&
-        this.form.typeCode !== "ipc"
+        this.form.typeCode !== "在线网页" && this.form.typeCode !== "流媒体"
       );
-    },
-    isIpc() {
-      return this.form.typeCode === "ipc";
     },
     rules() {
       return this.form.typeCode === "在线网页" ||
@@ -695,39 +551,6 @@ export default {
               { required: true, message: "请输入素材名称", trigger: "blur" },
             ],
             url: [{ required: true, message: "请输入url", trigger: "blur" }],
-            desc: [
-              { required: true, message: "请输入素材描述", trigger: "blur" },
-            ],
-          }
-        : this.form.typeCode === "ipc"
-        ? {
-            name: [
-              { required: true, message: "请输入素材名称", trigger: "blur" },
-            ],
-            ipType: [
-              { required: true, message: "请选择IP类型", trigger: "blur" },
-            ],
-            ipAddress: [
-              { required: true, message: "请输入IP地址", trigger: "blur" },
-            ],
-            port: [
-              { required: true, message: "请输入端口号", trigger: "blur" },
-            ],
-            channel: [
-              { required: true, message: "请输入通道号", trigger: "blur" },
-            ],
-            userName: [
-              { required: true, message: "请输入用户名", trigger: "blur" },
-            ],
-            password: [
-              { required: true, message: "请输入密码", trigger: "blur" },
-            ],
-            protocol: [
-              { required: true, message: "请选择传输协议", trigger: "blur" },
-            ],
-            bitRateType: [
-              { required: true, message: "请选择码率类型", trigger: "blur" },
-            ],
             desc: [
               { required: true, message: "请输入素材描述", trigger: "blur" },
             ],
@@ -882,28 +705,12 @@ export default {
       this.getList();
     },
     handleTypeCodeChange(val) {
-      if (val === "ipc") {
-        this.form = {
-          typeCode: val,
-          ipType: "IPV4",
-          ipAddress: "",
-          port: 554,
-          channel: "ch1",
-          userName: "",
-          password: "",
-          protocol: "TCP",
-          bitRateType: "main",
-          desc: "",
-        };
-      } else {
-        this.form = {
-          typeCode: val,
-          name: "",
-          url: "",
-          desc: "",
-        };
-      }
-
+      this.form = {
+        typeCode: val,
+        name: "",
+        url: "",
+        desc: "",
+      };
       this.$nextTick(() => {
         if (this.$refs.form) this.$refs.form.clearValidate();
       });
@@ -975,14 +782,6 @@ export default {
         desc,
         typeCode,
         url,
-        ipType,
-        ipAddress,
-        port,
-        channel,
-        userName,
-        password,
-        protocol,
-        bitRateType,
         statusCode,
       } = row;
       if (["流媒体", "在线网页"].includes(typeCode)) {
@@ -992,22 +791,6 @@ export default {
           typeCode,
           name,
           url,
-          desc,
-        };
-      } else if (typeCode === "ipc") {
-        this.isStaticForm = false;
-        this.form = {
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
           desc,
         };
       } else {
@@ -1075,44 +858,6 @@ export default {
           auditType,
           desc,
           code,
-        });
-        if (res.code !== "200") return this.$message.error(res.msg);
-        this.$message.success(res.msg);
-        if (!this.isEdit) {
-          this.reset();
-        }
-        this.getList();
-        this.showForm = false;
-      } else if (this.isIpc) {
-        const {
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
-          desc,
-        } = this.form;
-        const res = await (this.isEdit
-          ? MaterialApi.put
-          : MaterialApi.postDynamic)({
-          code,
-          typeCode,
-          name,
-          ipType,
-          ipAddress,
-          port,
-          channel,
-          userName,
-          password,
-          protocol,
-          bitRateType,
-          desc,
         });
         if (res.code !== "200") return this.$message.error(res.msg);
         this.$message.success(res.msg);
