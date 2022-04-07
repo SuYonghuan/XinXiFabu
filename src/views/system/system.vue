@@ -20,8 +20,8 @@
         <el-collapse-item title="时间段" name="1">
           <div
             class="grid-content"
-            v-if="timeList"
-            v-for="item of timeList.timeRelateList"
+            v-for="item of timeList ? timeList.timeRelateList : []"
+            :key="item.code"
           >
             <span>{{ item.beginTimeSlot }}-{{ item.endTimeSlot }}</span>
             <span>
@@ -31,6 +31,7 @@
                   v-for="item in timeArray"
                   :label="item.value"
                   :value="item.value"
+                  :key="item.value"
                 ></el-option>
               </el-select>
               分
@@ -43,49 +44,9 @@
       </el-collapse>
     </el-card>
 
-    <!--  素材到期时间  -->
-    <el-card class="box-card">
-      <div class="top-div">
-        <p>
-          素材到期提醒：提前
-          <el-input-number
-            v-model="programMonitorList.days"
-            :min="1"
-            :max="365"
-          ></el-input-number>
-          天 <span style="margin-left: 30px"></span> 提醒时间
-          <el-time-picker
-            arrow-control
-            v-model="programMonitorList.clockTime"
-            :picker-options="{
-              selectableRange: '00:00:00 - 23:59:59',
-            }"
-            :format="'HH:mm'"
-            :value-format="'HH:mm'"
-            placeholder="提醒时间"
-          >
-          </el-time-picker>
-          <span style="margin-left: 30px"></span>
-          提醒频率
-          <el-radio v-model="programMonitorList.repeatExecution" label="false"
-            >仅一次</el-radio
-          >
-          <el-radio v-model="programMonitorList.repeatExecution" label="true"
-            >每天一次</el-radio
-          >
-        </p>
-        <el-button
-          type="primary"
-          @click="submitPgForm()"
-          v-if="pageMenu.progSet"
-          >保存</el-button
-        >
-      </div>
-    </el-card>
-
     <!--  应用功能  -->
     <el-card class="box-card">
-      <p class="switch-p" v-for="item of moduleList">
+      <p class="switch-p" v-for="item of moduleList" :key="item.moduleName">
         {{ item.moduleName }}
         <el-switch
           v-model="item.isOpen"
@@ -137,8 +98,6 @@ import {
   setTimeRelate,
   ModulesSet,
   GetModuleList,
-  GetProgramMonitor,
-  SettingProgramMonitor,
 } from "http/api/system";
 import { ERR_OK } from "http/config";
 import { mapGetters } from "vuex";
@@ -191,7 +150,6 @@ export default {
   },
   created() {
     this.GetRolePermissions();
-    this.GetProgramMonitor();
     this.getTimeAxis();
     this.GetModuleList();
   },
@@ -247,17 +205,7 @@ export default {
         }
       });
     },
-    GetProgramMonitor() {
-      GetProgramMonitor({}).then((res) => {
-        if (res.code === ERR_OK) {
-          if (res.data) {
-            this.programMonitorList = res.data;
-            this.programMonitorList.repeatExecution = this.programMonitorList.repeatExecution.toString();
-          }
-          // console.log(this.programMonitorList)
-        }
-      });
-    },
+
     getTimeAxis() {
       const param = {
         MallCode: this.user.mallCode,
@@ -314,15 +262,7 @@ export default {
         this.$message.error(res.msg);
       });
     },
-    SettingProgramMonitor(param) {
-      SettingProgramMonitor(param).then((res) => {
-        if (res.code === ERR_OK) {
-          this.$message.success(res.msg);
-          return;
-        }
-        this.$message.error(res.msg);
-      });
-    },
+
     /**
      * End
      */
@@ -372,11 +312,6 @@ export default {
       if (item.isHas) {
         this.ModulesSet(item);
       }
-    },
-    //素材到期提醒
-    submitPgForm() {
-      this.programMonitorList.mallCode = this.user.mallCode;
-      this.SettingProgramMonitor(this.programMonitorList);
     },
   },
   computed: {
