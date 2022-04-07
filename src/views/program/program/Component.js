@@ -139,7 +139,6 @@ class SignComponent extends BaseComponent {
 }
 export const typeCodeClassMap = {
   audio: BaseComponent,
-  html: BaseComponent,
   stream: BaseComponent,
   video: BaseComponent,
   clock: ClockComponent,

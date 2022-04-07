@@ -857,8 +857,6 @@ export default {
           ? "音频"
           : file.type.includes("image")
           ? "图片"
-          : file.type === "text/html"
-          ? "html"
           : file.type === "text/plain"
           ? "文本"
           : file.name && file.name.toLowerCase().endsWith(".svga")
@@ -869,7 +867,7 @@ export default {
         return false;
       }
       const unit = type === "文本" ? "KB" : "MB";
-      const number = type === "文本" ? 5 : type === "html" ? 10 : 500;
+      const number = type === "文本" ? 5 : 500;
       const limit = (unit === "KB" ? 1024 : 1024 * 1024) * number;
       if (file.size > limit) {
         this.$message.error(`${type}大小不能超过 ${number}${unit}!`);

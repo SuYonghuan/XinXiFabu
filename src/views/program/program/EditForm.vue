@@ -489,15 +489,6 @@
                 @selectMat="openMaterialModal"
               ></mat-list>
             </template>
-            <template v-else-if="activeComponent.typeCode === 'html'">
-              <mat-list
-                :data="activeComponent.materials"
-                @preview="previewMat"
-                @remove="removeMaterial"
-                :limit="1"
-                @selectMat="openMaterialModal"
-              ></mat-list>
-            </template>
             <template
               v-else-if="
                 activeComponent.typeCode === 'text' ||
@@ -1113,7 +1104,6 @@ import svga from "../svga.vue";
 const logos = {
   audio: "#iconyinpin",
   clock: "#iconshijian",
-  html: "#iconHTML",
   svga: "#iconshipin",
   image: "#icontupian",
   stream: "#iconliumeiti",
@@ -1236,7 +1226,6 @@ export default {
         "video",
         "image",
         "text",
-        "html",
         "weather",
         "svga",
         "clock",

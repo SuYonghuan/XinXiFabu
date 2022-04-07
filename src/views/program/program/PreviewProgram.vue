@@ -222,15 +222,11 @@
           scrolling="no"
           class="component"
           v-else-if="
-            (component.typeCode === 'html' || component.typeCode === 'url') &&
+            component.typeCode === 'url' &&
               component.materials &&
               component.materials.length
           "
-          :src="
-            component.typeCode === 'html'
-              ? component.materials[0].fileUrl
-              : component.materials[0].url
-          "
+          :src="component.materials[0].url"
           :style="{
             top: component.offsetY + 'px',
             left: component.offsetX + 'px',
