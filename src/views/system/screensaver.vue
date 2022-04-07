@@ -20,33 +20,12 @@
           class="style-item"
           @click="clickStyle(index)"
           v-for="(item, index) of styleData"
+          :key="item.title"
           :class="{ 'style-active': active == index }"
         >
           <p class="style-title">{{ item.title }}</p>
           <div class="item-div">
             <img v-show="item.img" :src="item.img" alt="" />
-          </div>
-          <i class="el-icon-circle-check"></i>
-        </div>
-        <div
-          class="style-item"
-          @click="clickStyle(6)"
-          :class="{ 'style-active': active == 6 }"
-        >
-          <p class="style-title">提示图标样式自定义</p>
-          <div class="item-div">
-            <div @click.stop="">
-              <el-upload
-                class="avatar-uploader"
-                :action="config.url + config.uploadFile"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
-              >
-                <i class="el-icon-plus avatar-uploader-icon"></i>
-                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              </el-upload>
-            </div>
           </div>
           <i class="el-icon-circle-check"></i>
         </div>
@@ -57,6 +36,7 @@
           v-for="item of screenEffect"
           v-model="list.screenEffect"
           :label="item.value"
+          :key="item.value"
           >{{ item.label }}</el-radio
         >
       </p>
@@ -66,6 +46,7 @@
             v-for="item of effectType[0]"
             v-model="list.effectType"
             :label="item.value"
+            :key="item.value"
             >{{ item.label }}
           </el-radio>
         </p>
@@ -74,6 +55,7 @@
             v-for="item of effectType[1]"
             v-model="list.effectType"
             :label="item.value"
+            :key="item.value"
             >{{ item.label }}
           </el-radio>
         </p>
