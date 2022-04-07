@@ -149,6 +149,16 @@ const routes = [
         component: () => import("views/mall/map"),
       },
       {
+        path: "/mall/facilities",
+        name: "设施管理",
+        component: () => import("views/mall/facilities"),
+      },
+      {
+        path: "/mall/icons",
+        name: "图标管理",
+        component: () => import("views/mall/icons"),
+      },
+      {
         path: "/program/material",
         name: "素材管理",
         component: () => import("views/program/material"),
