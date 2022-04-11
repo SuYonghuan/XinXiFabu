@@ -7,41 +7,6 @@
         <el-breadcrumb-item>{{ presentMenu.textCH }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <el-dropdown trigger="click" style="width:20px" v-show="!autoAuth">
-      <el-badge
-        class="notice-badge"
-        style="width:20px;height:80px;"
-        :value="noticeData.count"
-        :hidden="noticeData.count < 1"
-      >
-        <img
-          style="position: absolute; top: 30px; width: 20px;"
-          src="./msg.svg"
-          @click="clickNoticeIcon"
-        />
-      </el-badge>
-      <el-dropdown-menu slot="dropdown" v-show="dropdownStatus">
-        <div class="notice-div">
-          <div class="notice-list">
-            <div
-              class="notice-item"
-              :key="item.code"
-              v-for="item of noticeData.list"
-            >
-              <p class="notice-title">
-                素材到期提醒
-                <i class="el-icon-close" @click="delNotice(item)"></i>
-              </p>
-              <p class="notice-content">{{ item.msg }}</p>
-            </div>
-          </div>
-          <p class="notice-txt">
-            <el-link type="primary" @click="clickNotice">前往通知中心</el-link>
-          </p>
-        </div>
-      </el-dropdown-menu>
-    </el-dropdown>
-    <div class="stick"></div>
     {{ user.nickName }}
     <el-dropdown
       trigger="click"
@@ -91,28 +56,9 @@ export default {
     ...mapGetters(["user", "presentMenu"]),
   },
   created() {
-    this.GetNoReadMessage();
     this.autoAuth = getCookie("autoauth") ? true : false;
   },
   methods: {
-    GetNoReadMessage() {
-      GetNoReadMessage({}).then((res) => {
-        if (res.code === ERR_OK) {
-          this.noticeData = res.data;
-          // console.log(res.data)
-        }
-      });
-    },
-    GetMessageInfo(param) {
-      GetMessageInfo(param).then((res) => {
-        if (res.code === ERR_OK) {
-          this.GetNoReadMessage();
-          this.$message.success("操作成功");
-          return;
-        }
-        this.$message.error(res.msg);
-      });
-    },
     cancel() {
       this.dialogFormVisible = false;
       this.resetForm();
@@ -151,19 +97,6 @@ export default {
         .catch(() => {
           console.log(this.user);
         });
-    },
-    //展开消息
-    clickNoticeIcon() {
-      this.dropdownStatus = !this.dropdownStatus;
-    },
-    //消息中心
-    clickNotice() {
-      this.dropdownStatus = true;
-      this.$router.push("/system/notice");
-    },
-    //删除消息
-    delNotice(item) {
-      this.GetMessageInfo({ Code: item.code });
     },
     //用户信息
     clickName() {
