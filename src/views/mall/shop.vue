@@ -25,6 +25,7 @@
               v-for="item in buildingList"
               :label="item.name"
               :value="item.code"
+              :key="item.code"
             ></el-option>
           </el-select>
           <span class="meta1">楼层</span>
@@ -38,8 +39,10 @@
               v-for="item in floorList"
               :label="item.name"
               :value="item.floorCode"
+              :key="item.floorCode"
             ></el-option>
           </el-select>
+
           <span class="meta1">业态</span>
           <el-select
             class="input1"
@@ -51,7 +54,50 @@
               v-for="item in formatList"
               :label="item.name"
               :value="item.code"
+              :key="item.code"
             ></el-option>
+          </el-select>
+          <span class="meta1">启用状态</span>
+          <el-select
+            class="input1"
+            size="small"
+            v-model="search.isShow"
+            placeholder="请选择"
+          >
+            <el-option
+              v-for="item in [
+                { name: '启用', code: true },
+                { name: '禁用', code: false },
+              ]"
+              :label="item.name"
+              :value="item.code"
+              :key="item.code"
+              clearable
+            ></el-option>
+          </el-select>
+          <span class="meta1">关键信息状况</span>
+          <el-select
+            size="small"
+            class="input1"
+            v-model="search.degree"
+            clearable
+            placeholder="关键信息状况"
+          >
+            <el-option
+              v-for="name in [
+                'Logo',
+                '宣传图',
+                '英文名称',
+                '中文简介',
+                '英文简介',
+                '标签',
+                '已完善',
+              ]"
+              :key="name"
+              :label="name === '已完善' ? '已完善' : '缺' + name"
+              :value="name"
+            >
+            </el-option>
           </el-select>
 
           <div class="btn1" @click="onSearch">
@@ -101,6 +147,11 @@
       <el-table-column prop="floorName" label="所属楼层"></el-table-column>
       <el-table-column prop="houseNum" label="门牌号"></el-table-column>
       <el-table-column prop="phone" label="联系方式"></el-table-column>
+      <el-table-column
+        prop="degree"
+        key="degree"
+        label="关键信息状况"
+      ></el-table-column>
       <el-table-column label="启用状态">
         <template slot-scope="scope">
           <el-switch
@@ -240,6 +291,7 @@
               v-for="item in formatList"
               :label="item.name"
               :value="item.code"
+              :key="item.code"
             ></el-option>
           </el-select>
           <el-select
@@ -252,6 +304,7 @@
               v-for="item in formatInfo.child"
               :label="item.name"
               :value="item.code"
+              :key="item.code"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -265,6 +318,7 @@
               v-for="item in buildingList"
               :label="item.name"
               :value="item.code"
+              :key="item.code"
             ></el-option>
           </el-select>
           <el-select
@@ -277,6 +331,7 @@
               v-for="item in floorList"
               :label="item.name"
               :value="item.floorCode"
+              :key="item.floorCode"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -287,6 +342,7 @@
               v-for="item in regionList"
               :label="item.areaName"
               :value="item.code"
+              :key="item.code"
             ></el-option>
           </el-select>
         </el-form-item>
@@ -370,7 +426,7 @@
       <el-form label-width="60">
         <el-form-item>
           <div>
-            <div v-for="items of labelList">
+            <div v-for="items of labelList" :key="items.name">
               <p>{{ items.name }}</p>
               <el-checkbox
                 class="checkbox-div"
@@ -378,6 +434,7 @@
                 v-model="labelActive"
                 :disabled="item.type"
                 :label="item.code"
+                :key="item.code"
                 border
               >
                 {{ item.name }}
@@ -518,6 +575,8 @@ export default {
         FloorCode: this.search.FloorCode,
         BuildingCode: this.search.BuildingCode,
         ShopFormatCode: this.search.ShopFormatCode,
+        degree: this.search.degree,
+        isShow: this.search.isShow,
         MallCode: this.user.mallCode,
         UserName: this.user.accountName,
         Paging: 1,
