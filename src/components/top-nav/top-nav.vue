@@ -34,8 +34,6 @@
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { delCookie, getCookie } from "common/js/cookie";
-import { GetNoReadMessage, GetMessageInfo } from "http/api/login";
-import { ERR_OK } from "http/config";
 
 export default {
   name: "navcon",
@@ -105,11 +103,6 @@ export default {
     ...mapMutations({
       setuser: "SET_USER",
     }),
-  },
-  watch: {
-    $route(val) {
-      this.GetNoReadMessage();
-    },
   },
 };
 </script>

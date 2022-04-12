@@ -335,6 +335,7 @@ body,
     line-height: 44px;
     color: #868f9f;
     margin-right: 16px;
+    white-space: nowrap;
   }
   .input1 {
     height: 44px;

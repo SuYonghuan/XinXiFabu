@@ -104,6 +104,11 @@ const routes = [
         component: () => import("views/device/device-group"),
       },
       {
+        path: "/device/app-manager",
+        name: "安装包管理",
+        component: () => import("views/device/app-manager"),
+      },
+      {
         path: "/app/app-list",
         name: "我的应用",
         component: () => import("views/app/app-list"),
