@@ -143,6 +143,17 @@
         label="上传时间"
         :formatter="dateFormatter"
       ></el-table-column>
+      <el-table-column prop="sub" key="sub" label="副广告绑定">
+        <template slot-scope="scope">
+          <el-link
+            @click="
+              bindMaterial = scope.row;
+              showBindModal = true;
+            "
+            >{{ scope.row.shopName || "绑定" }}</el-link
+          >
+        </template></el-table-column
+      >
       <el-table-column prop="desc" key="desc" label="描述">
         <template slot-scope="scope">
           <el-popover trigger="hover" placement="top">
@@ -467,6 +478,13 @@
         "
       ></edit-form>
     </el-dialog>
+    <el-dialog :visible.sync="showBindModal" class="material-shop">
+      <material-shop
+        v-if="showBindModal"
+        :material="bindMaterial"
+        @change="getList"
+      ></material-shop>
+    </el-dialog>
   </table-page>
 </template>
 
@@ -477,8 +495,9 @@ import { GetRolePermissions } from "http/api/program";
 import { ERR_OK } from "http/config";
 import EditForm from "./program/EditForm.vue";
 import svga from "./svga.vue";
+import MaterialShop from "./material/MaterialShop.vue";
 export default {
-  components: { EditForm, svga },
+  components: { EditForm, svga, MaterialShop },
   data() {
     return {
       name: "",
@@ -520,6 +539,8 @@ export default {
       editCode: null,
       progMaterialCode: null,
       selectedProgs: [],
+      showBindModal: false,
+      bindMaterial: null,
     };
   },
   computed: {
@@ -959,7 +980,11 @@ export default {
   },
 };
 </script>
-
+<style>
+.material-shop .el-dialog {
+  background: #f6f6f6;
+}
+</style>
 <style scoped lang="scss">
 .gap {
   margin: 20px auto;
