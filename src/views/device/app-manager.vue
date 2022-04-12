@@ -343,6 +343,24 @@
       class="app-dev-modal"
     >
       <div style="background:#f6f6f6">
+        <div style="display: flex">
+          <span class="meta1">设备名称</span>
+          <el-input
+            class="input1"
+            v-model="appDevName"
+            placeholder="请输入设备名称"
+            size="small"
+            clearable
+            @keyup.enter.native="getAppDevList"
+          >
+          </el-input>
+          <div class="btn1" @click="getAppDevList">
+            <svg class="icon" aria-hidden="true">
+              <use xlink:href="#iconsousuo"></use>
+            </svg>
+          </div>
+        </div>
+
         <el-table :data="appDevs">
           <el-table-column
             prop="devNum"
@@ -462,6 +480,7 @@ export default {
       appToPublish: null,
       showAppDevModal: false,
       appVersionCode: null,
+      appDevName: "",
       appDevs: [],
       appDevPageSize: 10,
       appDevTotal: 0,
@@ -510,9 +529,15 @@ export default {
 
   methods: {
     async getAppDevList() {
-      const { appDevPageIndex, appDevPageSize, appVersionCode } = this;
+      const {
+        appDevPageIndex,
+        appDevPageSize,
+        appVersionCode,
+        appDevName,
+      } = this;
       const { code, data, msg } = await API.publishedDevList({
         versionCode: appVersionCode,
+        name: appDevName,
         paging: 1,
         pageIndex: appDevPageIndex,
         pageSize: appDevPageSize,
@@ -535,6 +560,7 @@ export default {
       this.appDevPageIndex = 1;
       this.appDevTotal = 0;
       this.appDevPageSize = 10;
+      this.appDevName = "";
       await this.getAppDevList();
       this.showAppDevModal = true;
     },
