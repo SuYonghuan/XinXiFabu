@@ -59,6 +59,23 @@
       </div>
     </el-card>
 
+    <el-card class="box-card">
+      <div class="device-card-title">
+        设备更新信息
+      </div>
+      <div class="grid">
+        <div>APP更新时间：{{ deviceInfo.versionInfo.appUpdateTime }}</div>
+        <div>APP更新状态：{{ deviceInfo.versionInfo.appUpdateState }}</div>
+        <div>APP更新版本：{{ deviceInfo.versionInfo.appVersion }}</div>
+        <div>
+          应用更新时间：{{ deviceInfo.versionInfo.applicationUpdateTime }}
+        </div>
+        <div>
+          应用更新状态：{{ deviceInfo.versionInfo.applicationUpdateState }}
+        </div>
+        <div>应用更新版本：{{ deviceInfo.versionInfo.applicationVersion }}</div>
+      </div>
+    </el-card>
     <el-tabs
       value="1"
       type="border-card"
@@ -243,6 +260,7 @@ export default {
       };
       GetDeviceInfo(param).then((res) => {
         if (res.code === ERR_OK) {
+          console.log(res.data);
           this.deviceInfo = res.data;
           Config.getMapInfo(
             (res) => {
@@ -422,8 +440,6 @@ export default {
   }
 
   .top-card {
-    margin-top: 40px;
-
     .device-card {
       display: flex;
       justify-content: space-between;
@@ -440,7 +456,11 @@ export default {
       }
     }
   }
-
+  .grid {
+    display: grid;
+    width: 60%;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
   .detail-table {
     div {
       height: 40px;
