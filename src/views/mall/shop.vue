@@ -1,138 +1,135 @@
 <template>
-  <table-page>
+  <table-page class="shop-page">
     <template v-slot:header>
-      <el-row class="gap" type="flex" justify="space-between">
-        <el-col style="display:flex;">
-          <span class="meta1">店铺名称</span>
-          <el-input
-            class="input1"
-            v-model="search.Name"
-            placeholder="店铺名称、店铺编号"
-            size="small"
-            :clearable="true"
-            @keyup.enter.native="onSearch"
-          >
-          </el-input>
-          <span class="meta1">楼栋</span>
-          <el-select
-            class="input1"
-            size="small"
-            v-model="search.BuildingCode"
-            placeholder="请选择"
-            @change="changeBuilding1()"
-          >
-            <el-option
-              v-for="item in buildingList"
-              :label="item.name"
-              :value="item.code"
-              :key="item.code"
-            ></el-option>
-          </el-select>
-          <span class="meta1">楼层</span>
-          <el-select
-            class="input1"
-            size="small"
-            v-model="search.FloorCode"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in floorList"
-              :label="item.name"
-              :value="item.floorCode"
-              :key="item.floorCode"
-            ></el-option>
-          </el-select>
+      <div style="display:flex">
+        <span class="meta1">店铺名称</span>
+        <el-input
+          class="input1"
+          v-model="search.Name"
+          placeholder="店铺名称、店铺编号"
+          size="small"
+          :clearable="true"
+          style="flex: 0 0 170px;"
+          @keyup.enter.native="onSearch"
+        >
+        </el-input>
+        <span class="meta1">楼栋</span>
+        <el-select
+          class="input1"
+          size="small"
+          v-model="search.BuildingCode"
+          placeholder="请选择"
+          @change="changeBuilding1()"
+        >
+          <el-option
+            v-for="item in buildingList"
+            :label="item.name"
+            :value="item.code"
+            :key="item.code"
+          ></el-option>
+        </el-select>
+        <span class="meta1">楼层</span>
+        <el-select
+          class="input1"
+          size="small"
+          v-model="search.FloorCode"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in floorList"
+            :label="item.name"
+            :value="item.floorCode"
+            :key="item.floorCode"
+          ></el-option>
+        </el-select>
 
-          <span class="meta1">业态</span>
-          <el-select
-            class="input1"
-            size="small"
-            v-model="search.ShopFormatCode"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in formatList"
-              :label="item.name"
-              :value="item.code"
-              :key="item.code"
-            ></el-option>
-          </el-select>
-          <span class="meta1">启用状态</span>
-          <el-select
-            class="input1"
-            size="small"
-            v-model="search.isShow"
-            placeholder="请选择"
-          >
-            <el-option
-              v-for="item in [
-                { name: '启用', code: true },
-                { name: '禁用', code: false },
-              ]"
-              :label="item.name"
-              :value="item.code"
-              :key="item.code"
-              clearable
-            ></el-option>
-          </el-select>
-          <span class="meta1">关键信息状况</span>
-          <el-select
-            size="small"
-            class="input1"
-            v-model="search.degree"
+        <span class="meta1">业态</span>
+        <el-select
+          class="input1"
+          size="small"
+          v-model="search.ShopFormatCode"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in formatList"
+            :label="item.name"
+            :value="item.code"
+            :key="item.code"
+          ></el-option>
+        </el-select>
+        <span class="meta1">启用状态</span>
+        <el-select
+          class="input1"
+          size="small"
+          v-model="search.isShow"
+          placeholder="请选择"
+          clearable
+        >
+          <el-option
+            v-for="item in [
+              { name: '启用', code: true },
+              { name: '禁用', code: false },
+            ]"
+            :label="item.name"
+            :value="item.code"
+            :key="item.code"
             clearable
-            placeholder="关键信息状况"
+          ></el-option>
+        </el-select>
+        <span class="meta1">关键信息状况</span>
+        <el-select
+          size="small"
+          class="input1"
+          v-model="search.degree"
+          clearable
+          placeholder="关键信息状况"
+        >
+          <el-option
+            v-for="name in [
+              'Logo',
+              '英文名称',
+              '中文简介',
+              '英文简介',
+              '已完善',
+            ]"
+            :key="name"
+            :label="name === '已完善' ? '已完善' : '缺' + name"
+            :value="name"
           >
-            <el-option
-              v-for="name in [
-                'Logo',
-                '宣传图',
-                '英文名称',
-                '中文简介',
-                '英文简介',
-                '标签',
-                '已完善',
-              ]"
-              :key="name"
-              :label="name === '已完善' ? '已完善' : '缺' + name"
-              :value="name"
-            >
-            </el-option>
-          </el-select>
+          </el-option>
+        </el-select>
 
-          <div class="btn1" @click="onSearch">
-            <svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconsousuo"></use>
-            </svg>
-          </div>
-          <div class="btn1" @click="replaySearch">
-            <svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconqingchu"></use>
-            </svg>
-          </div>
-        </el-col>
-        <div style="width: 400px;display:flex;justify-content: flex-end;">
-          <el-button
-            class="svg-suffix"
-            type="primary"
-            v-if="pageMenu.addShop"
-            @click="handleEdit({})"
-            ><svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconjia"></use></svg
-            >新增</el-button
-          >
-          <span
-            class="btn1"
-            v-if="pageMenu.syndata"
-            style="margin-left:8px;"
-            @click="handleSysData()"
-          >
-            <svg class="icon" aria-hidden="true">
-              <use xlink:href="#iconshuaxin"></use>
-            </svg>
-          </span>
+        <div class="btn1" @click="onSearch">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconsousuo"></use>
+          </svg>
         </div>
-      </el-row>
+        <div class="btn1" @click="replaySearch">
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconqingchu"></use>
+          </svg>
+        </div>
+        <el-button
+          class="svg-suffix"
+          type="primary"
+          v-if="pageMenu.addShop"
+          style="margin-left: 8px;"
+          @click="handleEdit({})"
+          ><svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconjia"></use></svg
+          >新增</el-button
+        >
+        <span
+          class="btn1"
+          v-if="pageMenu.syndata"
+          style="margin-left:8px;"
+          @click="handleSysData()"
+        >
+          <svg class="icon" aria-hidden="true">
+            <use xlink:href="#iconshuaxin"></use>
+          </svg>
+        </span>
+      </div>
     </template>
 
     <!--  表格  -->
@@ -143,16 +140,32 @@
     >
       <el-table-column prop="name" label="店铺名称"></el-table-column>
       <el-table-column prop="nameEn" label="英文名称"></el-table-column>
-      <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
-      <el-table-column prop="floorName" label="所属楼层"></el-table-column>
-      <el-table-column prop="houseNum" label="门牌号"></el-table-column>
-      <el-table-column prop="phone" label="联系方式"></el-table-column>
+      <el-table-column
+        prop="shopFormat"
+        label="所属业态"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        prop="floorName"
+        label="所属楼层"
+        width="100"
+      ></el-table-column>
+      <el-table-column
+        prop="houseNum"
+        label="门牌号"
+        width="150"
+      ></el-table-column>
+      <el-table-column
+        prop="phone"
+        label="联系方式"
+        width="100"
+      ></el-table-column>
       <el-table-column
         prop="degree"
         key="degree"
         label="关键信息状况"
       ></el-table-column>
-      <el-table-column label="启用状态">
+      <el-table-column label="启用状态" width="80">
         <template slot-scope="scope">
           <el-switch
             :value="scope.row.isShow"
@@ -161,7 +174,7 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="220">
         <template slot-scope="scope">
           <el-button
             type="primary"
@@ -1048,8 +1061,24 @@ export default {
   },
 };
 </script>
-
-<style scoped>
+<style lang="scss">
+#app {
+  .shop-page {
+    .meta1 {
+      margin-right: 8px;
+    }
+    .input1 {
+      flex: 1;
+      width: auto;
+      margin-right: 8px;
+      input {
+        width: 100%;
+      }
+    }
+  }
+}
+</style>
+<style scoped lang="scss">
 .gap {
   margin: 20px auto;
 }

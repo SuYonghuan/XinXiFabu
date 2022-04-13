@@ -164,15 +164,7 @@ export const ShopFormatDel = (param) =>
   );
 
 //获取品牌数据列表
-export const PageShopList = (param) =>
-  post(
-    `${
-      store.state.config.mallYunUrl
-    }/API/Shop/PageShopList?token=${encodeURIComponent(
-      mergeWordAndTimeStamp("/API/Shop/PageShopList")
-    )}&time=${timeStamp()}`,
-    param
-  );
+export const PageShopList = cPostForYun("/API/Shop/PageShopList");
 
 //添加品牌数据
 export const ShopAdd = (param) =>
