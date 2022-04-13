@@ -9,13 +9,33 @@
         :label="type.k"
       ></el-option>
     </el-select>
-
-    <el-tree
+    <div
       v-if="deviceQueryType === 'group'"
-      :data="devices"
-      show-checkbox
-      @check="handleDeviceCheck"
-    ></el-tree>
+      style="width: 50%;padding-top: 10px;"
+    >
+      <div
+        v-for="group in devices"
+        :key="group.label"
+        style="display: flex;align-items: baseline;"
+      >
+        <el-checkbox
+          style="flex: 0 0 20px"
+          @change="handleGroupCheckChange($event, group)"
+        >
+        </el-checkbox>
+        <el-collapse style="flex: 1">
+          <el-collapse-item>
+            <template slot="title">
+              {{ group.label }}
+            </template>
+            <div v-for="device in group.children" :key="device.code">
+              {{ device.label }}
+            </div>
+          </el-collapse-item></el-collapse
+        >
+      </div>
+    </div>
+
     <el-transfer
       v-else
       filterable
@@ -33,7 +53,9 @@
       <el-button @click="$emit('closeForm')">取 消</el-button>
       <el-button
         type="primary"
-        :disabled="!selectedDevices.length"
+        :disabled="
+          deviceQueryType ? !selectedGroups.length : !selectedDevices.length
+        "
         @click="submit"
         >发 布</el-button
       >
@@ -48,6 +70,7 @@ export default {
     return {
       devices: [],
       selectedDevices: [],
+      selectedGroups: [],
       pageIndex: 1,
       total: 0,
       deviceQueryType: "group",
@@ -57,7 +80,7 @@ export default {
       ],
     };
   },
-  props: ["showForm", "resolutions", "schedule"],
+  props: ["showForm", "schedule"],
   computed: {
     resolution() {
       return !this.schedule ? null : this.schedule.resolution;
@@ -77,6 +100,10 @@ export default {
     filterMethod(query, item) {
       return item.label.indexOf(query) > -1;
     },
+    handleGroupCheckChange(isChecked, group) {
+      if (isChecked) this.selectedGroups = [...this.selectedGroups, group];
+      else this.selectedGroups = this.selectedGroups.filter((g) => g !== group);
+    },
     handleDeviceCheck(_, { checkedNodes }) {
       this.selectedDevices = checkedNodes.filter(({ children }) => !children);
     },
@@ -87,6 +114,7 @@ export default {
     async init() {
       this.devices = [];
       this.selectedDevices = [];
+      this.selectedGroups = [];
       await Promise.all([this.getDevices()]);
     },
     dateFormatter(row) {
@@ -95,12 +123,12 @@ export default {
       return `${date} ${time}`;
     },
     async getDevices() {
-      const { deviceQueryType, resolution } = this;
+      const { deviceQueryType, schedule } = this;
       this.devices = [];
       this.selectedDevices = [];
       const { code, data, msg } = await ScheduleApi.getDeviceList({
+        scheduleCode: schedule.code,
         searchMode: deviceQueryType,
-        resolution,
       });
       if (code == "200") {
         this.devices = !deviceQueryType
@@ -121,9 +149,17 @@ export default {
       }
     },
     async submit() {
-      const { selectedDevices, schedule, deviceQueryType } = this;
+      const {
+        selectedDevices,
+        selectedGroups,
+        schedule,
+        deviceQueryType,
+      } = this;
       const devices = deviceQueryType
-        ? selectedDevices.map(({ code }) => code)
+        ? selectedGroups.reduce(
+            (acc, nxt) => [...acc, ...nxt.children.map(({ code }) => code)],
+            []
+          )
         : selectedDevices;
       const { code, msg } = await ScheduleApi.publish({
         schedule: schedule.code,
