@@ -138,7 +138,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["config", "presentMenu"]),
+    ...mapGetters(["config", "presentMenu", "user"]),
     uploadUrl() {
       return this.config.fileUrl + this.config.uploadFile;
     },
@@ -179,6 +179,7 @@ export default {
           },
         });
         const { code, msg } = await api.put({
+          mallCode: this.user.mallCode,
           name,
           themeCode: theme.code,
         });
@@ -189,6 +190,7 @@ export default {
     },
     async submit() {
       const { code, msg } = await api.putIcon({
+        mallCode: this.user.mallCode,
         themeCode: this.theme.code,
         objCode: this.form.objCode,
         filePath: this.form.fileList[0].name,
@@ -231,6 +233,7 @@ export default {
           },
         });
         const { code, msg } = await api.post({
+          mallCode: this.user.mallCode,
           themeName,
           sourceCode: theme.code,
         });
@@ -246,6 +249,7 @@ export default {
           cancelButtonText: "取消",
         });
         const { code, msg } = await api.delete({
+          mallCode: this.user.mallCode,
           codes: [theme.code],
         });
         if (code !== "200")
@@ -261,6 +265,7 @@ export default {
     },
     async getList() {
       const { code, data, msg } = await api.get({
+        mallCode: this.user.mallCode,
         dataType: this.typeCode,
         paging: 0,
       });
