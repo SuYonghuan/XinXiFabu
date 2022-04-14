@@ -74,6 +74,17 @@
             />
           </el-select>
         </el-form-item>
+        <span class="meta1">有效期</span>
+        <el-date-picker
+          style="flex: 1"
+          v-model="form.duration"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="yyyy-MM-dd"
+        >
+        </el-date-picker>
       </el-col>
       <el-col class="right">
         <div style="flex: 1"></div>
@@ -1065,6 +1076,9 @@ export default {
             );
             this.currentPlayList = this.form.playList[0];
           }
+          if (this.form.beginTime) {
+            this.form.duration = [this.form.beginTime, this.form.endTime];
+          }
         } else this.$message({ type: "error", message: msg });
       }
       await this.getPrograms();
@@ -1081,6 +1095,7 @@ export default {
         timeIntervals,
         playList,
         ranges,
+        duration,
       } = this.form;
       return {
         code,
@@ -1088,6 +1103,12 @@ export default {
         playMode,
         desc,
         resolution,
+        ...(duration
+          ? {
+              beginTime: duration[0],
+              endTime: duration[1],
+            }
+          : {}),
         ...(playMode === "carousel"
           ? {
               playList: playList.map(({ dateType, programmes, range }) => ({
@@ -1197,11 +1218,15 @@ export default {
       padding-right: 10px;
       flex: 1;
       display: flex;
+      align-items: center;
+      .el-form-item__label {
+        display: inline-flex;
+      }
       .el-form-item__content {
         vertical-align: middle;
       }
       .el-form-item {
-        flex: 1 1 25%;
+        flex: 1;
         display: flex;
         margin: auto;
       }
@@ -1212,6 +1237,7 @@ export default {
         font-size: 12px;
         color: #868f9f;
         margin-right: 4px;
+        white-space: nowrap;
       }
       .input1 {
         max-width: 200px;

@@ -54,7 +54,7 @@
         key="selection"
         type="selection"
         width="55"
-        :selectable="(row) => !row.deviceCount"
+        :selectable="(row) => row.pubState !== 1"
       ></el-table-column>
       <el-table-column type="index" key="index"></el-table-column>
       <el-table-column
@@ -109,10 +109,10 @@
           >
             <schedule-devices :code="scope.row.code"></schedule-devices>
             <el-link :underline="false" type="primary" slot="reference">
-              已发布
+              {{ scope.row.pubState === 1 ? "已发布" : "已过期" }}
             </el-link>
           </el-popover>
-          <div v-else>待发布</div>
+          <div v-else>{{ scope.row.pubState === 0 ? "未发布" : "已过期" }}</div>
         </template>
       </el-table-column>
       <el-table-column

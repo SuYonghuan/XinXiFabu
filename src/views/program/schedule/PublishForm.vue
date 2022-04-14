@@ -26,7 +26,7 @@
         <el-collapse style="flex: 1">
           <el-collapse-item>
             <template slot="title">
-              {{ group.label }}
+              {{ group.label }}<span v-if="group.isSyn">【同屏】</span>
             </template>
             <div v-for="device in group.children" :key="device.code">
               {{ device.label }}
@@ -137,8 +137,9 @@ export default {
               key: code,
               floorName,
             }))
-          : data.map(({ groupByName, devices }) => ({
+          : data.map(({ groupByName, isSyn, devices }) => ({
               label: groupByName,
+              isSyn,
               children: devices.map((device) => ({
                 ...device,
                 label: device.devNum,
