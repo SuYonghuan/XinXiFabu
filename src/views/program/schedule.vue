@@ -99,17 +99,17 @@
         key="creator"
         label="创建者"
       ></el-table-column>
-      <el-table-column prop="deviceCount" key="deviceCount" label="日程状态">
+      <el-table-column prop="pubState" key="pubState" label="日程状态">
         <template slot-scope="scope">
           <el-popover
-            v-if="scope.row.deviceCount > 0"
+            v-if="scope.row.pubState === 1"
             trigger="click"
             placement="bottom"
             width="550"
           >
             <schedule-devices :code="scope.row.code"></schedule-devices>
             <el-link :underline="false" type="primary" slot="reference">
-              {{ scope.row.pubState === 1 ? "已发布" : "已过期" }}
+              已发布
             </el-link>
           </el-popover>
           <div v-else>{{ scope.row.pubState === 0 ? "未发布" : "已过期" }}</div>
