@@ -1029,7 +1029,7 @@ export default {
           code: this.code,
         });
         if (code == "200") {
-          this.form = data;
+          this.form = { ...data };
           if (this.form.timeIntervals) {
             if (this.form.playMode === "customize") {
               this.form.ranges = this.form.timeIntervals.reduce(
@@ -1077,7 +1077,10 @@ export default {
             this.currentPlayList = this.form.playList[0];
           }
           if (this.form.beginTime) {
-            this.form.duration = [this.form.beginTime, this.form.endTime];
+            this.form = {
+              ...this.form,
+              duration: [this.form.beginTime, this.form.endTime],
+            };
           }
         } else this.$message({ type: "error", message: msg });
       }
