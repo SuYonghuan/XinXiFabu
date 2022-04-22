@@ -1,9 +1,9 @@
 <template>
   <div>
     <H2>
-      副广告绑定
+      富广告绑定
       <el-popover trigger="hover" placement="top">
-        仅开启人脸功能用户可使用副广告功能
+        仅开启人脸功能用户可使用富广告功能
         <span
           slot="reference"
           style="white-space: nowrap;text-overflow: ellipsis;overflow: hidden;"

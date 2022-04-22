@@ -143,7 +143,7 @@
         label="上传时间"
         :formatter="dateFormatter"
       ></el-table-column>
-      <el-table-column prop="sub" key="sub" label="副广告绑定">
+      <el-table-column prop="sub" key="sub" label="富广告绑定">
         <template slot-scope="scope">
           <el-link
             @click="
