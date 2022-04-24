@@ -326,7 +326,6 @@ ul {
 
   .page-collections-wrap {
     padding-top: 30px;
-    width: 120%;
     text-align: left;
     min-height: 700px;
     .block-collection {
