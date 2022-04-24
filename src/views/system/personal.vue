@@ -35,8 +35,8 @@
       </div>
       <el-divider></el-divider>
       <div class="content-p">
-        <div>
-          <p class="content-t" style="position: absolute">网站logo</p>
+        <div style="display: flex;">
+          <p class="content-t">网站logo</p>
           <el-upload
             class="avatar-uploader"
             :action="config.url + config.uploadFile"
@@ -431,7 +431,8 @@ export default {
 };
 </script>
 
-<style>
+<style></style>
+<style scoped lang="scss">
 .avatar-uploader-icon {
   font-size: 20px;
   color: #8c939d;
@@ -446,8 +447,6 @@ export default {
   height: 40px;
   display: block;
 }
-</style>
-<style scoped lang="scss">
 .box-card {
   margin-top: 40px;
 
