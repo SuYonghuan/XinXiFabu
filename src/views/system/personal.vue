@@ -432,23 +432,6 @@ export default {
 </script>
 
 <style>
-.avatar-uploader {
-  margin-left: 100px;
-  height: 43px;
-}
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-}
-
-.avatar-uploader .el-upload:hover {
-  border-color: #409eff;
-}
-
 .avatar-uploader-icon {
   font-size: 20px;
   color: #8c939d;
