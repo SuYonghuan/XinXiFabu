@@ -886,7 +886,7 @@
     margin-left: 10px;
   }
 
-  /deep/.el-textarea .el-input__count{
+  ::v-deep .el-textarea .el-input__count{
     height: 12px;
     line-height: 12px;
   }
