@@ -140,7 +140,7 @@ export default {
   computed: {
     ...mapGetters(["config", "presentMenu", "user"]),
     uploadUrl() {
-      return this.config.fileUrl + this.config.uploadFile;
+      return this.config.fileUrl + this.config.yunUpdateFile;
     },
     typeCode() {
       return nameTypeCodeMap[this.activeName];
