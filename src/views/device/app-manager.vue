@@ -5,7 +5,7 @@
         style="display: flex;justify-content: space-between;align-items: center;"
       >
         <div style="display:inline-flex">
-          <span class="meta1">应用名称</span>
+          <span class="meta1">安装包名称</span>
           <el-input
             class="input1"
             v-model="name"
@@ -110,7 +110,7 @@
       <el-table-column
         prop="name"
         key="name"
-        label="应用名称"
+        label="安装包名称"
       ></el-table-column>
       <el-table-column prop="logo" label="logo">
         <template slot-scope="scope">
