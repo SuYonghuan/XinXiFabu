@@ -304,6 +304,7 @@ export default {
       GetDeviceList(param).then((res) => {
         if (res.code === ERR_OK) {
           this.staffList = res.data;
+          this.selectedStaffList = this.staffList.includeDevice;
         }
       });
     },
