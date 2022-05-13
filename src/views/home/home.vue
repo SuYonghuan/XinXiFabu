@@ -112,13 +112,11 @@ export default {
           {
             name: "故障设备",
             type: "line",
-            stack: "总量",
             data: this.chartData.faultDev,
           },
           {
             name: "正常设备",
             type: "line",
-            stack: "总量",
             data: this.chartData.runDev,
           },
         ],
