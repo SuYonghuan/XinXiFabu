@@ -37,38 +37,32 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="关联店铺数量">
-        <template slot-scope="scope">
-          {{ scope.row.shopCount }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="name" label="子业态">
-        <template slot-scope="scope">
-          {{ scope.row.childCount }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="name" label="业态颜色">
+      <el-table-column prop="shopCount" label="关联店铺数量"></el-table-column>
+      <el-table-column prop="childCount" label="子业态"> </el-table-column>
+      <el-table-column prop="color" label="业态颜色">
         <template slot-scope="scope">
           <div
+            v-if="scope.row.color"
             class="color-div"
-            :style="`background-color: ${scope.row.color}`"
+            :style="'background:' + scope.row.color"
           ></div>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="边框颜色">
+      <el-table-column prop="borderColor" key="borderColor" label="边框颜色">
         <template slot-scope="scope">
           <div
+            v-if="scope.row.borderColor"
             class="color-div"
-            :style="`background-color: ${scope.row.borderColor}`"
+            :style="'background:' + scope.row.borderColor"
           ></div>
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="修改时间">
+      <el-table-column prop="addTime" label="修改时间">
         <template slot-scope="scope">{{
           timestampToTime(scope.row.addTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作"  width="120px">
+      <el-table-column label="操作" width="120px">
         <template slot-scope="scope">
           <el-tooltip
             transition="none"
@@ -123,16 +117,14 @@
       >
       <!--  分页  -->
       <pagination
-      :list="tableData"
-      :total="total"
-      :page="currentPage"
-      :pageSize="pageSize"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    ></pagination>
+        :list="tableData"
+        :total="total"
+        :page="currentPage"
+        :pageSize="pageSize"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      ></pagination>
     </el-row>
-    <el-dialog
-
 
     <!--  图片放大  -->
     <div class="max-img" v-show="maxImg" @click="maxDiv">
@@ -205,7 +197,11 @@
         </el-tab-pane>
         <el-tab-pane label="子级业态" name="子级业态">
           <el-form :label-width="'120px'" ref="childForm">
-            <el-row :gutter="20" v-for="(item, index) of childForm">
+            <el-row
+              :gutter="20"
+              v-for="(item, index) of childForm"
+              :key="item.Name"
+            >
               <el-col :span="10">
                 <div class="grid-content bg-purple">
                   <el-form-item label="业态名称">
@@ -575,7 +571,6 @@ export default {
 </script>
 
 <style>
-
 .avatar {
   width: 178px;
   height: 178px;
