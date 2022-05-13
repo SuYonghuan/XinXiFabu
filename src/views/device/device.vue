@@ -341,7 +341,11 @@
         :rules="rules1"
         ref="editForm"
       >
-        <el-form-item label="开机时间" prop="bootTime">
+        <el-form-item
+          label="开机时间"
+          prop="bootTime"
+          v-if="!(downType === 2 && editForm.systemType === 'Windows')"
+        >
           <el-time-picker
             v-model="editForm.bootTime"
             :format="'HH:mm'"
