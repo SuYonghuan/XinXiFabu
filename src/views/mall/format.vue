@@ -512,8 +512,7 @@ export default {
             }
             const param = {
               Codes: ids,
-              UserName: "saasyun",
-              MallCode: "b233c544-3d1d-4000-b2d1-1c3fef570079",
+              MallCode: this.user.mallCode,
             };
             this.ShopFormatDel(param);
           })
