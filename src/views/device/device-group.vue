@@ -555,6 +555,7 @@ export default {
         this.dialogTitle = "编辑";
         this.dialogType = true;
       } else {
+        if (this.deviceForm.code) delete this.deviceForm.code;
         this.deviceForm.gName =
           this.dateFormat("yyyy-mm-dd hh:ii:ss") + " 新建节目组";
         this.deviceForm.screenInfoCode = this.searchDeviceList[0].code;
