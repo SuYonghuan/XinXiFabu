@@ -32,11 +32,11 @@
           {{ scope.row.shopCount }}
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="子业态">
+      <!-- <el-table-column prop="name" label="子业态">
         <template slot-scope="scope">
           {{ scope.row.childCount }}
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="name" label="业态颜色">
         <template slot-scope="scope">
           <div class="color-div" :style="`background-color: ${scope.row.color}`"></div>
@@ -73,7 +73,7 @@
     <el-dialog :title="dialogTitle" :visible.sync="dialogVisible" width="50%" :before-close="handleClose"
                append-to-body>
       <el-tabs type="border-card" v-model="tabDefa">
-        <el-tab-pane label="父级业态" name="父级业态">
+        <el-tab-pane label="业态" name="父级业态">
           <el-form :label-width="'120px'" :model="editForm" :rules="rules" ref="editForm">
             <el-form-item label="业态名称" prop="name">
               <el-input type="text" v-model="editForm.name" maxlength="8" placeholder="请输入业态名称"></el-input>
@@ -104,7 +104,7 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-        <el-tab-pane label="子级业态" name="子级业态">
+        <!-- <el-tab-pane label="子级业态" name="子级业态">
           <el-form :label-width="'120px'" ref="childForm">
             <el-row :gutter="20" v-for="(item,index) of childForm">
               <el-col :span="10">
@@ -129,7 +129,7 @@
             </el-row>
           </el-form>
           <el-button type="success" style="width: 100%" @click="addChild">添加子业态</el-button>
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
 
       <span slot="footer" class="dialog-footer">

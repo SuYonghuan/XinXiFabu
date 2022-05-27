@@ -42,7 +42,7 @@
     <!--  表格  -->
     <el-table :data="tableData" style="width: 100%;" height="620">
       <el-table-column prop="name" label="店铺名称"></el-table-column>
-      <el-table-column prop="nameEn" label="英文名称"></el-table-column>
+      <!-- <el-table-column prop="nameEn" label="英文名称"></el-table-column> -->
       <el-table-column prop="shopFormat" label="所属业态"></el-table-column>
       <el-table-column prop="floorName" label="所属楼层"></el-table-column>
       <el-table-column prop="houseNum" label="门牌号"></el-table-column>
@@ -102,16 +102,16 @@
                   :value-key="'name'"
                   @select="handleSelect"
           ></el-autocomplete>
-          <el-input type="text" v-model="editForm.nameEn" style="width: 40%;margin-left: 10px;"
-                    placeholder="请输入英文商铺名称"></el-input>
+          <!-- <el-input type="text" v-model="editForm.nameEn" style="width: 40%;margin-left: 10px;"
+                    placeholder="请输入英文商铺名称"></el-input> -->
         </el-form-item>
         <el-form-item label="所属业态" prop="shopFormat">
           <el-select v-model="editForm.shopFormat" placeholder="请选择业态" @change="changeFormat()">
             <el-option v-for="item in formatList" :label="item.name" :value="item.code"></el-option>
           </el-select>
-          <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态" @change="changeFloor()">
+          <!-- <el-select v-model="editForm.secFormat" style="margin-left: 10px;" placeholder="请选择子业态" @change="changeFloor()">
             <el-option v-for="item in formatInfo.child" :label="item.name" :value="item.code"></el-option>
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item label="所属楼栋楼层" prop="floorCode">
           <el-select v-model="editForm.buildingCode" placeholder="请选择楼栋" @change="changeBuilding()">
@@ -121,21 +121,21 @@
             <el-option v-for="item in floorList" :label="item.name" :value="item.floorCode"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属区域" prop="areaCode">
+        <!-- <el-form-item label="所属区域" prop="areaCode">
           <el-select v-model="editForm.areaCode" placeholder="请选择区域">
             <el-option label="暂无区域" value=""></el-option>
             <el-option v-for="item in regionList" :label="item.areaName" :value="item.code"></el-option>
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="门牌号" prop="houseNum">
           <el-input type="text" v-model="editForm.houseNum" class="" placeholder="请输入门牌号"></el-input>
         </el-form-item>
         <el-form-item label="联系方式" prop="phone">
           <el-input type="text" v-model="editForm.phone" class="" placeholder="请输入联系方式"></el-input>
         </el-form-item>
-        <el-form-item label="营业时间" prop="businessHours">
+        <!-- <el-form-item label="营业时间" prop="businessHours">
           <el-input type="text" v-model="editForm.businessHours" class="" placeholder="请输入营业时间"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="商铺LOGO" prop="logo">
           <el-upload
                   class="avatar-uploader"
@@ -150,8 +150,8 @@
         <el-form-item label="简介" prop="intro">
           <el-input type="textarea" style="width: 40%;" rows="5" maxlength="2000" :show-word-limit="true"
                     v-model="editForm.intro" placeholder="请输入中文简介"></el-input>
-          <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5" maxlength="2000" :show-word-limit="true"
-                    v-model="editForm.introEn" placeholder="请输入英文简介"></el-input>
+          <!-- <el-input type="textarea" style="width: 40%;margin-left: 10px;" rows="5" maxlength="2000" :show-word-limit="true"
+                    v-model="editForm.introEn" placeholder="请输入英文简介"></el-input> -->
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">

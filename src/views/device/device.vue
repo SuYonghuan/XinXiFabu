@@ -92,7 +92,13 @@
       <el-table-column prop="floor" label="楼栋/楼层"></el-table-column>
       <el-table-column label="设备所在组">
         <template slot-scope="scope">
-          {{ scope.row.groupList.length }}
+          <el-popover placement="top-start" v-show="scope.row.deviceType == '触摸屏' && scope.row.systemType == 'Windows'"
+                      trigger="hover">
+            <div>
+              <p v-for="item of scope.row.groupList" :key="item.code">{{ item.gName }}</p>
+            </div>
+            <p slot="reference">{{ scope.row.groupList.length }}</p>
+          </el-popover>
         </template>
       </el-table-column>
       <el-table-column prop="bootTime" label="开机时间"></el-table-column>
