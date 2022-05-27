@@ -575,7 +575,7 @@
                     :key="key"
                     :value="key"
                     :label="key"
-                    v-for="key in ['自动', '固定', '从右往左']"
+                    v-for="key in ['自动', '固定', '从左往右']"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -2123,6 +2123,7 @@ export default {
         this.init();
       } else {
         this.form = null;
+        this.guideLineHelper = null;
       }
     },
     "form.backgroundMaterial"(val) {
