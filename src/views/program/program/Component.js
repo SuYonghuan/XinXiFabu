@@ -76,7 +76,7 @@ class TextComponent extends BaseComponent {
       typeCode === "signTxt_time" ||
       typeCode === "signTxt_name"
         ? "自动"
-        : "从左往右";
+        : "从右往左";
     this.materials = [];
   }
 }

@@ -88,7 +88,12 @@
               {{ componentTypes[code] }}
             </div>
           </el-popover>
-          <div class="btn" :key="code" v-else @click="appendComponent(code)">
+          <div
+            class="btn"
+            :key="code + 'else'"
+            v-else
+            @click="appendComponent(code)"
+          >
             <svg class="icon" aria-hidden="true">
               <use :xlink:href="logos[code]"></use>
             </svg>
@@ -575,7 +580,7 @@
                     :key="key"
                     :value="key"
                     :label="key"
-                    v-for="key in ['自动', '固定', '从左往右']"
+                    v-for="key in ['自动', '固定', '从右往左']"
                   ></el-option>
                 </el-select>
               </el-form-item>
