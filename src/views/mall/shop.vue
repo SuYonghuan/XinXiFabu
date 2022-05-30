@@ -130,6 +130,9 @@
         <el-form-item label="门牌号" prop="houseNum">
           <el-input type="text" v-model="editForm.houseNum" class="" placeholder="请输入门牌号"></el-input>
         </el-form-item>
+        <el-form-item label="猫酷ID" prop="McShopID">
+          <el-input type="text" v-model="editForm.McShopID" class="" placeholder="请输入猫酷ID"></el-input>
+        </el-form-item>
         <el-form-item label="联系方式" prop="phone">
           <el-input type="text" v-model="editForm.phone" class="" placeholder="请输入联系方式"></el-input>
         </el-form-item>
@@ -608,7 +611,8 @@
 							"IntroEN": this.editForm.introEn,
 							"MallCode": this.user.mallCode,
 							"UserName": this.user.accountName,
-							"BrandCode": ""
+							"BrandCode": "",
+							"McShopID": this.editForm.McShopID,
 						}
 
 						if (this.editForm.code) {
@@ -886,7 +890,7 @@
     margin-left: 10px;
   }
 
-  /deep/.el-textarea .el-input__count{
+  ::v-deep .el-textarea .el-input__count{
     height: 12px;
     line-height: 12px;
   }
